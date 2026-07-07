@@ -1,0 +1,236 @@
+@model BusinessDashboardViewModel
+@using System.Globalization
+@using DukkanPilot.Core.Enums
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["Subtitle"] = Model.BusinessName;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+@if (!Model.Subscription.HasValidSubscription)
+{
+    <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <strong>Aboneliğiniz aktif değil.</strong> Yönetim modülleri kısıtlandı.
+        </div>
+        @if (Model.IsBusinessOwner)
+        {
+            <a href="/Business/Billing" class="btn btn-sm btn-warning">Abonelik durumunu görüntüle</a>
+        }
+        else
+        {
+            <span class="small text-muted">İşletme sahibinizle iletişime geçin.</span>
+        }
+    </div>
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Hoş Geldiniz — @Model.BusinessName</h2>
+        <p class="text-muted mb-0">Menü ve işletme performans özeti</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/QrMenu" class="btn btn-outline-primary">QR Menü Yönet</a>
+        <a href="/Business/Reports" class="btn btn-outline-primary">Raporları Gör</a>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Abonelik Özeti</h3>
+        @if (Model.IsBusinessOwner)
+        {
+            <a href="/Business/Billing" class="btn btn-sm btn-outline-primary">Detay</a>
+        }
+    </div>
+    <div class="panel-card-body">
+        <dl class="row mb-0 small">
+            <dt class="col-sm-3 col-md-2">Plan</dt>
+            <dd class="col-sm-9 col-md-4 fw-semibold">@Model.Subscription.PlanName</dd>
+            <dt class="col-sm-3 col-md-2">Durum</dt>
+            <dd class="col-sm-9 col-md-4">
+                <span class="badge @Model.Subscription.StatusCssClass">@Model.Subscription.StatusText</span>
+            </dd>
+            <dt class="col-sm-3 col-md-2">Kalan Gün</dt>
+            <dd class="col-sm-9 col-md-4">
+                @(Model.Subscription.DaysRemaining.HasValue ? $"{Model.Subscription.DaysRemaining} gün" : "Süresiz")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Kategori</div>
+            <div class="stat-value">@Model.TotalCategoryCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Kategori</div>
+            <div class="stat-value">@Model.ActiveCategoryCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Ürün</div>
+            <div class="stat-value">@Model.TotalProductCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Ürün</div>
+            <div class="stat-value">@Model.ActiveProductCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Sipariş</div>
+            <div class="stat-value">@Model.TotalOrderCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Müşteri</div>
+            <div class="stat-value">@Model.TotalCustomerCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Müşteri</div>
+            <div class="stat-value">@Model.ActiveCustomerCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Son Siparişler</h3>
+                <a href="/Business/Orders" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sipariş No</th>
+                                <th>Müşteri</th>
+                                <th>Tutar</th>
+                                <th>Durum</th>
+                                <th>Tarih</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.RecentOrders.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Henüz sipariş yok.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var order in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@order.OrderNumber</td>
+                                    <td>@(order.CustomerName ?? "-")</td>
+                                    <td>@order.TotalAmount.ToString("N2", culture) ₺</td>
+                                    <td>
+                                        <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(order.Status)">
+                                            @OrderDisplayHelper.GetStatusLabel(order.Status)
+                                        </span>
+                                    </td>
+                                    <td>@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                                    <td class="text-end">
+                                        <a href="/Business/Orders/Details/@order.Id" class="btn btn-sm btn-outline-primary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Hızlı Erişim</h3>
+            </div>
+            <div class="panel-card-body d-flex flex-wrap gap-2">
+                <a href="/Business/Categories" class="btn btn-outline-primary">Kategoriler</a>
+                <a href="/Business/Categories/Create" class="btn btn-outline-primary">Yeni Kategori</a>
+                <a href="/m/demo-kafe" class="btn btn-outline-primary" target="_blank" rel="noopener">QR Menüyü Gör</a>
+                <a href="/Business/Products" class="btn btn-outline-primary">Ürünler</a>
+                <a href="/Business/Products/Create" class="btn btn-outline-primary">Yeni Ürün</a>
+                <a href="/Business/Orders" class="btn btn-outline-primary">Siparişler</a>
+                <a href="/Business/Customers" class="btn btn-outline-primary">Müşteriler</a>
+                <a href="/Business/Loyalty" class="btn btn-outline-primary">Sadakat</a>
+                <a href="/Business/Reports" class="btn btn-outline-primary">Raporlar</a>
+                <a href="/Business/QrMenu" class="btn btn-outline-primary">QR Kodunu İndir</a>
+            </div>
+        </div>
+        <div class="panel-card mt-4">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Sadakat Özeti</h3>
+                <a href="/Business/Loyalty" class="btn btn-sm btn-outline-primary">Detay</a>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-7">Toplam Aktif Müşteri Puanı</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.LoyaltySummary.TotalActiveCustomerPoints</dd>
+                    <dt class="col-7">Son Puan Hareketi</dt>
+                    <dd class="col-5 text-end">
+                        @(Model.LoyaltySummary.LastTransactionDate.HasValue
+                            ? Model.LoyaltySummary.LastTransactionDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                            : "-")
+                    </dd>
+                    <dt class="col-7">Aktif Sadakat Kuralı</dt>
+                    <dd class="col-5 text-end">
+                        @if (Model.LoyaltySummary.HasActiveLoyaltyRule)
+                        {
+                            <span class="badge bg-success">Var</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Yok</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <div class="panel-card mt-4">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Kampanya Özeti</h3>
+                <a href="/Business/Campaigns" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-7">Toplam Kampanya</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.CampaignSummary.TotalCampaignCount</dd>
+                    <dt class="col-7">Aktif Kampanya</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.CampaignSummary.ActiveCampaignCount</dd>
+                    <dt class="col-7">Yayında Olan</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.CampaignSummary.PublishedCampaignCount</dd>
+                    <dt class="col-7">En Yakın Bitiş</dt>
+                    <dd class="col-5 text-end">
+                        @if (!string.IsNullOrWhiteSpace(Model.CampaignSummary.NearestEndingCampaignTitle))
+                        {
+                            <span class="d-block fw-semibold">@Model.CampaignSummary.NearestEndingCampaignTitle</span>
+                            <span class="text-muted">@Model.CampaignSummary.NearestEndingCampaignEndDate!.Value.ToLocalTime().ToString("dd.MM.yyyy", culture)</span>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

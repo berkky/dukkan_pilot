@@ -1,0 +1,31 @@
+@model CategoryDetailsViewModel
+@{
+    ViewData["Title"] = "Kategori Detayı";
+    ViewData["Subtitle"] = Model.Name;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0">@Model.Name</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Id</dt><dd class="col-sm-9">@Model.Id</dd>
+            <dt class="col-sm-3">Sıra</dt><dd class="col-sm-9">@Model.SortOrder</dd>
+            <dt class="col-sm-3">Durum</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsActive) { <span class="badge bg-success">Aktif</span> }
+                else { <span class="badge bg-secondary">Pasif</span> }
+            </dd>
+            <dt class="col-sm-3">Toplam Ürün</dt><dd class="col-sm-9">@Model.ProductCount</dd>
+            <dt class="col-sm-3">Aktif Ürün</dt><dd class="col-sm-9">@Model.ActiveProductCount</dd>
+            <dt class="col-sm-3">Oluşturulma</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</dd>
+        </dl>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Ürün Düzenle";
+    ViewData["Subtitle"] = Model.Name;
+}
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            <input type="hidden" asp-for="Id" />
+            <partial name="_FormFields" model="Model" />
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">Güncelle</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

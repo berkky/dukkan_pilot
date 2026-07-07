@@ -1,0 +1,73 @@
+@model BusinessSubscriptionStatusViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Abonelik";
+    ViewData["Subtitle"] = "Abonelik durumu";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4 mb-1">Abonelik Durumu</h2>
+        <p class="text-muted mb-0">İşletmenizin plan ve abonelik bilgileri</p>
+    </div>
+    <a href="/Business/Dashboard" class="btn btn-outline-secondary">Dashboard</a>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Mevcut Abonelik</h3>
+        <span class="badge @Model.StatusCssClass">@Model.StatusText</span>
+    </div>
+    <div class="panel-card-body">
+        @if (Model.HasValidSubscription)
+        {
+            <div class="alert alert-success small">
+                @Model.Message
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning small">
+                @Model.Message Yönetim modüllerine erişim kısıtlanmıştır.
+            </div>
+        }
+
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Plan</dt>
+            <dd class="col-sm-8 fw-semibold">@Model.PlanName</dd>
+
+            <dt class="col-sm-4">Durum</dt>
+            <dd class="col-sm-8">
+                <span class="badge @Model.StatusCssClass">@Model.StatusText</span>
+                @if (Model.IsTrial)
+                {
+                    <span class="badge bg-info ms-1">Deneme</span>
+                }
+            </dd>
+
+            <dt class="col-sm-4">Başlangıç</dt>
+            <dd class="col-sm-8">
+                @(Model.StartDate.HasValue
+                    ? Model.StartDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                    : "-")
+            </dd>
+
+            <dt class="col-sm-4">Bitiş</dt>
+            <dd class="col-sm-8">
+                @(Model.EndDate.HasValue
+                    ? Model.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                    : "Süresiz")
+            </dd>
+
+            <dt class="col-sm-4">Kalan Gün</dt>
+            <dd class="col-sm-8">
+                @(Model.DaysRemaining.HasValue ? $"{Model.DaysRemaining} gün" : "Süresiz")
+            </dd>
+        </dl>
+
+        <div class="alert alert-light border small mt-4 mb-0">
+            Plan yükseltme ve ödeme entegrasyonu sonraki aşamada eklenecektir.
+        </div>
+    </div>
+</div>

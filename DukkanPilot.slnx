@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DukkanPilot.Core/DukkanPilot.Core.csproj" />
+    <Project Path="src/DukkanPilot.Infrastructure/DukkanPilot.Infrastructure.csproj" />
+    <Project Path="src/DukkanPilot.Web/DukkanPilot.Web.csproj" />
+  </Folder>
+</Solution>

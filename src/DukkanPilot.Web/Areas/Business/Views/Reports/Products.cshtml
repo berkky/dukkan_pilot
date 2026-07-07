@@ -1,0 +1,138 @@
+@model ProductReportViewModel
+@using System.Globalization
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Ürün Raporu";
+    ViewData["Subtitle"] = "Ürün satış analitiği";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var chartLabels = JsonSerializer.Serialize(Model.ChartProducts.Select(x => x.ProductName));
+    var chartValues = JsonSerializer.Serialize(Model.ChartProducts.Select(x => x.QuantitySold));
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Ürün Raporu</h2>
+        <p class="text-muted mb-0">Ürün satış performansı</p>
+    </div>
+</div>
+
+<partial name="_ReportNav" />
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Ürün</div>
+            <div class="stat-value">@Model.TotalProductCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Ürün</div>
+            <div class="stat-value">@Model.ActiveProductCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">En Çok Satan</div>
+            <div class="stat-value fs-6">@(Model.TopSellingProductName ?? "-")</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">En Yüksek Ciro</div>
+            <div class="stat-value fs-6">@(Model.TopRevenueProductName ?? "-")</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Top 10 Ürün</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ürün Adı</th>
+                                <th>Kategori</th>
+                                <th>Satılan Adet</th>
+                                <th>Toplam Ciro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.TopProducts.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Henüz satış verisi yok.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var product in Model.TopProducts)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@product.ProductName</td>
+                                    <td>@product.CategoryName</td>
+                                    <td>@product.QuantitySold</td>
+                                    <td>@product.TotalRevenue.ToString("N2", culture) ₺</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Top 5 Ürün Satış Adedi</h3>
+            </div>
+            <div class="panel-card-body">
+                @if (Model.ChartProducts.Any())
+                {
+                    <canvas id="productsChart" height="260"></canvas>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Grafik için yeterli veri yok.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (Model.ChartProducts.Any())
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ctx = document.getElementById('productsChart');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(chartLabels),
+                    datasets: [{
+                        label: 'Satış Adedi',
+                        data: @Html.Raw(chartValues),
+                        backgroundColor: 'rgba(25, 135, 84, 0.6)',
+                        borderColor: 'rgba(25, 135, 84, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        </script>
+    }
+}

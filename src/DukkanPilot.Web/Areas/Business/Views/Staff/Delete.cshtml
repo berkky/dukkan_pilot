@@ -1,0 +1,58 @@
+@model StaffDetailsViewModel
+
+@{
+    ViewData["Title"] = "Personel Pasif Yap";
+    ViewData["Subtitle"] = Model.FullName;
+    var isSelf = ViewData["IsSelf"] as bool? == true;
+}
+
+<div class="panel-card border-danger">
+    <div class="panel-card-header bg-danger-subtle">
+        <h3 class="h6 mb-0 text-danger">Personeli Pasif Yap</h3>
+    </div>
+    <div class="panel-card-body">
+        @if (isSelf)
+        {
+            <div class="alert alert-danger">
+                Kendi hesabınızı pasif duruma alamazsınız.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <strong>@Model.FullName</strong> personelini pasif duruma almak istediğinize emin misiniz?
+                Bu işlem veritabanından silme yapmaz; kullanıcı <code>IsActive = false</code> olarak işaretlenir ve giriş yapamaz.
+            </div>
+        }
+
+        <dl class="row mb-4">
+            <dt class="col-sm-3">E-posta</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Rol</dt>
+            <dd class="col-sm-9">
+                <span class="badge @StaffDisplayHelper.GetRoleBadgeClass(Model.BusinessRole)">
+                    @StaffDisplayHelper.GetRoleLabel(Model.BusinessRole)
+                </span>
+            </dd>
+
+            <dt class="col-sm-3">Durum</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsActive)
+                {
+                    <span class="badge bg-success">Aktif</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Zaten Pasif</span>
+                }
+            </dd>
+        </dl>
+
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger" @(Model.IsActive && !isSelf ? "" : "disabled")>Pasif Yap</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+        </form>
+    </div>
+</div>

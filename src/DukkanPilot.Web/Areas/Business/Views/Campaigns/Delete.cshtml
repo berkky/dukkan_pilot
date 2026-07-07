@@ -1,0 +1,42 @@
+@model CampaignDetailsViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Kampanya Pasif Yap";
+    ViewData["Subtitle"] = Model.Title;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="panel-card border-danger">
+    <div class="panel-card-header bg-danger-subtle">
+        <h3 class="h6 mb-0 text-danger">Kampanyayı Pasif Yap</h3>
+    </div>
+    <div class="panel-card-body">
+        <div class="alert alert-warning">
+            <strong>@Model.Title</strong> kampanyasını pasif duruma almak istediğinize emin misiniz?
+            Bu işlem veritabanından silme yapmaz; kampanya <code>IsActive = false</code> olarak işaretlenir.
+        </div>
+        <dl class="row mb-4">
+            <dt class="col-sm-3">Başlangıç</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</dd>
+            <dt class="col-sm-3">Bitiş</dt>
+            <dd class="col-sm-9">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</dd>
+            <dt class="col-sm-3">Durum</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsActive)
+                {
+                    <span class="badge bg-success">Aktif</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Zaten Pasif</span>
+                }
+            </dd>
+        </dl>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger" @(Model.IsActive ? "" : "disabled")>Pasif Yap</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+        </form>
+    </div>
+</div>
+

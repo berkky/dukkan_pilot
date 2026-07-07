@@ -1,0 +1,193 @@
+@model RewardDetailsViewModel
+
+@using System.Globalization
+
+@{
+
+    ViewData["Title"] = "Ödül Detayı";
+
+    ViewData["Subtitle"] = Model.Name;
+
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+
+}
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+
+    <h2 class="h4 mb-0">@Model.Name</h2>
+
+    <div class="d-flex gap-2">
+
+        @if (Model.IsActive)
+
+        {
+
+            <a asp-action="Redeem" asp-route-id="@Model.Id" class="btn btn-success">Ödülü Kullan</a>
+
+        }
+
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+
+    </div>
+
+</div>
+
+
+
+<div class="row g-4">
+
+    <div class="col-lg-5">
+
+        <div class="panel-card">
+
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+
+                <h3 class="h6 mb-0">Ödül Bilgileri</h3>
+
+                @if (Model.IsActive)
+
+                {
+
+                    <span class="badge bg-success">Aktif</span>
+
+                }
+
+                else
+
+                {
+
+                    <span class="badge bg-secondary">Pasif</span>
+
+                }
+
+            </div>
+
+            <div class="panel-card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-4">Ödül Adı</dt>
+
+                    <dd class="col-sm-8 fw-semibold">@Model.Name</dd>
+
+
+
+                    <dt class="col-sm-4">Gerekli Puan</dt>
+
+                    <dd class="col-sm-8">@Model.RequiredPoints puan</dd>
+
+
+
+                    <dt class="col-sm-4">Açıklama</dt>
+
+                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)</dd>
+
+
+
+                    <dt class="col-sm-4">Oluşturulma</dt>
+
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="col-lg-7">
+
+        <div class="panel-card">
+
+            <div class="panel-card-header">
+
+                <h3 class="h6 mb-0">Son Kullanımlar</h3>
+
+            </div>
+
+            <div class="panel-card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th>Tarih</th>
+
+                                <th>Müşteri</th>
+
+                                <th>Telefon</th>
+
+                                <th>Puan</th>
+
+                                <th>Açıklama</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        @if (!Model.RecentRedemptions.Any())
+
+                        {
+
+                            <tr>
+
+                                <td colspan="5" class="text-center text-muted py-4">Bu ödülle henüz kullanım yapılmadı.</td>
+
+                            </tr>
+
+                        }
+
+                        else
+
+                        {
+
+                            foreach (var item in Model.RecentRedemptions)
+
+                            {
+
+                                <tr>
+
+                                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+
+                                    <td class="fw-semibold">@item.CustomerName</td>
+
+                                    <td>@(item.CustomerPhone ?? "-")</td>
+
+                                    <td>@item.Points</td>
+
+                                    <td>@(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description)</td>
+
+                                </tr>
+
+                            }
+
+                        }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+

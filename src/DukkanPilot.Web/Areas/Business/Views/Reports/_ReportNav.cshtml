@@ -1,0 +1,6 @@
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="/Business/Reports" class="btn btn-sm @(ViewData["ActiveMenu"]?.ToString() == "reports" ? "btn-primary" : "btn-outline-primary")">Genel Özet</a>
+    <a href="/Business/Reports/Sales" class="btn btn-sm @(ViewData["ActiveMenu"]?.ToString() == "reports-sales" ? "btn-primary" : "btn-outline-primary")">Satış Raporu</a>
+    <a href="/Business/Reports/Products" class="btn btn-sm @(ViewData["ActiveMenu"]?.ToString() == "reports-products" ? "btn-primary" : "btn-outline-primary")">Ürün Raporu</a>
+    <a href="/Business/Reports/Customers" class="btn btn-sm @(ViewData["ActiveMenu"]?.ToString() == "reports-customers" ? "btn-primary" : "btn-outline-primary")">Müşteri Raporu</a>
+</div>

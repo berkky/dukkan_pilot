@@ -1,0 +1,69 @@
+@model IEnumerable<SubscriptionPlanFormViewModel>
+@{
+    ViewData["Title"] = "Abonelik Planları";
+    ViewData["Subtitle"] = "Plan tanımlarını yönetin";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4 mb-1">Abonelik Planları</h2>
+        <p class="text-muted mb-0">Free, Starter, Pro ve diğer planlar</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">+ Yeni Plan</a>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Plan Adı</th>
+                        <th>Fiyat</th>
+                        <th>Maks. Ürün</th>
+                        <th>Maks. Kampanya</th>
+                        <th>Durum</th>
+                        <th class="text-end">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Henüz plan kaydı yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var plan in Model)
+                    {
+                        <tr>
+                            <td>@plan.Id</td>
+                            <td class="fw-semibold">@plan.Name</td>
+                            <td>@plan.Price.ToString("N2") ₺</td>
+                            <td>@plan.MaxProducts</td>
+                            <td>@plan.MaxCampaigns</td>
+                            <td>
+                                @if (plan.IsActive)
+                                {
+                                    <span class="badge bg-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Pasif</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                <a asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                <a asp-action="Delete" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

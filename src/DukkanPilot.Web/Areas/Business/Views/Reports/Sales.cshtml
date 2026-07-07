@@ -1,0 +1,155 @@
+@model SalesReportViewModel
+@using System.Globalization
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Satış Raporu";
+    ViewData["Subtitle"] = "Satış analitiği";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var chartLabels = JsonSerializer.Serialize(Model.DailyChart.Select(x => x.Label));
+    var chartValues = JsonSerializer.Serialize(Model.DailyChart.Select(x => x.Revenue));
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Satış Raporu</h2>
+        <p class="text-muted mb-0">Sipariş ve ciro analizi</p>
+    </div>
+</div>
+
+<partial name="_ReportNav" />
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Bugünkü Satış</div>
+            <div class="stat-value fs-5">@Model.TodayRevenue.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Son 7 Gün Satış</div>
+            <div class="stat-value fs-5">@Model.Last7DaysRevenue.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Son 30 Gün Satış</div>
+            <div class="stat-value fs-5">@Model.Last30DaysRevenue.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Ort. Sipariş Tutarı</div>
+            <div class="stat-value fs-5">@Model.AverageOrderAmount.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Tamamlanan Sipariş</div>
+            <div class="stat-value">@Model.CompletedOrderCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Bekleyen Sipariş</div>
+            <div class="stat-value">@Model.PendingOrderCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">İptal Sipariş</div>
+            <div class="stat-value">@Model.CancelledOrderCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Son 20 Sipariş</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sipariş No</th>
+                                <th>Tarih</th>
+                                <th>Müşteri</th>
+                                <th>Tutar</th>
+                                <th>Durum</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.RecentOrders.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Henüz sipariş yok.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var order in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@order.OrderNumber</td>
+                                    <td>@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                                    <td>@(order.CustomerName ?? "-")</td>
+                                    <td>@order.TotalAmount.ToString("N2", culture) ₺</td>
+                                    <td>
+                                        <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(order.Status)">
+                                            @OrderDisplayHelper.GetStatusLabel(order.Status)
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="/Business/Orders/Details/@order.OrderId" class="btn btn-sm btn-outline-primary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Son 7 Gün Günlük Ciro</h3>
+            </div>
+            <div class="panel-card-body">
+                <canvas id="salesChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('salesChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(chartLabels),
+                datasets: [{
+                    label: 'Ciro (₺)',
+                    data: @Html.Raw(chartValues),
+                    backgroundColor: 'rgba(13, 110, 253, 0.6)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,115 @@
+﻿@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<section class="hero-section text-white">
+    <div class="container py-5">
+        <div class="row align-items-center py-lg-5">
+            <div class="col-lg-7">
+                <span class="badge hero-badge mb-3">SaaS · QR Menü · WhatsApp Sipariş</span>
+                <h1 class="display-5 fw-bold mb-3">İşletmenizi dijitalleştirin, siparişleri kolaylaştırın</h1>
+                <p class="lead mb-4 text-white-50">
+                    DükkanPilot; kafe, restoran ve küçük esnaf işletmeleri için QR menü,
+                    WhatsApp sipariş, müşteri takibi ve sadakat sistemi sunar.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-area="Business" asp-controller="Dashboard" asp-action="Index" class="btn btn-light btn-lg">
+                        İşletme Paneline Git
+                    </a>
+                    <a href="/m/demo-kafe" class="btn btn-outline-light btn-lg">
+                        Demo Menü
+                    </a>
+                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-light btn-lg">
+                        Yönetim Paneli
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 mt-5 mt-lg-0">
+                <div class="hero-card p-4">
+                    <h2 class="h5 mb-3">Neler sunuyoruz?</h2>
+                    <ul class="list-unstyled mb-0 hero-feature-list">
+                        <li>📱 Mobil uyumlu QR menü</li>
+                        <li>💬 WhatsApp ile hızlı sipariş</li>
+                        <li>⭐ Sadakat ve kampanya yönetimi</li>
+                        <li>📊 Basit ve anlaşılır raporlar</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="ozellikler" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h3 fw-bold">Temel Modüller</h2>
+            <p class="text-muted">MVP sürümünde adım adım devreye alınacak özellikler</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">📋</div>
+                    <h3 class="h5">Menü Yönetimi</h3>
+                    <p class="text-muted mb-0">Kategori ve ürünlerinizi kolayca yönetin, anında güncelleyin.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">📱</div>
+                    <h3 class="h5">QR Menü</h3>
+                    <p class="text-muted mb-0">Müşterileriniz masadan QR okutarak menünüze ulaşsın.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">💬</div>
+                    <h3 class="h5">WhatsApp Sipariş</h3>
+                    <p class="text-muted mb-0">Sepet oluşturup tek tıkla WhatsApp üzerinden sipariş verin.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">👤</div>
+                    <h3 class="h5">Müşteri Takibi</h3>
+                    <p class="text-muted mb-0">Müşteri kartları ve sipariş geçmişi ile ilişkinizi güçlendirin.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">⭐</div>
+                    <h3 class="h5">Sadakat Sistemi</h3>
+                    <p class="text-muted mb-0">Puan ve ödül kurallarıyla müşterilerinizi geri kazanın.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">🤖</div>
+                    <h3 class="h5">AI Kampanya Asistanı</h3>
+                    <p class="text-muted mb-0">İlerleyen sürümlerde yapay zeka destekli kampanya metinleri.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="cta-card text-center p-5">
+            <h2 class="h4 mb-3">Demo panelleri hazır</h2>
+            <p class="text-muted mb-4">
+                Proje iskeleti oluşturuldu. İşletme ve yönetim panellerini inceleyerek devam edebilirsiniz.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="/m/demo-kafe" class="btn btn-success">
+                    Demo QR Menü
+                </a>
+                <a asp-area="Business" asp-controller="Dashboard" asp-action="Index" class="btn btn-primary">
+                    İşletme Dashboard
+                </a>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-primary">
+                    Admin Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

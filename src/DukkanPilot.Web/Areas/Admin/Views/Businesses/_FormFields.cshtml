@@ -1,0 +1,52 @@
+@model BusinessFormViewModel
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <label asp-for="Name" class="form-label"></label>
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="Slug" class="form-label"></label>
+    <input asp-for="Slug" class="form-control" placeholder="ornek-isletme" />
+    <span asp-validation-for="Slug" class="text-danger small"></span>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="Phone" class="form-label"></label>
+    <input asp-for="Phone" class="form-control" />
+    <span asp-validation-for="Phone" class="text-danger small"></span>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="LogoUrl" class="form-label"></label>
+    <input asp-for="LogoUrl" class="form-control" />
+    <span asp-validation-for="LogoUrl" class="text-danger small"></span>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="WhatsAppNumber" class="form-label"></label>
+    <input asp-for="WhatsAppNumber" class="form-control" placeholder="905551234567" />
+    <span asp-validation-for="WhatsAppNumber" class="text-danger small"></span>
+  </div>
+  <div class="col-md-3">
+    <label asp-for="ThemeColor" class="form-label"></label>
+    <input asp-for="ThemeColor" type="color" class="form-control form-control-color w-100" />
+    <span asp-validation-for="ThemeColor" class="text-danger small"></span>
+  </div>
+  <div class="col-md-3">
+    <label asp-for="Currency" class="form-label"></label>
+    <input asp-for="Currency" class="form-control" />
+    <span asp-validation-for="Currency" class="text-danger small"></span>
+  </div>
+  <div class="col-md-6">
+    <label asp-for="SubscriptionPlanId" class="form-label"></label>
+    <select asp-for="SubscriptionPlanId" asp-items="Model.AvailablePlans" class="form-select">
+      <option value="">Plan seçiniz</option>
+    </select>
+    <span asp-validation-for="SubscriptionPlanId" class="text-danger small"></span>
+  </div>
+  <div class="col-md-6 d-flex align-items-end">
+    <div class="form-check">
+      <input asp-for="IsActive" class="form-check-input" />
+      <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+  </div>
+</div>

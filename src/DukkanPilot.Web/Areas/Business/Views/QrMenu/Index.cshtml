@@ -1,0 +1,123 @@
+@model QrMenuViewModel
+@{
+    ViewData["Title"] = "QR Menü";
+    ViewData["Subtitle"] = Model.BusinessName;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">QR Menü Yönetimi</h2>
+        <p class="text-muted mb-0">Dijital menü linki ve QR kod</p>
+    </div>
+    <a href="@Model.PublicMenuUrl" target="_blank" rel="noopener" class="btn btn-primary">Menüyü Aç</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Menü Bilgileri</h3>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-4">
+                    <dt class="col-sm-4">İşletme</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.BusinessName</dd>
+
+                    <dt class="col-sm-4">Slug</dt>
+                    <dd class="col-sm-8"><code>@Model.Slug</code></dd>
+
+                    <dt class="col-sm-4">Tema Rengi</dt>
+                    <dd class="col-sm-8">
+                        <span class="d-inline-block rounded-circle align-middle me-2"
+                              style="width: 16px; height: 16px; background-color: @Model.ThemeColor;"></span>
+                        @Model.ThemeColor
+                    </dd>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+                    {
+                        <dt class="col-sm-4">Logo</dt>
+                        <dd class="col-sm-8">
+                            <img src="@Model.LogoUrl" alt="@Model.BusinessName logo" class="img-thumbnail" style="max-height: 64px;" />
+                        </dd>
+                    }
+                </dl>
+
+                <label class="form-label fw-semibold">Public Menü URL</label>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" id="publicMenuUrl" value="@Model.PublicMenuUrl" readonly />
+                    <button type="button" class="btn btn-outline-primary" id="copyUrlBtn">Linki Kopyala</button>
+                </div>
+                <div id="copyFeedback" class="text-success small d-none">Kopyalandı!</div>
+                <p class="text-muted small mb-0 mt-3">
+                    Bu linki müşterilerinizle paylaşabilir veya QR kodu yazdırıp masalara koyabilirsiniz.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">QR Kod</h3>
+            </div>
+            <div class="panel-card-body text-center">
+                <div id="qrcode" class="d-inline-block p-3 bg-white border rounded mb-4"></div>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="@Model.PublicMenuUrl" target="_blank" rel="noopener" class="btn btn-outline-primary">
+                        Menüyü Aç
+                    </a>
+                    <button type="button" class="btn btn-success" id="downloadQrBtn">PNG İndir</button>
+                </div>
+                <p class="text-muted small mt-3 mb-0">
+                    QR kod tarandığında müşteriler doğrudan dijital menünüze yönlendirilir.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        (function () {
+            const menuUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PublicMenuUrl));
+            const downloadFileName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.QrDownloadFileName));
+
+            new QRCode(document.getElementById('qrcode'), {
+                text: menuUrl,
+                width: 220,
+                height: 220,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('copyUrlBtn').addEventListener('click', async function () {
+                const feedback = document.getElementById('copyFeedback');
+                try {
+                    await navigator.clipboard.writeText(menuUrl);
+                    feedback.classList.remove('d-none');
+                    setTimeout(function () { feedback.classList.add('d-none'); }, 2000);
+                } catch {
+                    const input = document.getElementById('publicMenuUrl');
+                    input.select();
+                    document.execCommand('copy');
+                    feedback.classList.remove('d-none');
+                    setTimeout(function () { feedback.classList.add('d-none'); }, 2000);
+                }
+            });
+
+            document.getElementById('downloadQrBtn').addEventListener('click', function () {
+                const canvas = document.querySelector('#qrcode canvas');
+                if (!canvas) {
+                    return;
+                }
+
+                const link = document.createElement('a');
+                link.download = downloadFileName;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,144 @@
+@model LoyaltyDashboardViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Sadakat";
+    ViewData["Subtitle"] = "Sadakat programı özeti";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Sadakat Programı</h2>
+        <p class="text-muted mb-0">Demo Kafe sadakat özeti</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="EditRule" class="btn btn-outline-primary">Kuralı Düzenle</a>
+        <a asp-action="Transactions" class="btn btn-outline-primary">Puan Hareketleri</a>
+        <a asp-action="AddTransaction" class="btn btn-primary">Manuel Puan İşlemi</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Kural</div>
+            <div class="stat-value fs-5">
+                @if (Model.HasActiveRule)
+                {
+                    <span class="badge bg-success">Var</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Yok</span>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Puan Oranı</div>
+            <div class="stat-value fs-5">
+                @(Model.PointsPerAmount.HasValue ? Model.PointsPerAmount.Value.ToString("0.##", culture) : "-")
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Müşteri</div>
+            <div class="stat-value">@Model.ActiveCustomerCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Dağıtılan Puan</div>
+            <div class="stat-value">@Model.TotalEarnedPoints</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Kullanılan Puan</div>
+            <div class="stat-value">@Model.TotalRedeemedPoints</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Ödül</div>
+            <div class="stat-value">@Model.ActiveRewardCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">En Düşük Ödül</div>
+            <div class="stat-value fs-6">
+                @if (Model.LowestActiveRewardPoints.HasValue)
+                {
+                    <span>@Model.LowestActiveRewardName (@Model.LowestActiveRewardPoints puan)</span>
+                }
+                else
+                {
+                    <span>-</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mb-4">
+    <a href="/Business/Rewards" class="btn btn-outline-primary">Ödülleri Yönet</a>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.RuleDescription))
+{
+    <div class="alert alert-info py-2 mb-4">
+        <strong>Aktif kural:</strong> @Model.RuleDescription
+    </div>
+}
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Son 10 Puan Hareketi</h3>
+        <a asp-action="Transactions" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
+    </div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Müşteri</th>
+                        <th>Telefon</th>
+                        <th>İşlem Tipi</th>
+                        <th>Puan</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.RecentTransactions.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Henüz puan hareketi yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.RecentTransactions)
+                    {
+                        <tr>
+                            <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                            <td class="fw-semibold">@item.CustomerName</td>
+                            <td>@(item.CustomerPhone ?? "-")</td>
+                            <td>
+                                <span class="badge @LoyaltyDisplayHelper.GetTypeBadgeClass(item.Type)">
+                                    @LoyaltyDisplayHelper.GetTypeLabel(item.Type)
+                                </span>
+                            </td>
+                            <td>@item.Points</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description)</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+@model IEnumerable<OrderListViewModel>
+
+@using System.Globalization
+
+@{
+
+    ViewData["Title"] = "Siparişler";
+
+    ViewData["Subtitle"] = "WhatsApp siparişleri";
+
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+
+}
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="h4 mb-1">Siparişler</h2>
+
+        <p class="text-muted mb-0">Demo Kafe sipariş listesi</p>
+
+    </div>
+
+</div>
+
+
+
+<div class="panel-card">
+
+    <div class="panel-card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>Sipariş No</th>
+
+                        <th>Müşteri Adı</th>
+
+                        <th>Müşteri Telefonu</th>
+
+                        <th>Toplam Tutar</th>
+
+                        <th>Durum</th>
+
+                        <th>Kaynak</th>
+
+                        <th>Oluşturulma Tarihi</th>
+
+                        <th class="text-end">İşlem</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                @if (!Model.Any())
+
+                {
+
+                    <tr>
+
+                        <td colspan="8" class="text-center text-muted py-4">Henüz sipariş yok.</td>
+
+                    </tr>
+
+                }
+
+                else
+
+                {
+
+                    foreach (var item in Model)
+
+                    {
+
+                        <tr>
+
+                            <td class="fw-semibold">@item.OrderNumber</td>
+
+                            <td>@(item.CustomerName ?? "-")</td>
+
+                            <td>@(item.CustomerPhone ?? "-")</td>
+
+                            <td>@item.TotalAmount.ToString("N2", culture) ₺</td>
+
+                            <td>
+
+                                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(item.Status)">
+
+                                    @OrderDisplayHelper.GetStatusLabel(item.Status)
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(item.Source)">
+
+                                    @OrderDisplayHelper.GetSourceLabel(item.Source)
+
+                                </span>
+
+                            </td>
+
+                            <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+
+                            <td class="text-end">
+
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+

@@ -1,0 +1,132 @@
+@{
+    var activeMenu = ViewData["ActiveMenu"] as string ?? string.Empty;
+}
+@using DukkanPilot.Core.Enums
+<aside class="business-sidebar">
+    <div class="sidebar-brand px-3 py-4">
+        <a href="/Business/Dashboard" class="text-decoration-none">
+            <span class="brand-icon">DP</span>
+            <span class="brand-text">DükkanPilot</span>
+        </a>
+        <small class="d-block text-muted mt-1 ps-1">İşletme Paneli · demo-kafe</small>
+    </div>
+
+    <nav class="sidebar-nav px-2">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "dashboard" ? "active" : "")" href="/Business/Dashboard">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </li>
+
+            <li class="sidebar-divider">Menü</li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "categories" ? "active" : "")" href="/Business/Categories">
+                    <span class="nav-icon">📋</span> Kategoriler
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "categories-create" ? "active" : "")" href="/Business/Categories/Create">
+                    <span class="nav-icon">➕</span> Yeni Kategori
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "products" ? "active" : "")" href="/Business/Products">
+                    <span class="nav-icon">🍽️</span> Ürünler
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "products-create" ? "active" : "")" href="/Business/Products/Create">
+                    <span class="nav-icon">➕</span> Yeni Ürün
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "qr-menu" ? "active" : "")" href="/Business/QrMenu">
+                    <span class="nav-icon">📱</span> QR Menü
+                </a>
+            </li>
+
+            <li class="sidebar-divider">Satış</li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "orders" ? "active" : "")" href="/Business/Orders">
+                    <span class="nav-icon">📦</span> Siparişler
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "customers" ? "active" : "")" href="/Business/Customers">
+                    <span class="nav-icon">👤</span> Müşteriler
+                </a>
+            </li>
+
+            <li class="sidebar-divider">Sadakat & Kampanya</li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "loyalty" ? "active" : "")" href="/Business/Loyalty">
+                    <span class="nav-icon">⭐</span> Sadakat
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "loyalty-transactions" ? "active" : "")" href="/Business/Loyalty/Transactions">
+                    <span class="nav-icon">📋</span> Puan Hareketleri
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "rewards" || activeMenu == "rewards-create" ? "active" : "")" href="/Business/Rewards">
+                    <span class="nav-icon">🎁</span> Ödüller
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "campaigns" || activeMenu == "campaigns-create" ? "active" : "")" href="/Business/Campaigns">
+                    <span class="nav-icon">🎯</span> Kampanyalar
+                </a>
+            </li>
+
+            <li class="sidebar-divider">Analiz</li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "reports" ? "active" : "")" href="/Business/Reports">
+                    <span class="nav-icon">📈</span> Raporlar
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "reports-sales" ? "active" : "")" href="/Business/Reports/Sales">
+                    <span class="nav-icon">💰</span> Satış Raporu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "reports-products" ? "active" : "")" href="/Business/Reports/Products">
+                    <span class="nav-icon">🍽️</span> Ürün Raporu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeMenu == "reports-customers" ? "active" : "")" href="/Business/Reports/Customers">
+                    <span class="nav-icon">👥</span> Müşteri Raporu
+                </a>
+            </li>
+
+            @if (User.IsInRole(nameof(UserRole.BusinessOwner)))
+            {
+                <li class="sidebar-divider">Yönetim</li>
+                <li class="nav-item">
+                    <a class="nav-link @(activeMenu == "billing" ? "active" : "")" href="/Business/Billing">
+                        <span class="nav-icon">💳</span> Abonelik
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(activeMenu == "staff" || activeMenu == "staff-create" ? "active" : "")" href="/Business/Staff">
+                        <span class="nav-icon">👥</span> Personel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(activeMenu == "staff-create" ? "active" : "")" href="/Business/Staff/Create">
+                        <span class="nav-icon">➕</span> Yeni Personel
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer px-3 py-3 mt-auto">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-outline-light btn-sm w-100">
+            ← Ana Sayfa
+        </a>
+    </div>
+</aside>

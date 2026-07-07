@@ -1,0 +1,45 @@
+@model LoyaltyRuleFormViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Sadakat Kuralı";
+    ViewData["Subtitle"] = "Kural düzenle";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4 mb-1">Sadakat Kuralı</h2>
+        <p class="text-muted mb-0">Örnek: Her 10 TL harcamada 1 puan</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Geri Dön</a>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <form asp-action="EditRule" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="PointsPerAmount" class="form-label"></label>
+                    <input asp-for="PointsPerAmount" class="form-control" step="0.01" />
+                    <div class="form-text">Minimum sipariş tutarı (10 TL) başına kazanılacak puan miktarı.</div>
+                    <span asp-validation-for="PointsPerAmount" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

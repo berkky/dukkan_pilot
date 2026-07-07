@@ -1,0 +1,64 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["Subtitle"] = "Platform genel görünümü";
+}
+
+<div class="page-header mb-4">
+    <h2 class="h4 mb-1">Platform Özeti</h2>
+    <p class="text-muted mb-0">Canlı veritabanı istatistikleri</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam İşletme</div>
+            <div class="stat-value">@Model.TotalBusinessCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Aktif İşletme</div>
+            <div class="stat-value">@Model.ActiveBusinessCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Plan</div>
+            <div class="stat-value">@Model.TotalPlanCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Abonelik</div>
+            <div class="stat-value">@Model.ActiveSubscriptionCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Ürün</div>
+            <div class="stat-value">@Model.TotalProductCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Sipariş</div>
+            <div class="stat-value">@Model.TotalOrderCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Hızlı Erişim</h3>
+            </div>
+            <div class="panel-card-body d-grid gap-2 d-md-flex">
+                <a href="/Admin/Businesses" class="btn btn-outline-primary">İşletmeler</a>
+                <a href="/Admin/Businesses/Create" class="btn btn-outline-primary">Yeni İşletme</a>
+                <a href="/Admin/SubscriptionPlans" class="btn btn-outline-secondary">Abonelik Planları</a>
+            </div>
+        </div>
+    </div>
+</div>

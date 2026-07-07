@@ -1,0 +1,37 @@
+@using DukkanPilot.Core.Enums
+@{
+    ViewData["Title"] = "Abonelik Gerekli";
+    ViewData["Subtitle"] = "Erişim kısıtlandı";
+    var isBusinessOwner = ViewData["IsBusinessOwner"] as bool? == true;
+}
+
+<div class="d-flex justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="panel-card border-warning">
+            <div class="panel-card-header bg-warning-subtle">
+                <h3 class="h6 mb-0 text-warning-emphasis">Abonelik Gerekli</h3>
+            </div>
+            <div class="panel-card-body">
+                @if (isBusinessOwner)
+                {
+                    <p class="mb-3">
+                        Aboneliğiniz aktif değil veya süresi dolmuş. Yönetim modüllerine erişim kısıtlandı.
+                        Abonelik durumunuzu kontrol edin.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="/Business/Billing" class="btn btn-primary">Abonelik Durumunu Görüntüle</a>
+                        <a href="/Business/Dashboard" class="btn btn-outline-secondary">Dashboard'a Dön</a>
+                    </div>
+                }
+                else
+                {
+                    <p class="mb-3">
+                        Bu işletmenin aboneliği aktif değil. Lütfen işletme sahibiyle iletişime geçin.
+                        Yönetim modüllerine erişim kısıtlandı.
+                    </p>
+                    <a href="/Business/Dashboard" class="btn btn-outline-secondary">Dashboard'a Dön</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

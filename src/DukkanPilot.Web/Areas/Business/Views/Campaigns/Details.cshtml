@@ -1,0 +1,59 @@
+@model CampaignDetailsViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Kampanya Detayı";
+    ViewData["Subtitle"] = Model.Title;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0">@Model.Title</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Başlık</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.Title</dd>
+
+            <dt class="col-sm-3">Açıklama</dt>
+            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)</dd>
+
+            <dt class="col-sm-3">Başlangıç Tarihi</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</dd>
+
+            <dt class="col-sm-3">Bitiş Tarihi</dt>
+            <dd class="col-sm-9">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</dd>
+
+            <dt class="col-sm-3">Durum</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsActive)
+                {
+                    <span class="badge bg-success">Aktif</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Pasif</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Yayın Durumu</dt>
+            <dd class="col-sm-9">
+                <span class="badge @CampaignDisplayHelper.GetPublishedBadgeClass(Model.IsPublished)">
+                    @CampaignDisplayHelper.GetPublishedLabel(Model.IsPublished)
+                </span>
+            </dd>
+
+            <dt class="col-sm-3">Oluşturulma</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+
+            <dt class="col-sm-3">Güncellenme</dt>
+            <dd class="col-sm-9">@(Model.UpdatedAt.HasValue ? Model.UpdatedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture) : "-")</dd>
+        </dl>
+    </div>
+</div>
+

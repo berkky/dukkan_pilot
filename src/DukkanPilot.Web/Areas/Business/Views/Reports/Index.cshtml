@@ -1,0 +1,97 @@
+@model ReportsOverviewViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Raporlar";
+    ViewData["Subtitle"] = "Genel özet";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Raporlar</h2>
+        <p class="text-muted mb-0">Demo Kafe işletme analitiği</p>
+    </div>
+</div>
+
+<partial name="_ReportNav" />
+
+<div class="row g-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Bugünkü Sipariş</div>
+            <div class="stat-value">@Model.TodayOrderCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Bugünkü Ciro</div>
+            <div class="stat-value fs-5">@Model.TodayRevenue.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Son 7 Gün Sipariş</div>
+            <div class="stat-value">@Model.Last7DaysOrderCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Son 7 Gün Ciro</div>
+            <div class="stat-value fs-5">@Model.Last7DaysRevenue.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Müşteri</div>
+            <div class="stat-value">@Model.TotalCustomerCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Ürün</div>
+            <div class="stat-value">@Model.TotalProductCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Kampanya</div>
+            <div class="stat-value">@Model.ActiveCampaignCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Dağıtılan Puan</div>
+            <div class="stat-value">@Model.TotalEarnedPoints</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-md-4">
+        <div class="panel-card h-100">
+            <div class="panel-card-body">
+                <h3 class="h6">Satış Raporu</h3>
+                <p class="text-muted small mb-3">Günlük ciro, sipariş durumları ve son siparişler.</p>
+                <a href="/Business/Reports/Sales" class="btn btn-outline-primary btn-sm">Satış Raporuna Git</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel-card h-100">
+            <div class="panel-card-body">
+                <h3 class="h6">Ürün Raporu</h3>
+                <p class="text-muted small mb-3">En çok satan ürünler ve ciro dağılımı.</p>
+                <a href="/Business/Reports/Products" class="btn btn-outline-primary btn-sm">Ürün Raporuna Git</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel-card h-100">
+            <div class="panel-card-body">
+                <h3 class="h6">Müşteri Raporu</h3>
+                <p class="text-muted small mb-3">En değerli müşteriler, harcama ve puan analizi.</p>
+                <a href="/Business/Reports/Customers" class="btn btn-outline-primary btn-sm">Müşteri Raporuna Git</a>
+            </div>
+        </div>
+    </div>
+</div>

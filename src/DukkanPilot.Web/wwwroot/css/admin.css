@@ -1,0 +1,90 @@
+.admin-body {
+    background: #f1f5f9;
+}
+
+.admin-wrapper {
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #0f172a;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.admin-sidebar .brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.5rem;
+    border-radius: 0.5rem;
+    background: #2563eb;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.admin-sidebar .brand-text {
+    color: #fff;
+    font-weight: 700;
+}
+
+.admin-sidebar .sidebar-divider {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    padding: 1rem 0.75rem 0.35rem;
+    margin-top: 0.25rem;
+}
+
+.admin-sidebar .nav-link {
+    color: #cbd5e1;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-sidebar .nav-link:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.admin-sidebar .nav-link.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+.admin-sidebar .nav-link.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.admin-navbar {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-main {
+    background: #f8fafc;
+}
+
+@media (max-width: 991.98px) {
+    .admin-wrapper {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+}

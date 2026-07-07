@@ -1,0 +1,298 @@
+@model CustomerDetailsViewModel
+
+@using System.Globalization
+
+@{
+
+    ViewData["Title"] = "Müşteri Detayı";
+
+    ViewData["Subtitle"] = Model.Name;
+
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+
+}
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="h4 mb-0">@Model.Name</h2>
+
+    <div class="d-flex gap-2">
+
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+
+    </div>
+
+</div>
+
+
+
+<div class="row g-4">
+
+    <div class="col-lg-5">
+
+        <div class="panel-card">
+
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+
+                <h3 class="h6 mb-0">Müşteri Bilgileri</h3>
+
+                @if (Model.IsActive)
+
+                {
+
+                    <span class="badge bg-success">Aktif</span>
+
+                }
+
+                else
+
+                {
+
+                    <span class="badge bg-secondary">Pasif</span>
+
+                }
+
+            </div>
+
+            <div class="panel-card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-4">Müşteri Adı</dt>
+
+                    <dd class="col-sm-8 fw-semibold">@Model.Name</dd>
+
+
+
+                    <dt class="col-sm-4">Telefon</dt>
+
+                    <dd class="col-sm-8">@(Model.Phone ?? "-")</dd>
+
+
+
+                    <dt class="col-sm-4">Notlar</dt>
+
+                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</dd>
+
+
+
+                    <dt class="col-sm-4">Toplam Puan</dt>
+
+                    <dd class="col-sm-8">@Model.TotalPoints</dd>
+
+
+
+                    <dt class="col-sm-4">Durum</dt>
+
+                    <dd class="col-sm-8">
+
+                        @if (Model.IsActive)
+
+                        {
+
+                            <span class="badge bg-success">Aktif</span>
+
+                        }
+
+                        else
+
+                        {
+
+                            <span class="badge bg-secondary">Pasif</span>
+
+                        }
+
+                    </dd>
+
+
+
+                    <dt class="col-sm-4">Oluşturulma</dt>
+
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="col-lg-7">
+
+        <div class="panel-card">
+
+            <div class="panel-card-header">
+
+                <h3 class="h6 mb-0">Sipariş Geçmişi</h3>
+
+            </div>
+
+            <div class="panel-card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th>Sipariş No</th>
+
+                                <th>Tarih</th>
+
+                                <th>Toplam Tutar</th>
+
+                                <th>Durum</th>
+
+                                <th>Kaynak</th>
+
+                                <th class="text-end">İşlem</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        @if (!Model.OrderHistory.Any())
+
+                        {
+
+                            <tr>
+
+                                <td colspan="6" class="text-center text-muted py-4">Bu müşteriye ait sipariş bulunamadı.</td>
+
+                            </tr>
+
+                        }
+
+                        else
+
+                        {
+
+                            foreach (var order in Model.OrderHistory)
+
+                            {
+
+                                <tr>
+
+                                    <td class="fw-semibold">@order.OrderNumber</td>
+
+                                    <td>@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+
+                                    <td>@order.TotalAmount.ToString("N2", culture) ₺</td>
+
+                                    <td>
+
+                                        <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(order.Status)">
+
+                                            @OrderDisplayHelper.GetStatusLabel(order.Status)
+
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(order.Source)">
+
+                                            @OrderDisplayHelper.GetSourceLabel(order.Source)
+
+                                        </span>
+
+                                    </td>
+
+                                    <td class="text-end">
+
+                                        <a href="/Business/Orders/Details/@order.OrderId" class="btn btn-sm btn-outline-primary">Detay</a>
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+                        }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Son 10 Puan Hareketi</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Tip</th>
+                                <th>Puan</th>
+                                <th>Açıklama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.LoyaltyTransactions.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">Henüz puan hareketi yok.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var tx in Model.LoyaltyTransactions)
+                            {
+                                <tr>
+                                    <td>@tx.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                                    <td>
+                                        <span class="badge @LoyaltyDisplayHelper.GetTypeBadgeClass(tx.Type)">
+                                            @LoyaltyDisplayHelper.GetTypeLabel(tx.Type)
+                                        </span>
+                                        @if (!string.IsNullOrWhiteSpace(tx.RewardName))
+                                        {
+                                            <span class="badge bg-info ms-1">Ödül: @tx.RewardName</span>
+                                        }
+                                    </td>
+                                    <td>@tx.Points</td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(tx.Description))
+                                        {
+                                            @tx.Description
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(tx.RewardName))
+                                        {
+                                            <span class="text-muted">Ödül kullanıldı: @tx.RewardName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

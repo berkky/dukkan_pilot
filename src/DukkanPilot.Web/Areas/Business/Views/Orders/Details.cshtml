@@ -1,0 +1,309 @@
+@model OrderDetailsViewModel
+
+@using System.Globalization
+
+@{
+
+    ViewData["Title"] = "Sipariş Detayı";
+
+    ViewData["Subtitle"] = Model.OrderNumber;
+
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+
+}
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="h4 mb-0">@Model.OrderNumber</h2>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+
+</div>
+
+
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="panel-card mb-4">
+
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+
+                <h3 class="h6 mb-0">Sipariş Bilgileri</h3>
+
+                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(Model.Status)">
+
+                    @OrderDisplayHelper.GetStatusLabel(Model.Status)
+
+                </span>
+
+            </div>
+
+            <div class="panel-card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-4">Sipariş No</dt>
+
+                    <dd class="col-sm-8 fw-semibold">@Model.OrderNumber</dd>
+
+
+
+                    <dt class="col-sm-4">Durum</dt>
+
+                    <dd class="col-sm-8">
+
+                        <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(Model.Status)">
+
+                            @OrderDisplayHelper.GetStatusLabel(Model.Status)
+
+                        </span>
+
+                    </dd>
+
+
+
+                    <dt class="col-sm-4">Kaynak</dt>
+
+                    <dd class="col-sm-8">
+
+                        <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(Model.Source)">
+
+                            @OrderDisplayHelper.GetSourceLabel(Model.Source)
+
+                        </span>
+
+                    </dd>
+
+
+
+                    <dt class="col-sm-4">Müşteri Adı</dt>
+
+                    <dd class="col-sm-8">@(Model.CustomerName ?? "-")</dd>
+
+
+
+                    <dt class="col-sm-4">Müşteri Telefonu</dt>
+
+                    <dd class="col-sm-8">@(Model.CustomerPhone ?? "-")</dd>
+
+
+
+                    <dt class="col-sm-4">Sipariş Notu</dt>
+
+                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</dd>
+
+
+
+                    <dt class="col-sm-4">Toplam Tutar</dt>
+
+                    <dd class="col-sm-8 fw-bold text-primary">@Model.TotalAmount.ToString("N2", culture) ₺</dd>
+
+
+
+                    <dt class="col-sm-4">Oluşturulma Tarihi</dt>
+
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="panel-card">
+
+            <div class="panel-card-header">
+
+                <h3 class="h6 mb-0">Sipariş Kalemleri</h3>
+
+            </div>
+
+            <div class="panel-card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th>Ürün Adı</th>
+
+                                <th class="text-center">Adet</th>
+
+                                <th class="text-end">Birim Fiyat</th>
+
+                                <th class="text-end">Satır Toplamı</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        @if (!Model.Items.Any())
+
+                        {
+
+                            <tr>
+
+                                <td colspan="4" class="text-center text-muted py-3">Sipariş kalemi bulunamadı.</td>
+
+                            </tr>
+
+                        }
+
+                        else
+
+                        {
+
+                            foreach (var item in Model.Items)
+
+                            {
+
+                                <tr>
+
+                                    <td class="fw-semibold">@item.ProductName</td>
+
+                                    <td class="text-center">@item.Quantity</td>
+
+                                    <td class="text-end">@item.UnitPrice.ToString("N2", culture) ₺</td>
+
+                                    <td class="text-end fw-semibold">@item.LineTotal.ToString("N2", culture) ₺</td>
+
+                                </tr>
+
+                            }
+
+                        }
+
+                        </tbody>
+
+                        @if (Model.Items.Any())
+
+                        {
+
+                            <tfoot class="table-light">
+
+                                <tr>
+
+                                    <th colspan="3" class="text-end">Genel Toplam</th>
+
+                                    <th class="text-end">@Model.TotalAmount.ToString("N2", culture) ₺</th>
+
+                                </tr>
+
+                            </tfoot>
+
+                        }
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="col-lg-4">
+
+        <div class="panel-card">
+
+            <div class="panel-card-header">
+
+                <h3 class="h6 mb-0">Durum Güncelle</h3>
+
+            </div>
+
+            <div class="panel-card-body">
+
+                <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+
+                        <label for="status" class="form-label">Yeni Durum</label>
+
+                        <select name="status" id="status" class="form-select" required>
+                            @{
+                                var statusOptions = new[]
+                                {
+                                    OrderStatus.Pending,
+                                    OrderStatus.Preparing,
+                                    OrderStatus.Completed,
+                                    OrderStatus.Cancelled
+                                };
+                            }
+                            @foreach (var statusOption in statusOptions)
+                            {
+                                if (Model.Status == statusOption)
+                                {
+                                    <option value="@((int)statusOption)" selected>@OrderDisplayHelper.GetStatusLabel(statusOption)</option>
+                                }
+                                else
+                                {
+                                    <option value="@((int)statusOption)">@OrderDisplayHelper.GetStatusLabel(statusOption)</option>
+                                }
+                            }
+                        </select>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Durumu Güncelle</button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Sadakat Puanı</h3>
+            </div>
+            <div class="panel-card-body">
+                @if (Model.AwardedLoyaltyPoints.HasValue)
+                {
+                    <div class="alert alert-success py-2 mb-0">
+                        Bu sipariş için <strong>@Model.AwardedLoyaltyPoints puan</strong> kazandırıldı.
+                    </div>
+                }
+                else if (!Model.HasMatchingCustomer)
+                {
+                    <div class="alert alert-warning py-2 mb-0">
+                        Puan için müşteri kaydı bulunamadı.
+                    </div>
+                }
+                else if (Model.PotentialLoyaltyPoints.HasValue)
+                {
+                    <div class="alert alert-info py-2 mb-0">
+                        Bu sipariş tamamlandığında kazandırılabilecek puan: <strong>@Model.PotentialLoyaltyPoints</strong>
+                    </div>
+                }
+                else if (!Model.HasActiveLoyaltyRule)
+                {
+                    <p class="text-muted mb-0 small">Aktif sadakat kuralı bulunamadı.</p>
+                }
+                else
+                {
+                    <p class="text-muted mb-0 small">Bu sipariş tutarı için kazandırılabilecek puan yok.</p>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>
+

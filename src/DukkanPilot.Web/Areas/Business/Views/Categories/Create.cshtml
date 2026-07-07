@@ -1,0 +1,21 @@
+@model CategoryFormViewModel
+@{
+    ViewData["Title"] = "Yeni Kategori";
+    ViewData["Subtitle"] = "Kategori oluştur";
+}
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <form asp-action="Create" method="post">
+            <partial name="_FormFields" model="Model" />
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

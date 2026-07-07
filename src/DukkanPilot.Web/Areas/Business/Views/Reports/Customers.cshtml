@@ -1,0 +1,95 @@
+@model CustomerReportViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Müşteri Raporu";
+    ViewData["Subtitle"] = "Müşteri analitiği";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Müşteri Raporu</h2>
+        <p class="text-muted mb-0">Müşteri davranış analizi</p>
+    </div>
+</div>
+
+<partial name="_ReportNav" />
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Müşteri</div>
+            <div class="stat-value">@Model.TotalCustomerCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Müşteri</div>
+            <div class="stat-value">@Model.ActiveCustomerCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">En Çok Sipariş Veren</div>
+            <div class="stat-value fs-6">@(Model.TopOrderCustomerName ?? "-")</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">En Yüksek Harcama</div>
+            <div class="stat-value fs-6">@(Model.TopSpendingCustomerName ?? "-")</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">En Yüksek Puan</div>
+            <div class="stat-value fs-6">@(Model.TopPointsCustomerName ?? "-")</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Top 10 Müşteri</h3>
+    </div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Müşteri Adı</th>
+                        <th>Telefon</th>
+                        <th>Sipariş Sayısı</th>
+                        <th>Toplam Harcama</th>
+                        <th>Toplam Puan</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.TopCustomers.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Henüz müşteri verisi yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var customer in Model.TopCustomers)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@customer.Name</td>
+                            <td>@(customer.Phone ?? "-")</td>
+                            <td>@customer.OrderCount</td>
+                            <td>@customer.TotalSpending.ToString("N2", culture) ₺</td>
+                            <td>@customer.TotalPoints</td>
+                            <td class="text-end">
+                                <a href="/Business/Customers/Details/@customer.CustomerId" class="btn btn-sm btn-outline-primary">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

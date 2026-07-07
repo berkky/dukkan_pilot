@@ -1,0 +1,67 @@
+@model StaffDetailsViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Personel Detayı";
+    ViewData["Subtitle"] = Model.FullName;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0">@Model.FullName</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Personel Bilgileri</h3>
+        @if (Model.IsActive)
+        {
+            <span class="badge bg-success">Aktif</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">Pasif</span>
+        }
+    </div>
+    <div class="panel-card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Ad Soyad</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.FullName</dd>
+
+            <dt class="col-sm-3">E-posta</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">İşletme Rolü</dt>
+            <dd class="col-sm-9">
+                <span class="badge @StaffDisplayHelper.GetRoleBadgeClass(Model.BusinessRole)">
+                    @StaffDisplayHelper.GetRoleLabel(Model.BusinessRole)
+                </span>
+            </dd>
+
+            <dt class="col-sm-3">Durum</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsActive)
+                {
+                    <span class="badge bg-success">Aktif</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Pasif</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Oluşturulma</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+
+            @if (Model.UpdatedAt.HasValue)
+            {
+                <dt class="col-sm-3">Son Güncelleme</dt>
+                <dd class="col-sm-9">@Model.UpdatedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+            }
+        </dl>
+    </div>
+</div>

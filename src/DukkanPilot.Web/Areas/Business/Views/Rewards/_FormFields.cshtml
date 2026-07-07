@@ -1,0 +1,57 @@
+@model RewardFormViewModel
+
+
+
+<div class="row g-3">
+
+    <div class="col-md-8">
+
+        <label asp-for="Name" class="form-label"></label>
+
+        <input asp-for="Name" class="form-control" />
+
+        <span asp-validation-for="Name" class="text-danger small"></span>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <label asp-for="RequiredPoints" class="form-label"></label>
+
+        <div class="input-group">
+
+            <input asp-for="RequiredPoints" class="form-control" min="1" />
+
+            <span class="input-group-text">puan</span>
+
+        </div>
+
+        <span asp-validation-for="RequiredPoints" class="text-danger small"></span>
+
+    </div>
+
+    <div class="col-12">
+
+        <label asp-for="Description" class="form-label"></label>
+
+        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+
+        <span asp-validation-for="Description" class="text-danger small"></span>
+
+    </div>
+
+    <div class="col-12">
+
+        <div class="form-check">
+
+            <input asp-for="IsActive" class="form-check-input" />
+
+            <label asp-for="IsActive" class="form-check-label"></label>
+
+        </div>
+
+    </div>
+
+</div>
+
+
