@@ -1,238 +1,201 @@
 @model CustomerDetailsViewModel
-
 @using System.Globalization
-
 @{
-
     ViewData["Title"] = "Müşteri Detayı";
-
     ViewData["Subtitle"] = Model.Name;
-
     var culture = CultureInfo.GetCultureInfo("tr-TR");
-
 }
 
-
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-    <h2 class="h4 mb-0">@Model.Name</h2>
-
-    <div class="d-flex gap-2">
-
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
-
-        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
-
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@Model.Name</h2>
+        <span class="badge @Model.SegmentBadgeClass">@Model.SegmentLabel</span>
+        @if (!Model.IsActive)
+        {
+            <span class="badge bg-secondary ms-1">Pasif</span>
+        }
     </div>
-
+    <div class="d-flex flex-wrap gap-2">
+        @if (!string.IsNullOrWhiteSpace(Model.WhatsAppContactUrl))
+        {
+            <a href="@Model.WhatsAppContactUrl" target="_blank" rel="noopener" class="btn btn-success btn-sm">WhatsApp</a>
+        }
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Düzenle</a>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+    </div>
 </div>
 
-
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Sipariş</div>
+            <div class="stat-value">@Model.TotalOrders</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Harcama</div>
+            <div class="stat-value fs-5">@Model.TotalSpent.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Ortalama Sepet</div>
+            <div class="stat-value fs-5">@Model.AverageBasket.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">En Yüksek Sipariş</div>
+            <div class="stat-value fs-5">@Model.MaxOrderAmount.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+</div>
 
 <div class="row g-4">
-
-    <div class="col-lg-5">
-
-        <div class="panel-card">
-
-            <div class="panel-card-header d-flex justify-content-between align-items-center">
-
-                <h3 class="h6 mb-0">Müşteri Bilgileri</h3>
-
-                @if (Model.IsActive)
-
-                {
-
-                    <span class="badge bg-success">Aktif</span>
-
-                }
-
-                else
-
-                {
-
-                    <span class="badge bg-secondary">Pasif</span>
-
-                }
-
+    <div class="col-lg-4">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Profil</h3>
             </div>
-
             <div class="panel-card-body">
-
-                <dl class="row mb-0">
-
-                    <dt class="col-sm-4">Müşteri Adı</dt>
-
-                    <dd class="col-sm-8 fw-semibold">@Model.Name</dd>
-
-
-
-                    <dt class="col-sm-4">Telefon</dt>
-
-                    <dd class="col-sm-8">@(Model.Phone ?? "-")</dd>
-
-
-
-                    <dt class="col-sm-4">Notlar</dt>
-
-                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</dd>
-
-
-
-                    <dt class="col-sm-4">Toplam Puan</dt>
-
-                    <dd class="col-sm-8">@Model.TotalPoints</dd>
-
-
-
-                    <dt class="col-sm-4">Durum</dt>
-
-                    <dd class="col-sm-8">
-
-                        @if (Model.IsActive)
-
-                        {
-
-                            <span class="badge bg-success">Aktif</span>
-
-                        }
-
-                        else
-
-                        {
-
-                            <span class="badge bg-secondary">Pasif</span>
-
-                        }
-
-                    </dd>
-
-
-
-                    <dt class="col-sm-4">Oluşturulma</dt>
-
-                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
-
+                <dl class="row mb-0 small">
+                    <dt class="col-5">Telefon</dt>
+                    <dd class="col-7">@(Model.Phone ?? "-")</dd>
+                    @if (!string.IsNullOrWhiteSpace(Model.Email))
+                    {
+                        <dt class="col-5">E-posta</dt>
+                        <dd class="col-7">@Model.Email</dd>
+                    }
+                    <dt class="col-5">Kayıt Tarihi</dt>
+                    <dd class="col-7">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+                    <dt class="col-5">Notlar</dt>
+                    <dd class="col-7">@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</dd>
                 </dl>
-
             </div>
-
         </div>
 
+        <div class="panel-card mb-4">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Sadakat Özeti</h3>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-6">Mevcut Puan</dt>
+                    <dd class="col-6 fw-semibold">@Model.TotalPoints</dd>
+                    <dt class="col-6">Kazanılan Puan</dt>
+                    <dd class="col-6 text-success">@Model.EarnedPoints</dd>
+                    <dt class="col-6">Harcanan Puan</dt>
+                    <dd class="col-6 text-danger">@Model.RedeemedPoints</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Aktivite Özeti</h3>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-7">İlk Sipariş</dt>
+                    <dd class="col-5 text-end">@(Model.FirstOrderDate.HasValue ? Model.FirstOrderDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</dd>
+                    <dt class="col-7">Son Sipariş</dt>
+                    <dd class="col-5 text-end">@(Model.LastOrderDate.HasValue ? Model.LastOrderDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</dd>
+                    <dt class="col-7">Son 30 Gün Sipariş</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.Last30DaysOrderCount</dd>
+                    <dt class="col-7">En Çok Aldığı Ürün</dt>
+                    <dd class="col-5 text-end">@(Model.TopProductName ?? "-")</dd>
+                </dl>
+            </div>
+        </div>
     </div>
 
-
-
-    <div class="col-lg-7">
-
-        <div class="panel-card">
-
+    <div class="col-lg-8">
+        <div class="panel-card mb-4">
             <div class="panel-card-header">
-
-                <h3 class="h6 mb-0">Sipariş Geçmişi</h3>
-
+                <h3 class="h6 mb-0">Son 10 Sipariş</h3>
             </div>
-
             <div class="panel-card-body p-0">
-
                 <div class="table-responsive">
-
                     <table class="table table-hover align-middle mb-0">
-
                         <thead class="table-light">
-
                             <tr>
-
                                 <th>Sipariş No</th>
-
                                 <th>Tarih</th>
-
-                                <th>Toplam Tutar</th>
-
+                                <th>Tutar</th>
                                 <th>Durum</th>
-
-                                <th>Kaynak</th>
-
                                 <th class="text-end">İşlem</th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                         @if (!Model.OrderHistory.Any())
-
                         {
-
                             <tr>
-
-                                <td colspan="6" class="text-center text-muted py-4">Bu müşteriye ait sipariş bulunamadı.</td>
-
+                                <td colspan="5" class="text-center text-muted py-4">Sipariş bulunamadı.</td>
                             </tr>
-
                         }
-
                         else
-
                         {
-
                             foreach (var order in Model.OrderHistory)
-
                             {
-
                                 <tr>
-
                                     <td class="fw-semibold">@order.OrderNumber</td>
-
                                     <td>@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
-
                                     <td>@order.TotalAmount.ToString("N2", culture) ₺</td>
-
                                     <td>
-
                                         <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(order.Status)">
-
                                             @OrderDisplayHelper.GetStatusLabel(order.Status)
-
                                         </span>
-
                                     </td>
-
-                                    <td>
-
-                                        <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(order.Source)">
-
-                                            @OrderDisplayHelper.GetSourceLabel(order.Source)
-
-                                        </span>
-
-                                    </td>
-
                                     <td class="text-end">
-
                                         <a href="/Business/Orders/Details/@order.OrderId" class="btn btn-sm btn-outline-primary">Detay</a>
-
                                     </td>
-
                                 </tr>
-
                             }
-
                         }
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
-
         </div>
 
-        <div class="panel-card mt-4">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">En Çok Aldığı Ürünler (Top 5)</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                @if (!Model.TopProducts.Any())
+                {
+                    <p class="text-muted mb-0 p-3">Ürün verisi yok.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Toplam Harcama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var product in Model.TopProducts)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@product.ProductName</td>
+                                    <td>@product.Quantity</td>
+                                    <td>@product.TotalSpent.ToString("N2", culture) ₺</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="panel-card">
             <div class="panel-card-header">
                 <h3 class="h6 mb-0">Son 10 Puan Hareketi</h3>
             </div>
@@ -264,26 +227,9 @@
                                         <span class="badge @LoyaltyDisplayHelper.GetTypeBadgeClass(tx.Type)">
                                             @LoyaltyDisplayHelper.GetTypeLabel(tx.Type)
                                         </span>
-                                        @if (!string.IsNullOrWhiteSpace(tx.RewardName))
-                                        {
-                                            <span class="badge bg-info ms-1">Ödül: @tx.RewardName</span>
-                                        }
                                     </td>
                                     <td>@tx.Points</td>
-                                    <td>
-                                        @if (!string.IsNullOrWhiteSpace(tx.Description))
-                                        {
-                                            @tx.Description
-                                        }
-                                        else if (!string.IsNullOrWhiteSpace(tx.RewardName))
-                                        {
-                                            <span class="text-muted">Ödül kullanıldı: @tx.RewardName</span>
-                                        }
-                                        else
-                                        {
-                                            <span>-</span>
-                                        }
-                                    </td>
+                                    <td>@(tx.Description ?? tx.RewardName ?? "-")</td>
                                 </tr>
                             }
                         }
@@ -293,6 +239,4 @@
             </div>
         </div>
     </div>
-
 </div>
-

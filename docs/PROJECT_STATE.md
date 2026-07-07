@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 22B aşaması (CSV ürün içe aktarma ve toplu ürün yönetimi) tamamlandı.
+> Son güncelleme: 23A aşaması (Müşteri CRM Premium / Sadakat Zekası) tamamlandı.
 
 ---
 
@@ -401,6 +401,16 @@ DukkanPilot.sln
 - Public menü ve sipariş takip akışı bozulmadı
 - Migration / Identity / SignalR / yeni NuGet dependency yok
 
+### 23A aşaması — Müşteri CRM Premium / Sadakat Zekası
+- **Customers Index:** premium CRM paneli — KPI kartları, segment badge, filtreler, WhatsApp iletişim
+- Segmentler: VIP (5+ sipariş veya 1000₺+), Tekrar Gelen, Yeni, Riskte, Pasif, Sipariş Yok
+- **Customer Details:** performans kartları, sadakat özeti, sipariş geçmişi, top 5 ürün, aktivite özeti
+- **CRM İçgörüleri:** `/Business/Customers/Insights` — segment dağılımı, en değerli/sık sipariş veren, riskteki ve yeni müşteriler
+- **CSV export:** `GET /Business/Customers/ExportCsv` — UTF-8 BOM, filtre desteği
+- Tenant filtresi `BusinessId` claim üzerinden korundu; 9C sadakat puanı akışı bozulmadı
+- Public menü, sepet, confirmation ve tracking akışı bozulmadı
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -462,7 +472,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-22B tamamlandı — CSV ürün içe aktarma, toplu ürün aksiyonları ve şablon indirme eklendi.
+23A tamamlandı — Müşteri CRM premium paneli, segment analizi ve Insights ekranı eklendi.
 
 ---
 
@@ -496,7 +506,9 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Business/Orders/LiveSummary` | Canlı sipariş özeti (JSON) |
 | `/Business/Orders/Kitchen` | Mutfak / operasyon modu |
 | `/Business/Orders/Details/{id}` | Sipariş detayı |
-| `/Business/Customers` | Müşteri listesi |
+| `/Business/Customers` | Müşteri listesi (premium CRM) |
+| `/Business/Customers/Insights` | CRM içgörüleri ve segment analizi |
+| `GET /Business/Customers/ExportCsv` | Müşteri CSV export |
 | `/Business/Customers/Details/{id}` | Müşteri detayı + sipariş/puan geçmişi |
 | `/Business/Loyalty` | Sadakat özeti |
 | `/Business/Loyalty/EditRule` | Sadakat kuralı düzenleme |

@@ -1,0 +1,180 @@
+@model CustomerInsightsViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "CRM İçgörüleri";
+    ViewData["Subtitle"] = "Müşteri segment analizi";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var segmentTotal = Model.SegmentDistribution.Sum(s => s.Count);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">CRM İçgörüleri</h2>
+        <p class="text-muted mb-0">Müşteri segmentleri ve değer analizi.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/Customers" class="btn btn-outline-secondary btn-sm">Müşteri Listesi</a>
+        <a href="/Business/Customers/ExportCsv" class="btn btn-outline-success btn-sm">CSV İndir</a>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Segment Dağılımı</h3>
+    </div>
+    <div class="panel-card-body">
+        @foreach (var segment in Model.SegmentDistribution)
+        {
+            var percent = segmentTotal > 0 ? (int)Math.Round(segment.Count * 100.0 / segmentTotal) : 0;
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1 small">
+                    <span>
+                        <span class="badge @segment.BadgeClass">@segment.Label</span>
+                        <span class="text-muted ms-2">@segment.Count müşteri</span>
+                    </span>
+                    <span class="fw-semibold">%@percent</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" style="width: @percent%"></div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">En Değerli Müşteriler</h3></div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Müşteri</th><th>Harcama</th><th>Sipariş</th><th class="text-end">İşlem</th></tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.TopValuableCustomers.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">Veri yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var c in Model.TopValuableCustomers)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@c.Name</td>
+                                    <td>@c.TotalSpent.ToString("N2", culture) ₺</td>
+                                    <td>@c.OrderCount</td>
+                                    <td class="text-end"><a href="/Business/Customers/Details/@c.Id" class="btn btn-sm btn-outline-primary">Detay</a></td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">En Sık Sipariş Verenler</h3></div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Müşteri</th><th>Sipariş</th><th>Son Sipariş</th><th class="text-end">İşlem</th></tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.TopFrequentCustomers.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">Veri yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var c in Model.TopFrequentCustomers)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@c.Name</td>
+                                    <td>@c.OrderCount</td>
+                                    <td>@(c.LastOrderDate.HasValue ? c.LastOrderDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</td>
+                                    <td class="text-end"><a href="/Business/Customers/Details/@c.Id" class="btn btn-sm btn-outline-primary">Detay</a></td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Riskteki Müşteriler</h3></div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Müşteri</th><th>Son Sipariş</th><th>Harcama</th><th class="text-end">İşlem</th></tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.AtRiskCustomers.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">Veri yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var c in Model.AtRiskCustomers)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@c.Name</td>
+                                    <td>@(c.LastOrderDate.HasValue ? c.LastOrderDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</td>
+                                    <td>@c.TotalSpent.ToString("N2", culture) ₺</td>
+                                    <td class="text-end">
+                                        @if (!string.IsNullOrWhiteSpace(c.WhatsAppContactUrl))
+                                        {
+                                            <a href="@c.WhatsAppContactUrl" target="_blank" rel="noopener" class="btn btn-sm btn-success me-1">WhatsApp</a>
+                                        }
+                                        <a href="/Business/Customers/Details/@c.Id" class="btn btn-sm btn-outline-primary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Yeni Müşteriler (Son 30 Gün)</h3></div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Müşteri</th><th>Harcama</th><th>Sipariş</th><th class="text-end">İşlem</th></tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.NewCustomers.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">Veri yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var c in Model.NewCustomers)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@c.Name</td>
+                                    <td>@c.TotalSpent.ToString("N2", culture) ₺</td>
+                                    <td>@c.OrderCount</td>
+                                    <td class="text-end"><a href="/Business/Customers/Details/@c.Id" class="btn btn-sm btn-outline-primary">Detay</a></td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

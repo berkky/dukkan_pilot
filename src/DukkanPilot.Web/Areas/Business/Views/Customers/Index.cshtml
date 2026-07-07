@@ -1,154 +1,181 @@
-@model IEnumerable<CustomerListViewModel>
-
+@model CustomersIndexViewModel
 @using System.Globalization
-
 @{
-
     ViewData["Title"] = "Müşteriler";
-
-    ViewData["Subtitle"] = "Müşteri listesi";
-
+    ViewData["Subtitle"] = "Müşteri CRM";
     var culture = CultureInfo.GetCultureInfo("tr-TR");
-
 }
 
-
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
     <div>
-
         <h2 class="h4 mb-1">Müşteriler</h2>
-
-        <p class="text-muted mb-0">Demo Kafe müşteri kayıtları</p>
-
+        <p class="text-muted mb-0">Müşteri segmentleri, harcama analizi ve iletişim.</p>
     </div>
-
-    <a asp-action="Create" class="btn btn-primary">+ Yeni Müşteri</a>
-
+    <div class="d-flex flex-wrap gap-2">
+        <a href="@Model.ExportCsvUrl" class="btn btn-outline-success btn-sm">CSV İndir</a>
+        <a href="/Business/Customers/Insights" class="btn btn-outline-primary btn-sm">CRM İçgörüleri</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Yeni Müşteri</a>
+    </div>
 </div>
 
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Müşteri</div>
+            <div class="stat-value">@Model.TotalCustomers</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Bu Ay Yeni</div>
+            <div class="stat-value text-info">@Model.NewCustomersThisMonth</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Tekrar Gelen</div>
+            <div class="stat-value text-primary">@Model.ReturningCustomers</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">VIP Müşteri</div>
+            <div class="stat-value text-warning">@Model.VipCustomers</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Riskteki Müşteri</div>
+            <div class="stat-value text-danger">@Model.AtRiskCustomers</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Müşteri Cirosu</div>
+            <div class="stat-value fs-5">@Model.TotalCustomerRevenue.ToString("N2", culture) ₺</div>
+            <div class="text-muted small">İptal hariç</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Ortalama Harcama</div>
+            <div class="stat-value fs-5">@Model.AverageCustomerSpend.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+</div>
 
+<div class="alert alert-light border small py-2 mb-4" role="note">
+    <strong>Segment kuralları:</strong>
+    VIP: 5+ sipariş veya 1000₺ üzeri harcama · Tekrar Gelen: 2+ sipariş · Yeni: son 30 gün · Riskte: son sipariş 30+ gün önce
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Filtreler</h3>
+    </div>
+    <div class="panel-card-body">
+        <form method="get" action="/Business/Customers" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label for="search" class="form-label small mb-1">Arama</label>
+                <input type="text" class="form-control form-control-sm" id="search" name="search" value="@Model.Search" placeholder="Ad, telefon veya e-posta" />
+            </div>
+            <div class="col-md-2">
+                <label for="segment" class="form-label small mb-1">Segment</label>
+                <select class="form-select form-select-sm" id="segment" name="segment">
+                    <option value="all" selected="@(Model.SegmentFilter == "all")">Tümü</option>
+                    <option value="vip" selected="@(Model.SegmentFilter == "vip")">VIP</option>
+                    <option value="returning" selected="@(Model.SegmentFilter == "returning")">Tekrar Gelen</option>
+                    <option value="new" selected="@(Model.SegmentFilter == "new")">Yeni</option>
+                    <option value="atrisk" selected="@(Model.SegmentFilter == "atrisk")">Riskte</option>
+                    <option value="passive" selected="@(Model.SegmentFilter == "passive")">Pasif</option>
+                    <option value="noorders" selected="@(Model.SegmentFilter == "noorders")">Sipariş Yok</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="lastOrder" class="form-label small mb-1">Son Sipariş</label>
+                <select class="form-select form-select-sm" id="lastOrder" name="lastOrder">
+                    <option value="all" selected="@(Model.LastOrderFilter == "all")">Tümü</option>
+                    <option value="today" selected="@(Model.LastOrderFilter == "today")">Bugün</option>
+                    <option value="week" selected="@(Model.LastOrderFilter == "week")">Son 7 gün</option>
+                    <option value="month" selected="@(Model.LastOrderFilter == "month")">Son 30 gün</option>
+                    <option value="older30" selected="@(Model.LastOrderFilter == "older30")">30+ gün</option>
+                    <option value="none" selected="@(Model.LastOrderFilter == "none")">Hiç sipariş yok</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="minSpend" class="form-label small mb-1">Min Harcama</label>
+                <input type="number" step="0.01" min="0" class="form-control form-control-sm" id="minSpend" name="minSpend" value="@(Model.MinSpend?.ToString(culture))" />
+            </div>
+            <div class="col-md-2">
+                <label for="maxSpend" class="form-label small mb-1">Max Harcama</label>
+                <input type="number" step="0.01" min="0" class="form-control form-control-sm" id="maxSpend" name="maxSpend" value="@(Model.MaxSpend?.ToString(culture))" />
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">Uygula</button>
+                <a href="/Business/Customers" class="btn btn-outline-secondary btn-sm">Temizle</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="panel-card">
-
     <div class="panel-card-body p-0">
-
         <div class="table-responsive">
-
             <table class="table table-hover align-middle mb-0">
-
                 <thead class="table-light">
-
                     <tr>
-
-                        <th>Id</th>
-
-                        <th>Müşteri Adı</th>
-
+                        <th>Müşteri</th>
                         <th>Telefon</th>
-
-                        <th>Toplam Puan</th>
-
-                        <th>Durum</th>
-
-                        <th>Sipariş Sayısı</th>
-
+                        <th>Sipariş</th>
+                        <th>Harcama</th>
+                        <th>Ort. Sepet</th>
                         <th>Son Sipariş</th>
-
+                        <th>Segment</th>
+                        <th>Puan</th>
                         <th class="text-end">İşlemler</th>
-
                     </tr>
-
                 </thead>
-
                 <tbody>
-
-                @if (!Model.Any())
-
+                @if (!Model.Customers.Any())
                 {
-
                     <tr>
-
-                        <td colspan="8" class="text-center text-muted py-4">Henüz müşteri yok.</td>
-
+                        <td colspan="9" class="text-center text-muted py-4">Filtreye uygun müşteri bulunamadı.</td>
                     </tr>
-
                 }
-
                 else
-
                 {
-
-                    foreach (var item in Model)
-
+                    foreach (var item in Model.Customers)
                     {
-
                         <tr>
-
-                            <td>@item.Id</td>
-
                             <td class="fw-semibold">@item.Name</td>
-
                             <td>@(item.Phone ?? "-")</td>
-
-                            <td>@item.TotalPoints</td>
-
-                            <td>
-
-                                @if (item.IsActive)
-
-                                {
-
-                                    <span class="badge bg-success">Aktif</span>
-
-                                }
-
-                                else
-
-                                {
-
-                                    <span class="badge bg-secondary">Pasif</span>
-
-                                }
-
-                            </td>
-
                             <td>@item.OrderCount</td>
-
+                            <td>@item.TotalSpent.ToString("N2", culture) ₺</td>
+                            <td>@item.AverageBasket.ToString("N2", culture) ₺</td>
                             <td>
-
                                 @(item.LastOrderDate.HasValue
-
                                     ? item.LastOrderDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
-
                                     : "-")
-
                             </td>
-
+                            <td>
+                                <span class="badge @item.SegmentBadgeClass">@item.SegmentLabel</span>
+                            </td>
+                            <td>@item.TotalPoints</td>
                             <td class="text-end">
-
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
-
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Sil</a>
-
+                                <div class="d-flex flex-wrap justify-content-end gap-1">
+                                    @if (!string.IsNullOrWhiteSpace(item.WhatsAppContactUrl))
+                                    {
+                                        <a href="@item.WhatsAppContactUrl" target="_blank" rel="noopener" class="btn btn-sm btn-success">WhatsApp</a>
+                                    }
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Düzenle</a>
+                                </div>
                             </td>
-
                         </tr>
-
                     }
-
                 }
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
-
