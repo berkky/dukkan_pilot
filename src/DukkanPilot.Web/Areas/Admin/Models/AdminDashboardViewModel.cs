@@ -142,6 +142,8 @@ public class BusinessesIndexViewModel
 
     public List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> AvailablePlans { get; set; } = [];
 
+    public string ExportCsvUrl { get; set; } = string.Empty;
+
     public List<BusinessListViewModel> Businesses { get; set; } = [];
 }
 

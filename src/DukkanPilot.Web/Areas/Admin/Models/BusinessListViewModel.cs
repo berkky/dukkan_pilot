@@ -15,4 +15,16 @@ public class BusinessListViewModel
     public int OrderCount { get; set; }
     public decimal TotalRevenue { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public int HealthScore { get; set; }
+
+    public string HealthLabel { get; set; } = string.Empty;
+
+    public string HealthBadgeClass { get; set; } = "bg-secondary";
+
+    public string PrimaryRiskReason { get; set; } = string.Empty;
+
+    public string PrimaryRiskBadgeClass { get; set; } = "bg-secondary";
+
+    public bool HasRisks { get; set; }
 }

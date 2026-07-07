@@ -1,70 +1,328 @@
-@model BusinessDetailsViewModel
+@model AdminBusinessDetailsViewModel
+@using System.Globalization
 @{
-    ViewData["Title"] = "İşletme Detayı";
+    ViewData["Title"] = "İşletme Operasyon Merkezi";
     ViewData["Subtitle"] = Model.Name;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string Money(decimal amount) => amount.ToString("N2", culture) + " ₺";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
     <div>
         <h2 class="h4 mb-1">@Model.Name</h2>
-        <p class="text-muted mb-0"><code>@Model.Slug</code></p>
+        <p class="text-muted mb-2">
+            <code>@Model.Slug</code>
+            @if (Model.IsActive)
+            {
+                <span class="badge bg-success ms-2">Aktif</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary ms-2">Pasif</span>
+            }
+        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.Phone))
+        {
+            <div class="small text-muted">Telefon: @Model.Phone</div>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Address))
+        {
+            <div class="small text-muted">Adres: @Model.Address</div>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="small mt-1">@Model.Description</div>
+        }
     </div>
-    <div class="d-flex gap-2">
-        <a asp-action="Subscription" asp-route-businessId="@Model.Id" class="btn btn-outline-primary">Abonelik Yönet</a>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
-        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="@Model.PublicMenuUrl" target="_blank" rel="noopener" class="btn btn-outline-primary">Public Menüyü Aç</a>
+        <a asp-action="Subscription" asp-route-businessId="@Model.Id" class="btn btn-outline-info">Aboneliği Yönet</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Admin İşletme Listesine Dön</a>
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">İşletme Sağlık Skoru</h3>
+            </div>
+            <div class="panel-card-body text-center">
+                <div class="display-4 fw-bold mb-2">@Model.Health.Score</div>
+                <span class="badge @Model.Health.BadgeClass fs-6">@Model.Health.Label</span>
+                <div class="progress mt-3" style="height: 10px;">
+                    <div class="progress-bar @Model.Health.BadgeClass" style="width: @Model.Health.Score%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Risk Nedenleri</h3>
+            </div>
+            <div class="panel-card-body">
+                @if (!Model.Health.Risks.Any())
+                {
+                    <span class="badge bg-success">Risk tespit edilmedi</span>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var risk in Model.Health.Risks)
+                        {
+                            <span class="badge @risk.BadgeClass">@risk.Reason</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
     <div class="col-lg-6">
         <div class="panel-card h-100">
-            <div class="panel-card-header"><h3 class="h6 mb-0">İşletme Bilgileri</h3></div>
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Abonelik Özeti</h3>
+                <a asp-action="Subscription" asp-route-businessId="@Model.Id" class="btn btn-sm btn-outline-primary">Aboneliği Yönet</a>
+            </div>
             <div class="panel-card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Id</dt><dd class="col-sm-8">@Model.Id</dd>
-                    <dt class="col-sm-4">Telefon</dt><dd class="col-sm-8">@(Model.Phone ?? "-")</dd>
-                    <dt class="col-sm-4">Logo</dt><dd class="col-sm-8">@(Model.LogoUrl ?? "-")</dd>
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-4">Plan</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.Subscription.PlanName</dd>
                     <dt class="col-sm-4">Durum</dt>
                     <dd class="col-sm-8">
-                        @if (Model.IsActive) { <span class="badge bg-success">Aktif</span> }
-                        else { <span class="badge bg-secondary">Pasif</span> }
+                        <span class="badge @Model.Subscription.StatusBadgeClass">@Model.Subscription.StatusText</span>
+                        @if (Model.Subscription.IsValid)
+                        {
+                            <span class="badge bg-success ms-1">Geçerli</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger ms-1">Geçersiz</span>
+                        }
                     </dd>
-                    <dt class="col-sm-4">Oluşturulma</dt><dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</dd>
+                    <dt class="col-sm-4">Başlangıç</dt>
+                    <dd class="col-sm-8">@(Model.Subscription.StartDate?.ToLocalTime().ToString("dd.MM.yyyy") ?? "-")</dd>
+                    <dt class="col-sm-4">Bitiş</dt>
+                    <dd class="col-sm-8">@(Model.Subscription.EndDate?.ToLocalTime().ToString("dd.MM.yyyy") ?? "-")</dd>
+                    <dt class="col-sm-4">Kalan Gün</dt>
+                    <dd class="col-sm-8">@(Model.Subscription.DaysRemaining.HasValue ? $"{Model.Subscription.DaysRemaining} gün" : "Süresiz")</dd>
+                    <dt class="col-sm-4">Plan Fiyatı</dt>
+                    <dd class="col-sm-8">@Money(Model.Subscription.PlanPrice) / ay</dd>
                 </dl>
             </div>
         </div>
     </div>
     <div class="col-lg-6">
         <div class="panel-card h-100">
-            <div class="panel-card-header"><h3 class="h6 mb-0">Ayarlar & Abonelik</h3></div>
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Plan Kullanım Özeti</h3>
+            </div>
             <div class="panel-card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">WhatsApp</dt><dd class="col-sm-8">@(Model.WhatsAppNumber ?? "-")</dd>
-                    <dt class="col-sm-4">Tema</dt>
-                    <dd class="col-sm-8">
-                        <span class="d-inline-block rounded border" style="width:1.25rem;height:1.25rem;background:@Model.ThemeColor"></span>
-                        @Model.ThemeColor
+                @if (!Model.PlanUsage.HasValidSubscription)
+                {
+                    <p class="text-muted mb-0">Geçerli abonelik bulunamadı.</p>
+                }
+                else
+                {
+                    @foreach (var metric in Model.PlanUsage.AllMetrics)
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>@metric.Name</span>
+                                <span class="@metric.StatusCssClass">@metric.UsageDisplay</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar @metric.ProgressBarClass" style="width: @metric.UsagePercent%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Menü Hazırlık Özeti</h3>
+            </div>
+            <div class="panel-card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <div class="stat-card py-3">
+                            <div class="stat-label small">Aktif Kategori</div>
+                            <div class="stat-value fs-4">@Model.Menu.ActiveCategories / @Model.Menu.TotalCategories</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card py-3">
+                            <div class="stat-label small">Aktif Ürün</div>
+                            <div class="stat-value fs-4">@Model.Menu.ActiveProducts / @Model.Menu.TotalProducts</div>
+                        </div>
+                    </div>
+                </div>
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-5">Pasif Ürün</dt>
+                    <dd class="col-sm-7">@Model.Menu.PassiveProducts</dd>
+                    <dt class="col-sm-5">Ort. Ürün Fiyatı</dt>
+                    <dd class="col-sm-7">@Money(Model.Menu.AverageProductPrice)</dd>
+                    <dt class="col-sm-5">Public Menü</dt>
+                    <dd class="col-sm-7">
+                        <a href="@Model.Menu.PublicMenuUrl" target="_blank" rel="noopener">@Model.Menu.PublicMenuUrl</a>
                     </dd>
-                    <dt class="col-sm-4">Para Birimi</dt><dd class="col-sm-8">@Model.Currency</dd>
-                    <dt class="col-sm-4">Aktif Plan</dt><dd class="col-sm-8">@Model.ActivePlanName</dd>
-                    <dt class="col-sm-4">Abonelik Durumu</dt><dd class="col-sm-8">@Model.SubscriptionStatus</dd>
-                    <dt class="col-sm-4">Başlangıç</dt>
-                    <dd class="col-sm-8">@(Model.SubscriptionStartDate?.ToLocalTime().ToString("dd.MM.yyyy") ?? "-")</dd>
                 </dl>
             </div>
         </div>
     </div>
-    <div class="col-12">
-        <div class="panel-card">
-            <div class="panel-card-header"><h3 class="h6 mb-0">İstatistikler</h3></div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Sipariş Performansı</h3>
+            </div>
             <div class="panel-card-body">
-                <div class="row g-3 text-center">
-                    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">Kategori</div><div class="stat-value">@Model.CategoryCount</div></div></div>
-                    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">Ürün</div><div class="stat-value">@Model.ProductCount</div></div></div>
-                    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">Müşteri</div><div class="stat-value">@Model.CustomerCount</div></div></div>
-                    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">Sipariş</div><div class="stat-value">@Model.OrderCount</div></div></div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-card py-3">
+                            <div class="stat-label small">Toplam Sipariş</div>
+                            <div class="stat-value fs-4">@Model.OrderSummary.TotalOrders</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card py-3">
+                            <div class="stat-label small">Toplam Ciro</div>
+                            <div class="stat-value fs-5">@Money(Model.OrderSummary.TotalRevenue)</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card py-3">
+                            <div class="stat-label small">Bugün / 7 Gün</div>
+                            <div class="stat-value fs-5">@Model.OrderSummary.TodayOrders / @Model.OrderSummary.Last7DaysOrders</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card py-3">
+                            <div class="stat-label small">Bu Ay Ciro</div>
+                            <div class="stat-value fs-5">@Money(Model.OrderSummary.ThisMonthRevenue)</div>
+                        </div>
+                    </div>
                 </div>
+                <dl class="row mb-0 small mt-3">
+                    <dt class="col-sm-5">Ortalama Sepet</dt>
+                    <dd class="col-sm-7">@Money(Model.OrderSummary.AverageBasket)</dd>
+                    <dt class="col-sm-5">Son Sipariş</dt>
+                    <dd class="col-sm-7">
+                        @(Model.OrderSummary.LastOrderAt.HasValue
+                            ? Model.OrderSummary.LastOrderAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                            : "-")
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Son 10 Sipariş</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sipariş No</th>
+                                <th>Tarih</th>
+                                <th>Müşteri</th>
+                                <th class="text-end">Tutar</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.RecentOrders.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-3">Sipariş yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var order in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@order.OrderNumber</td>
+                                    <td class="small">@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                                    <td>@order.CustomerName</td>
+                                    <td class="text-end">@Money(order.TotalAmount)</td>
+                                    <td><span class="badge @order.StatusBadgeClass">@order.StatusText</span></td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">En Çok Satan Ürünler (Top 5)</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ürün</th>
+                                <th class="text-end">Adet</th>
+                                <th class="text-end">Ciro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.TopProducts.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">Veri yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var product in Model.TopProducts)
+                            {
+                                <tr>
+                                    <td>@product.ProductName</td>
+                                    <td class="text-end">@product.Quantity</td>
+                                    <td class="text-end">@Money(product.Revenue)</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Sahip ve Personel</h3>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-5">İşletme Sahibi</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrWhiteSpace(Model.Users.OwnerName))
+                        {
+                            <div class="fw-semibold">@Model.Users.OwnerName</div>
+                        }
+                        <div class="text-muted">@(Model.Users.OwnerEmail ?? "-")</div>
+                    </dd>
+                    <dt class="col-sm-5">Personel</dt>
+                    <dd class="col-sm-7">@Model.Users.StaffCount</dd>
+                    <dt class="col-sm-5">Toplam Rol</dt>
+                    <dd class="col-sm-7">@Model.Users.TotalRoleCount</dd>
+                </dl>
             </div>
         </div>
     </div>

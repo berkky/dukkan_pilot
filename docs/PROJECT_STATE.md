@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 24A aşaması (Admin SaaS Yönetim Merkezi) tamamlandı.
+> Son güncelleme: 24B aşaması (Admin İşletme Operasyonları / Platform Kontrol Merkezi) tamamlandı.
 
 ---
 
@@ -424,6 +424,19 @@ DukkanPilot.sln
 - Public menü, sepet, confirmation ve tracking akışı bozulmadı
 - Migration / Identity / SignalR / yeni NuGet dependency yok
 
+### 24B aşaması — Admin İşletme Operasyonları / Platform Kontrol Merkezi
+- **Admin Business Details:** `/Admin/Businesses/Details/{id}` operasyon kontrol merkezine dönüştürüldü — profil, sağlık skoru, riskler, abonelik/plan kullanım, menü hazırlık, sipariş performansı, son siparişler, top ürünler, sahip/personel özeti
+- **İşletme sağlık skoru (0-100):** aktiflik, abonelik, iletişim, kategori/ürün, son 30 gün sipariş, logo/açıklama, public menü hazırlığı
+- **Risk nedenleri:** abonelik, pasiflik, menü eksikliği, iletişim ve sipariş riskleri badge ile
+- **Admin Businesses Index:** sağlık skoru, risk badge, public menü linki, hızlı aktif/pasif toggle, CSV export butonu
+- **CSV export:** `GET /Admin/Businesses/ExportCsv` — UTF-8 BOM, mevcut filtrelerle uyumlu
+- **ToggleActive:** `POST /Admin/Businesses/ToggleActive/{id}` — SuperAdmin, anti-forgery, yalnızca `Business.IsActive`
+- Admin dashboard listelerindeki detay linkleri `/Admin/Businesses/Details/{id}` route’una yönlendirir
+- Business panel impersonation yok; public menü yalnızca `/m/{slug}` ile açılır
+- Admin yetkisi SuperAdmin ile korundu; Business tenant filtreleri bozulmadı
+- Public menü, sepet, confirmation ve tracking akışı bozulmadı
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -485,7 +498,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-24A tamamlandı — Admin SaaS Yönetim Merkezi, platform KPI/abonelik özeti ve Admin Businesses/SubscriptionPlans iyileştirmeleri eklendi.
+24B tamamlandı — Admin işletme operasyon kontrol merkezi, sağlık skoru, CSV export ve hızlı aktif/pasif toggle eklendi.
 
 ---
 
@@ -506,7 +519,10 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/` | Ana sayfa |
 | `/Admin/Dashboard` | Admin özet |
 | `/Admin/Businesses` | İşletme listesi |
+| `/Admin/Businesses/Details/{id}` | İşletme operasyon kontrol merkezi |
+| `/Admin/Businesses/ExportCsv` | İşletme CSV dışa aktarma |
 | `/Admin/Businesses/Subscription/{id}` | İşletme abonelik yönetimi |
+| `POST /Admin/Businesses/ToggleActive/{id}` | İşletme hızlı aktif/pasif |
 | `/Admin/SubscriptionPlans` | Plan listesi |
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
 | `/Business/Products/ImportCsv` | CSV ile ürün içe aktarma |

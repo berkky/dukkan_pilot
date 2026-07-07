@@ -11,7 +11,10 @@
         <h2 class="h4 mb-1">İşletme Listesi</h2>
         <p class="text-muted mb-0">Platforma kayıtlı tüm işletmeler</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary">+ Yeni İşletme</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="@Model.ExportCsvUrl" class="btn btn-outline-secondary">CSV Dışa Aktar</a>
+        <a asp-action="Create" class="btn btn-primary">+ Yeni İşletme</a>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -100,12 +103,10 @@
                     <tr>
                         <th>İşletme Adı</th>
                         <th>Slug</th>
-                        <th>Telefon</th>
-                        <th>Aktiflik</th>
+                        <th>Sağlık</th>
+                        <th>Risk</th>
                         <th>Plan</th>
                         <th>Abonelik</th>
-                        <th>Bitiş</th>
-                        <th class="text-end">Ürün</th>
                         <th class="text-end">Sipariş</th>
                         <th class="text-end">İşlemler</th>
                     </tr>
@@ -114,7 +115,7 @@
                 @if (!Model.Businesses.Any())
                 {
                     <tr>
-                        <td colspan="10" class="text-center text-muted py-4">Kayıt bulunamadı.</td>
+                        <td colspan="8" class="text-center text-muted py-4">Kayıt bulunamadı.</td>
                     </tr>
                 }
                 else
@@ -122,10 +123,8 @@
                     foreach (var item in Model.Businesses)
                     {
                         <tr>
-                            <td class="fw-semibold">@item.Name</td>
-                            <td><code>@item.Slug</code></td>
-                            <td>@(item.Phone ?? "-")</td>
                             <td>
+                                <div class="fw-semibold">@item.Name</div>
                                 @if (item.IsActive)
                                 {
                                     <span class="badge bg-success">Aktif</span>
@@ -135,20 +134,37 @@
                                     <span class="badge bg-secondary">Pasif</span>
                                 }
                             </td>
+                            <td><code>@item.Slug</code></td>
+                            <td>
+                                <span class="fw-semibold">@item.HealthScore</span>
+                                <span class="badge @item.HealthBadgeClass ms-1">@item.HealthLabel</span>
+                            </td>
+                            <td>
+                                @if (item.HasRisks)
+                                {
+                                    <span class="badge @item.PrimaryRiskBadgeClass">@item.PrimaryRiskReason</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Risk yok</span>
+                                }
+                            </td>
                             <td>@item.PlanName</td>
                             <td>
                                 <span class="badge @item.SubscriptionStatusBadgeClass">@item.SubscriptionStatusText</span>
                             </td>
-                            <td class="small">
-                                @(item.SubscriptionEndDate.HasValue
-                                    ? item.SubscriptionEndDate.Value.ToLocalTime().ToString("dd.MM.yyyy")
-                                    : "-")
-                            </td>
-                            <td class="text-end">@item.ProductCount</td>
                             <td class="text-end">@item.OrderCount</td>
                             <td class="text-end text-nowrap">
+                                <a href="/m/@item.Slug" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary" title="Public Menü">Menü</a>
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
-                                <a asp-action="Subscription" asp-route-businessId="@item.Id" class="btn btn-sm btn-outline-info">Abonelik Yönet</a>
+                                <a asp-action="Subscription" asp-route-businessId="@item.Id" class="btn btn-sm btn-outline-info">Abonelik</a>
+                                <form asp-action="ToggleActive" asp-route-id="@item.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-warning" : "btn-outline-success")"
+                                            title="@(item.IsActive ? "Pasif Yap" : "Aktif Yap")">
+                                        @(item.IsActive ? "Pasif" : "Aktif")
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }
