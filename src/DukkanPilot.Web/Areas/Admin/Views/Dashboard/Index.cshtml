@@ -1,63 +1,323 @@
 @model AdminDashboardViewModel
+@using System.Globalization
 @{
-    ViewData["Title"] = "Dashboard";
-    ViewData["Subtitle"] = "Platform genel görünümü";
+    ViewData["Title"] = "SaaS Yönetim Merkezi";
+    ViewData["Subtitle"] = "Platform genelindeki işletme, abonelik ve kullanım durumunu takip edin.";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string Money(decimal amount) => amount.ToString("N2", culture) + " ₺";
+    var sub = Model.Subscriptions;
+    var subTotal = sub.TrialSubscriptions + sub.ActiveSubscriptions + sub.ExpiredSubscriptions
+        + sub.CancelledSubscriptions + sub.ExpiringSoonSubscriptions + sub.BusinessesWithoutSubscription;
+    int SubPercent(int count) => subTotal > 0 ? (int)Math.Round(count * 100.0 / subTotal) : 0;
 }
 
 <div class="page-header mb-4">
-    <h2 class="h4 mb-1">Platform Özeti</h2>
-    <p class="text-muted mb-0">Canlı veritabanı istatistikleri</p>
+    <h2 class="h4 mb-1">SaaS Yönetim Merkezi</h2>
+    <p class="text-muted mb-0">Platform genelindeki işletme, abonelik ve kullanım durumunu takip edin.</p>
 </div>
 
-<div class="row g-4">
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card">
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
             <div class="stat-label">Toplam İşletme</div>
-            <div class="stat-value">@Model.TotalBusinessCount</div>
+            <div class="stat-value">@Model.Platform.TotalBusinesses</div>
+            <small class="text-muted">@Model.Platform.ActiveBusinesses aktif · @Model.Platform.PassiveBusinesses pasif</small>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card">
-            <div class="stat-label">Aktif İşletme</div>
-            <div class="stat-value">@Model.ActiveBusinessCount</div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Platform Cirosu</div>
+            <div class="stat-value">@Money(Model.Platform.TotalRevenue)</div>
+            <small class="text-muted">Bugün: @Money(Model.Platform.TodayRevenue)</small>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card">
-            <div class="stat-label">Toplam Plan</div>
-            <div class="stat-value">@Model.TotalPlanCount</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card">
-            <div class="stat-label">Aktif Abonelik</div>
-            <div class="stat-value">@Model.ActiveSubscriptionCount</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card">
-            <div class="stat-label">Toplam Ürün</div>
-            <div class="stat-value">@Model.TotalProductCount</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
             <div class="stat-label">Toplam Sipariş</div>
-            <div class="stat-value">@Model.TotalOrderCount</div>
+            <div class="stat-value">@Model.Platform.TotalOrders</div>
+            <small class="text-muted">Son 7 gün: @Model.Platform.Last7DaysOrders</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Aktif Abonelik</div>
+            <div class="stat-value">@sub.ActiveSubscriptions</div>
+            <small class="text-muted">@sub.ExpiredSubscriptions süresi dolmuş</small>
         </div>
     </div>
 </div>
 
-<div class="row g-4 mt-2">
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-md-4 col-xl-2">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Toplam Kullanıcı</div>
+            <div class="stat-value fs-4">@Model.Platform.TotalUsers</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-xl-2">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">İşletme Sahibi</div>
+            <div class="stat-value fs-4">@Model.Platform.BusinessOwnersCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-xl-2">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Personel</div>
+            <div class="stat-value fs-4">@Model.Platform.StaffUsersCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-xl-2">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Bugünkü Sipariş</div>
+            <div class="stat-value fs-4">@Model.Platform.TodayOrders</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-xl-2">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Bu Ay Ciro</div>
+            <div class="stat-value fs-5">@Money(Model.Platform.ThisMonthRevenue)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-xl-2">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Bu Ay Sipariş</div>
+            <div class="stat-value fs-4">@Model.Platform.ThisMonthOrders</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Abonelik Durumu</h3>
+            </div>
+            <div class="panel-card-body">
+                @{
+                    var subItems = new (string Label, int Count, string Badge)[]
+                    {
+                        ("Deneme (Trial)", sub.TrialSubscriptions, "bg-info text-dark"),
+                        ("Aktif", sub.ActiveSubscriptions, "bg-success"),
+                        ("Süresi Dolmuş", sub.ExpiredSubscriptions, "bg-danger"),
+                        ("İptal", sub.CancelledSubscriptions, "bg-secondary"),
+                        ("7 Gün İçinde Bitecek", sub.ExpiringSoonSubscriptions, "bg-warning text-dark"),
+                        ("Aboneliği Olmayan", sub.BusinessesWithoutSubscription, "bg-dark")
+                    };
+                }
+                @foreach (var item in subItems)
+                {
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span>@item.Label</span>
+                            <span class="badge @item.Badge">@item.Count</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar @item.Badge" role="progressbar"
+                                 style="width: @(SubPercent(item.Count))%"
+                                 aria-valuenow="@item.Count" aria-valuemin="0" aria-valuemax="@subTotal"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Plan Dağılımı</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Plan</th>
+                                <th class="text-end">İşletme</th>
+                                <th class="text-end">Aktif Abonelik</th>
+                                <th class="text-end">Potansiyel Gelir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.PlanDistribution.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">Plan kaydı yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var plan in Model.PlanDistribution)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@plan.PlanName</td>
+                                    <td class="text-end">@plan.BusinessCount</td>
+                                    <td class="text-end">@plan.ActiveSubscriptionCount</td>
+                                    <td class="text-end">@Money(plan.MonthlyPotentialRevenue)</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
     <div class="col-lg-8">
         <div class="panel-card">
-            <div class="panel-card-header">
-                <h3 class="h6 mb-0">Hızlı Erişim</h3>
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">En Aktif İşletmeler (Top 10)</h3>
+                <a href="/Admin/Businesses" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
             </div>
-            <div class="panel-card-body d-grid gap-2 d-md-flex">
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>İşletme</th>
+                                <th>Slug</th>
+                                <th class="text-end">Sipariş</th>
+                                <th class="text-end">Ciro</th>
+                                <th class="text-end">Ürün</th>
+                                <th>Plan</th>
+                                <th>Durum</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.TopActiveBusinesses.Any())
+                        {
+                            <tr><td colspan="8" class="text-center text-muted py-3">Veri yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var b in Model.TopActiveBusinesses)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@b.BusinessName</td>
+                                    <td><code>@b.Slug</code></td>
+                                    <td class="text-end">@b.OrderCount</td>
+                                    <td class="text-end">@Money(b.Revenue)</td>
+                                    <td class="text-end">@b.ActiveProductsCount</td>
+                                    <td>@b.CurrentPlanName</td>
+                                    <td><span class="badge @b.SubscriptionStatusBadgeClass">@b.SubscriptionStatus</span></td>
+                                    <td class="text-end">
+                                        <a href="/Admin/Businesses/Details/@b.BusinessId" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Hızlı Aksiyonlar</h3>
+            </div>
+            <div class="panel-card-body d-grid gap-2">
                 <a href="/Admin/Businesses" class="btn btn-outline-primary">İşletmeler</a>
-                <a href="/Admin/Businesses/Create" class="btn btn-outline-primary">Yeni İşletme</a>
                 <a href="/Admin/SubscriptionPlans" class="btn btn-outline-secondary">Abonelik Planları</a>
+                <a href="/Admin/SubscriptionPlans/Create" class="btn btn-outline-secondary">Yeni Plan</a>
+                <a href="/Admin/Businesses" class="btn btn-outline-info">Abonelik Yönetimi (İşletme Listesi)</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Riskli İşletmeler</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>İşletme</th>
+                                <th>Risk</th>
+                                <th class="text-end">Son Sipariş</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.RiskyBusinesses.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">Riskli işletme bulunamadı.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var r in Model.RiskyBusinesses)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@r.BusinessName</td>
+                                    <td><span class="badge @r.RiskBadgeClass">@r.RiskReason</span></td>
+                                    <td class="text-end small text-muted">
+                                        @(r.LastOrderAt.HasValue ? r.LastOrderAt.Value.ToLocalTime().ToString("dd.MM.yyyy") : "-")
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="/Admin/Businesses/Details/@r.BusinessId" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Son Kayıt Olan İşletmeler</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>İşletme</th>
+                                <th>Kayıt</th>
+                                <th>Plan</th>
+                                <th>Durum</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.RecentBusinesses.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-3">Kayıt yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var b in Model.RecentBusinesses)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@b.BusinessName</div>
+                                        @if (!string.IsNullOrEmpty(b.OwnerEmail))
+                                        {
+                                            <small class="text-muted">@b.OwnerEmail</small>
+                                        }
+                                    </td>
+                                    <td class="small">@b.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                                    <td>@b.CurrentPlanName</td>
+                                    <td><span class="badge @b.SubscriptionStatusBadgeClass">@b.SubscriptionStatus</span></td>
+                                    <td class="text-end">
+                                        <a href="/Admin/Businesses/Details/@b.BusinessId" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

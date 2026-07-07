@@ -1,6 +1,7 @@
 using DukkanPilot.Core.Entities;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,23 +22,43 @@ public class SubscriptionPlansController : AdminBaseController
     {
         ViewData["ActiveMenu"] = "plans";
 
+        var now = DateTime.UtcNow;
+
+        var businesses = await _context.Businesses
+            .AsNoTracking()
+            .Include(b => b.Subscriptions)
+            .ToListAsync();
+
         var plans = await _context.SubscriptionPlans
             .AsNoTracking()
             .OrderBy(p => p.SortOrder)
             .ThenBy(p => p.Name)
-            .Select(p => new SubscriptionPlanFormViewModel
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                MaxProducts = p.MaxProducts,
-                MaxCampaigns = p.MaxCampaigns,
-                IsActive = p.IsActive
-            })
             .ToListAsync();
 
-        return View(plans);
+        var items = plans.Select(plan =>
+        {
+            var activeCount = businesses.Count(b =>
+            {
+                var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);
+                return latest?.SubscriptionPlanId == plan.Id
+                    && AdminSaasQueryHelper.IsSubscriptionValid(latest, now);
+            });
+
+            return new SubscriptionPlanListViewModel
+            {
+                Id = plan.Id,
+                Name = plan.Name,
+                Description = plan.Description,
+                Price = plan.Price,
+                MaxProducts = plan.MaxProducts,
+                MaxCampaigns = plan.MaxCampaigns,
+                IsActive = plan.IsActive,
+                ActiveBusinessCount = activeCount,
+                HasActiveSubscriptions = activeCount > 0
+            };
+        }).ToList();
+
+        return View(items);
     }
 
     [HttpGet("Create")]

@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 23A aşaması (Müşteri CRM Premium / Sadakat Zekası) tamamlandı.
+> Son güncelleme: 24A aşaması (Admin SaaS Yönetim Merkezi) tamamlandı.
 
 ---
 
@@ -411,6 +411,19 @@ DukkanPilot.sln
 - Public menü, sepet, confirmation ve tracking akışı bozulmadı
 - Migration / Identity / SignalR / yeni NuGet dependency yok
 
+### 24A aşaması — Admin SaaS Yönetim Merkezi
+- **Admin SaaS Yönetim Merkezi:** `GET /Admin/Dashboard` — platform KPI, abonelik özeti, plan dağılımı
+- Platform KPI kartları: işletme, kullanıcı, sipariş, ciro (bugün / 7 gün / bu ay); iptal siparişler ciroya dahil değil
+- Abonelik durumu özeti: Trial, Active, Expired, Cancelled, 7 gün içinde bitecek, aboneliği olmayan
+- Plan dağılımı: işletme sayısı, aktif abonelik, potansiyel aylık gelir (`Plan.Price × aktif abonelik`)
+- En aktif işletmeler (Top 10), riskli işletmeler, son kayıt olan işletmeler listeleri
+- **Admin Businesses Index:** özet kartları, arama (ad/slug/telefon), aktiflik/abonelik/plan filtreleri, ürün/sipariş sayıları
+- **Admin SubscriptionPlans Index:** plan kullanım sayısı, limit/fiyat okunaklı gösterim, aktif abonelikte silme uyarısı
+- Admin sidebar: “SaaS Yönetim Merkezi” linki
+- Admin yetkisi SuperAdmin ile korundu; Business tenant filtreleri bozulmadı
+- Public menü, sepet, confirmation ve tracking akışı bozulmadı
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -472,7 +485,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-23A tamamlandı — Müşteri CRM premium paneli, segment analizi ve Insights ekranı eklendi.
+24A tamamlandı — Admin SaaS Yönetim Merkezi, platform KPI/abonelik özeti ve Admin Businesses/SubscriptionPlans iyileştirmeleri eklendi.
 
 ---
 

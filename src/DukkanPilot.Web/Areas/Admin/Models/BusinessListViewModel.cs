@@ -8,5 +8,11 @@ public class BusinessListViewModel
     public string? Phone { get; set; }
     public bool IsActive { get; set; }
     public string PlanName { get; set; } = "-";
+    public string SubscriptionStatusText { get; set; } = "-";
+    public string SubscriptionStatusBadgeClass { get; set; } = "bg-secondary";
+    public DateTime? SubscriptionEndDate { get; set; }
+    public int ProductCount { get; set; }
+    public int OrderCount { get; set; }
+    public decimal TotalRevenue { get; set; }
     public DateTime CreatedAt { get; set; }
 }

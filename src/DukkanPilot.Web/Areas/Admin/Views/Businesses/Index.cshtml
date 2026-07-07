@@ -1,15 +1,95 @@
-@model IEnumerable<BusinessListViewModel>
+@model BusinessesIndexViewModel
+@using System.Globalization
 @{
     ViewData["Title"] = "İşletmeler";
     ViewData["Subtitle"] = "Tüm işletmeleri yönetin";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
         <h2 class="h4 mb-1">İşletme Listesi</h2>
         <p class="text-muted mb-0">Platforma kayıtlı tüm işletmeler</p>
     </div>
     <a asp-action="Create" class="btn btn-primary">+ Yeni İşletme</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Toplam İşletme</div>
+            <div class="stat-value fs-4">@Model.TotalBusinesses</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Aktif</div>
+            <div class="stat-value fs-4">@Model.ActiveBusinesses</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Pasif</div>
+            <div class="stat-value fs-4">@Model.PassiveBusinesses</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Aboneliği Aktif</div>
+            <div class="stat-value fs-4">@Model.ActiveSubscriptionBusinesses</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Aboneliği Bitmiş</div>
+            <div class="stat-value fs-4">@Model.ExpiredSubscriptionBusinesses</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small text-muted">Arama</label>
+                <input type="text" name="search" value="@Model.Search" class="form-control"
+                       placeholder="İşletme adı, slug veya telefon" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Aktiflik</label>
+                <select name="statusFilter" class="form-select">
+                    <option value="all" selected="@(Model.StatusFilter == "all")">Tümü</option>
+                    <option value="active" selected="@(Model.StatusFilter == "active")">Aktif</option>
+                    <option value="passive" selected="@(Model.StatusFilter == "passive")">Pasif</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Abonelik Durumu</label>
+                <select name="subscriptionFilter" class="form-select">
+                    <option value="all" selected="@(Model.SubscriptionFilter == "all")">Tümü</option>
+                    <option value="active" selected="@(Model.SubscriptionFilter == "active")">Aktif</option>
+                    <option value="trial" selected="@(Model.SubscriptionFilter == "trial")">Deneme</option>
+                    <option value="expired" selected="@(Model.SubscriptionFilter == "expired")">Süresi Dolmuş</option>
+                    <option value="cancelled" selected="@(Model.SubscriptionFilter == "cancelled")">İptal</option>
+                    <option value="expiring" selected="@(Model.SubscriptionFilter == "expiring")">7 Gün İçinde Bitecek</option>
+                    <option value="none" selected="@(Model.SubscriptionFilter == "none")">Aboneliği Yok</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Plan</label>
+                <select name="planFilter" class="form-select">
+                    <option value="">Tümü</option>
+                    @foreach (var plan in Model.AvailablePlans)
+                    {
+                        <option value="@plan.Value" selected="@plan.Selected">@plan.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-outline-primary w-100">Filtrele</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="panel-card">
@@ -18,29 +98,30 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Id</th>
                         <th>İşletme Adı</th>
                         <th>Slug</th>
                         <th>Telefon</th>
-                        <th>Durum</th>
+                        <th>Aktiflik</th>
                         <th>Plan</th>
-                        <th>Oluşturulma</th>
+                        <th>Abonelik</th>
+                        <th>Bitiş</th>
+                        <th class="text-end">Ürün</th>
+                        <th class="text-end">Sipariş</th>
                         <th class="text-end">İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
-                @if (!Model.Any())
+                @if (!Model.Businesses.Any())
                 {
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">Henüz işletme kaydı yok.</td>
+                        <td colspan="10" class="text-center text-muted py-4">Kayıt bulunamadı.</td>
                     </tr>
                 }
                 else
                 {
-                    foreach (var item in Model)
+                    foreach (var item in Model.Businesses)
                     {
                         <tr>
-                            <td>@item.Id</td>
                             <td class="fw-semibold">@item.Name</td>
                             <td><code>@item.Slug</code></td>
                             <td>@(item.Phone ?? "-")</td>
@@ -55,12 +136,19 @@
                                 }
                             </td>
                             <td>@item.PlanName</td>
-                            <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
-                            <td class="text-end">
+                            <td>
+                                <span class="badge @item.SubscriptionStatusBadgeClass">@item.SubscriptionStatusText</span>
+                            </td>
+                            <td class="small">
+                                @(item.SubscriptionEndDate.HasValue
+                                    ? item.SubscriptionEndDate.Value.ToLocalTime().ToString("dd.MM.yyyy")
+                                    : "-")
+                            </td>
+                            <td class="text-end">@item.ProductCount</td>
+                            <td class="text-end">@item.OrderCount</td>
+                            <td class="text-end text-nowrap">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
-                                <a asp-action="Subscription" asp-route-businessId="@item.Id" class="btn btn-sm btn-outline-info">Abonelik</a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                                <a asp-action="Subscription" asp-route-businessId="@item.Id" class="btn btn-sm btn-outline-info">Abonelik Yönet</a>
                             </td>
                         </tr>
                     }

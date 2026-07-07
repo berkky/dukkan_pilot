@@ -4,6 +4,7 @@ using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
 using DukkanPilot.Web.Areas.Business.Models;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,30 +22,141 @@ public class BusinessesController : AdminBaseController
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(
+        string? search,
+        string statusFilter = "all",
+        string subscriptionFilter = "all",
+        int? planFilter = null)
     {
         ViewData["ActiveMenu"] = "businesses";
 
-        var items = await _context.Businesses
+        var now = DateTime.UtcNow;
+
+        var allBusinesses = await _context.Businesses
             .AsNoTracking()
+            .Include(b => b.Subscriptions)
+                .ThenInclude(s => s.SubscriptionPlan)
             .OrderByDescending(b => b.CreatedAt)
-            .Select(b => new BusinessListViewModel
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Slug = b.Slug,
-                Phone = b.Phone,
-                IsActive = b.IsActive,
-                CreatedAt = b.CreatedAt,
-                PlanName = b.Subscriptions
-                    .Where(s => s.IsActive && s.Status == SubscriptionStatus.Active)
-                    .OrderByDescending(s => s.StartDate)
-                    .Select(s => s.SubscriptionPlan.Name)
-                    .FirstOrDefault() ?? "-"
-            })
             .ToListAsync();
 
-        return View(items);
+        var productCounts = await _context.Products
+            .AsNoTracking()
+            .GroupBy(p => p.BusinessId)
+            .Select(g => new { BusinessId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.BusinessId, x => x.Count);
+
+        var orderStats = await _context.Orders
+            .AsNoTracking()
+            .GroupBy(o => o.BusinessId)
+            .Select(g => new
+            {
+                BusinessId = g.Key,
+                Count = g.Count(),
+                Revenue = g.Where(o => o.Status != OrderStatus.Cancelled).Sum(o => o.TotalAmount)
+            })
+            .ToDictionaryAsync(x => x.BusinessId, x => x);
+
+        var filtered = allBusinesses.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim().ToLowerInvariant();
+            filtered = filtered.Where(b =>
+                b.Name.ToLowerInvariant().Contains(term) ||
+                b.Slug.ToLowerInvariant().Contains(term) ||
+                (b.Phone?.ToLowerInvariant().Contains(term) ?? false));
+        }
+
+        filtered = statusFilter switch
+        {
+            "active" => filtered.Where(b => b.IsActive),
+            "passive" => filtered.Where(b => !b.IsActive),
+            _ => filtered
+        };
+
+        if (planFilter.HasValue)
+        {
+            filtered = filtered.Where(b =>
+            {
+                var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);
+                return latest?.SubscriptionPlanId == planFilter.Value;
+            });
+        }
+
+        if (!string.Equals(subscriptionFilter, "all", StringComparison.OrdinalIgnoreCase))
+        {
+            filtered = filtered.Where(b =>
+            {
+                var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);
+                return subscriptionFilter.ToLowerInvariant() switch
+                {
+                    "active" => latest is not null && AdminSaasQueryHelper.IsSubscriptionValid(latest, now),
+                    "trial" => latest is not null
+                        && latest.Status == SubscriptionStatus.Trial
+                        && AdminSaasQueryHelper.IsSubscriptionValid(latest, now),
+                    "expired" => AdminSaasQueryHelper.IsExpiredSubscription(latest, now),
+                    "cancelled" => latest?.Status == SubscriptionStatus.Cancelled,
+                    "none" => latest is null,
+                    "expiring" => latest is not null && AdminSaasQueryHelper.IsExpiringSoon(latest, now),
+                    _ => true
+                };
+            });
+        }
+
+        var businesses = filtered
+            .Select(b =>
+            {
+                var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);
+                productCounts.TryGetValue(b.Id, out var productCount);
+                orderStats.TryGetValue(b.Id, out var orders);
+
+                return new BusinessListViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Slug = b.Slug,
+                    Phone = b.Phone,
+                    IsActive = b.IsActive,
+                    CreatedAt = b.CreatedAt,
+                    PlanName = latest?.SubscriptionPlan?.Name ?? "-",
+                    SubscriptionStatusText = latest is not null
+                        ? AdminSaasQueryHelper.GetStatusLabel(latest.Status)
+                        : "-",
+                    SubscriptionStatusBadgeClass = latest is not null
+                        ? AdminSaasQueryHelper.GetStatusBadgeClass(latest.Status)
+                        : "bg-secondary",
+                    SubscriptionEndDate = latest?.EndDate,
+                    ProductCount = productCount,
+                    OrderCount = orders?.Count ?? 0,
+                    TotalRevenue = orders?.Revenue ?? 0m
+                };
+            })
+            .ToList();
+
+        var model = new BusinessesIndexViewModel
+        {
+            TotalBusinesses = allBusinesses.Count,
+            ActiveBusinesses = allBusinesses.Count(b => b.IsActive),
+            PassiveBusinesses = allBusinesses.Count(b => !b.IsActive),
+            ActiveSubscriptionBusinesses = allBusinesses.Count(b =>
+            {
+                var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);
+                return latest is not null && AdminSaasQueryHelper.IsSubscriptionValid(latest, now);
+            }),
+            ExpiredSubscriptionBusinesses = allBusinesses.Count(b =>
+            {
+                var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);
+                return AdminSaasQueryHelper.IsExpiredSubscription(latest, now);
+            }),
+            Search = search,
+            StatusFilter = statusFilter,
+            SubscriptionFilter = subscriptionFilter,
+            PlanFilter = planFilter,
+            AvailablePlans = await GetPlanSelectListAsync(planFilter),
+            Businesses = businesses
+        };
+
+        return View(model);
     }
 
     [HttpGet("Create")]

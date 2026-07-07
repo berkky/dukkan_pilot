@@ -1,7 +1,9 @@
-@model IEnumerable<SubscriptionPlanFormViewModel>
+@model IEnumerable<SubscriptionPlanListViewModel>
+@using System.Globalization
 @{
     ViewData["Title"] = "Abonelik Planları";
     ViewData["Subtitle"] = "Plan tanımlarını yönetin";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -18,11 +20,10 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Id</th>
                         <th>Plan Adı</th>
                         <th>Fiyat</th>
-                        <th>Maks. Ürün</th>
-                        <th>Maks. Kampanya</th>
+                        <th>Limitler</th>
+                        <th class="text-end">Aktif İşletme</th>
                         <th>Durum</th>
                         <th class="text-end">İşlemler</th>
                     </tr>
@@ -31,7 +32,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Henüz plan kaydı yok.</td>
+                        <td colspan="6" class="text-center text-muted py-4">Henüz plan kaydı yok.</td>
                     </tr>
                 }
                 else
@@ -39,11 +40,28 @@
                     foreach (var plan in Model)
                     {
                         <tr>
-                            <td>@plan.Id</td>
-                            <td class="fw-semibold">@plan.Name</td>
-                            <td>@plan.Price.ToString("N2") ₺</td>
-                            <td>@plan.MaxProducts</td>
-                            <td>@plan.MaxCampaigns</td>
+                            <td>
+                                <div class="fw-semibold">@plan.Name</div>
+                                @if (!string.IsNullOrWhiteSpace(plan.Description))
+                                {
+                                    <small class="text-muted">@plan.Description</small>
+                                }
+                            </td>
+                            <td>
+                                <span class="fw-semibold">@plan.Price.ToString("N2", culture) ₺</span>
+                                <small class="d-block text-muted">/ ay</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border me-1">@plan.MaxProducts ürün</span>
+                                <span class="badge bg-light text-dark border">@plan.MaxCampaigns kampanya</span>
+                            </td>
+                            <td class="text-end">
+                                <span class="fw-semibold">@plan.ActiveBusinessCount</span>
+                                @if (plan.HasActiveSubscriptions)
+                                {
+                                    <small class="d-block text-warning">Aktif abonelik var</small>
+                                }
+                            </td>
                             <td>
                                 @if (plan.IsActive)
                                 {
@@ -54,10 +72,17 @@
                                     <span class="badge bg-secondary">Pasif</span>
                                 }
                             </td>
-                            <td class="text-end">
+                            <td class="text-end text-nowrap">
                                 <a asp-action="Details" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
                                 <a asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-                                <a asp-action="Delete" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                                @if (plan.HasActiveSubscriptions)
+                                {
+                                    <span class="btn btn-sm btn-outline-danger disabled" title="Aktif abonelikte kullanılan plan pasife alınırken dikkatli olun.">Sil</span>
+                                }
+                                else
+                                {
+                                    <a asp-action="Delete" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                                }
                             </td>
                         </tr>
                     }
