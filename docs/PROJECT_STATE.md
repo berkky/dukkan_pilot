@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 21A aşaması (business dashboard analitik iyileştirme) tamamlandı.
+> Son güncelleme: 21B aşaması (premium raporlama paneli) tamamlandı.
 
 ---
 
@@ -369,6 +369,14 @@ DukkanPilot.sln
 - **Son siparişler** tablosu + **Hızlı aksiyonlar** (tenant slug ile QR menü linki)
 - Migration / Identity / SignalR / yeni NuGet dependency yok
 
+### 21B aşaması — Premium Raporlama Paneli
+- **Reports:** `/Business/Reports` — tarih dönemi filtreleri (bugün, son 7 gün, bu ay, özel aralık)
+- KPI: toplam ciro (iptal hariç), sipariş sayıları, ortalama sepet, min/max sipariş tutarı
+- Günlük performans tablosu + progress bar; en çok satan ürünler (top 10); durum dağılımı; son 10 sipariş
+- **CSV export:** `GET /Business/Reports/ExportCsv` — UTF-8 BOM, tenant filtresi
+- Sales/Products/Customers alt raporları korundu; subscription gate korundu
+- Migration / Identity / SignalR / yeni NuGet / Chart.js eklenmedi
+
 ---
 
 ## 6. Veritabanı
@@ -430,7 +438,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek (ör. public menü abonelik kontrolü, ödeme entegrasyonu, AI entegrasyonu).
 
-21A tamamlandı — business dashboard analitik KPI'lar, durum dağılımı ve en çok satan ürünler eklendi.
+21B tamamlandı — premium raporlama paneli, dönem filtreleri ve CSV export eklendi.
 
 ---
 
