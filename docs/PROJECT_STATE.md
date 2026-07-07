@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 21B aşaması (premium raporlama paneli) tamamlandı.
+> Son güncelleme: 22B aşaması (CSV ürün içe aktarma ve toplu ürün yönetimi) tamamlandı.
 
 ---
 
@@ -377,6 +377,30 @@ DukkanPilot.sln
 - Sales/Products/Customers alt raporları korundu; subscription gate korundu
 - Migration / Identity / SignalR / yeni NuGet / Chart.js eklenmedi
 
+### 22A aşaması — Menü Stüdyosu / Premium Menü Yönetimi
+- **Menü Stüdyosu:** `/Business/MenuStudio` — menü sağlık kontrolü, özet kartlar, kategori bazlı ürün özeti, public menü önizleme
+- Hızlı aksiyonlar: yeni kategori/ürün, QR menü, QR afişi, işletme ayarları, public link kopyalama
+- **Products Index:** özet kartlar, kategori/durum/arama/fiyat filtreleri, public görünürlük, hızlı fiyat güncelleme
+- **POST** `/Business/Products/ToggleActive/{id}`, `/Business/Products/UpdatePrice/{id}`, `/Business/Products/Duplicate/{id}` — antiforgery + tenant filtresi
+- **GET** `/Business/Products/ExportCsv` — UTF-8 BOM CSV export
+- **Categories Index:** özet kartlar, kategori başına ürün/aktif ürün/ortalama fiyat, public görünürlük
+- **POST** `/Business/Categories/ToggleActive/{id}` — antiforgery + tenant filtresi
+- Sidebar: Menü Stüdyosu linki; Dashboard hızlı aksiyonlara Menü Stüdyosu eklendi
+- Plan limit entegrasyonu (ürün kopyalama + plan kullanım gösterimi) korundu
+- Public menü, sepet, confirmation ve tracking akışı bozulmadı
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
+### 22B aşaması — Toplu Ürün Yönetimi / CSV İçe Aktarma
+- **CSV içe aktarma:** `/Business/Products/ImportCsv` — önizleme (dry-run) ve import modları
+- **Şablon:** `GET /Business/Products/DownloadImportTemplate` — UTF-8 BOM CSV şablonu
+- CSV doğrulama: başlık zorunlu, max 500 satır, max 1 MB, kategori eşleşmesi, fiyat ≥ 0, duplicate ürün adı engeli
+- Plan ürün limiti import sırasında korunur; limit aşımında kalan satırlar atlanır
+- **Toplu aksiyon:** `POST /Business/Products/BulkAction` — aktif/pasif, fiyat % artır/azalt
+- Products Index: CSV içe aktar, şablon indir, checkbox toplu seçim, bulk action bar
+- MenuStudio hızlı aksiyonlarına import kısayolları eklendi
+- Public menü ve sipariş takip akışı bozulmadı
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -436,9 +460,9 @@ DukkanPilot.sln
 
 ## 9. Sıradaki aşama
 
-Sonraki MVP aşaması proje ihtiyacına göre belirlenecek (ör. public menü abonelik kontrolü, ödeme entegrasyonu, AI entegrasyonu).
+Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-21B tamamlandı — premium raporlama paneli, dönem filtreleri ve CSV export eklendi.
+22B tamamlandı — CSV ürün içe aktarma, toplu ürün aksiyonları ve şablon indirme eklendi.
 
 ---
 
@@ -462,6 +486,10 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Admin/Businesses/Subscription/{id}` | İşletme abonelik yönetimi |
 | `/Admin/SubscriptionPlans` | Plan listesi |
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
+| `/Business/Products/ImportCsv` | CSV ile ürün içe aktarma |
+| `/Business/Products/DownloadImportTemplate` | CSV ürün şablonu indirme |
+| `POST /Business/Products/BulkAction` | Toplu ürün aktif/pasif ve fiyat işlemleri |
+| `/Business/MenuStudio` | Menü Stüdyosu — sağlık kontrolü ve menü özeti |
 | `/Business/Categories` | Kategori listesi |
 | `/Business/Products` | Ürün listesi |
 | `/Business/Orders` | Sipariş listesi |

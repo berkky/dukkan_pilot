@@ -1,69 +1,284 @@
-@model IEnumerable<ProductListViewModel>
+@model ProductsIndexViewModel
+@using System.Globalization
 @{
     ViewData["Title"] = "Ürünler";
     ViewData["Subtitle"] = "Menü ürünleri";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var returnUrl = $"/Business/Products{Context.Request.QueryString}";
+    if (string.IsNullOrEmpty(Context.Request.QueryString.Value))
+    {
+        returnUrl = "/Business/Products";
+    }
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
     <div>
         <h2 class="h4 mb-1">Ürünler</h2>
-        <p class="text-muted mb-0">Demo Kafe menü ürünleri</p>
+        <p class="text-muted mb-0">Menü ürünlerinizi yönetin, filtreleyin ve hızlı güncelleyin.</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary">+ Yeni Ürün</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/Products/ImportCsv" class="btn btn-outline-primary btn-sm">CSV İçe Aktar</a>
+        <a href="/Business/Products/DownloadImportTemplate" class="btn btn-outline-secondary btn-sm">Şablon İndir</a>
+        <a href="@Model.ExportCsvUrl" class="btn btn-outline-success btn-sm">CSV İndir</a>
+        <a href="/Business/MenuStudio" class="btn btn-outline-secondary btn-sm">Menü Stüdyosu</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Yeni Ürün</a>
+    </div>
 </div>
 
-<div class="panel-card">
-    <div class="panel-card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Id</th>
-                        <th>Ürün Adı</th>
-                        <th>Kategori</th>
-                        <th>Fiyat</th>
-                        <th>Sıra</th>
-                        <th>Durum</th>
-                        <th class="text-end">İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Henüz ürün yok.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Id</td>
-                            <td class="fw-semibold">@item.Name</td>
-                            <td>@item.CategoryName</td>
-                            <td>@item.Price.ToString("N2") ₺</td>
-                            <td>@item.SortOrder</td>
-                            <td>
-                                @if (item.IsActive)
-                                {
-                                    <span class="badge bg-success">Aktif</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Pasif</span>
-                                }
-                            </td>
-                            <td class="text-end">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Sil</a>
-                            </td>
-                        </tr>
-                    }
-                }
-                </tbody>
-            </table>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Ürün</div>
+            <div class="stat-value">@Model.TotalProducts</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Aktif Ürün</div>
+            <div class="stat-value text-success">@Model.ActiveProducts</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Pasif Ürün</div>
+            <div class="stat-value text-secondary">@Model.PassiveProducts</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Ortalama Fiyat</div>
+            <div class="stat-value fs-5">@Model.AveragePrice.ToString("N2", culture) ₺</div>
+            <div class="text-muted small">Plan: @Model.ProductPlanUsage.UsageDisplay</div>
         </div>
     </div>
 </div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Filtreler</h3>
+    </div>
+    <div class="panel-card-body">
+        <form method="get" action="/Business/Products" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label for="categoryId" class="form-label small mb-1">Kategori</label>
+                <select class="form-select form-select-sm" id="categoryId" name="categoryId">
+                    <option value="">Tümü</option>
+                    @foreach (var category in Model.AvailableCategories)
+                    {
+                        if (Model.CategoryFilter.HasValue && Model.CategoryFilter.Value.ToString() == category.Value)
+                        {
+                            <option value="@category.Value" selected>@category.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@category.Value">@category.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="status" class="form-label small mb-1">Durum</label>
+                <select class="form-select form-select-sm" id="status" name="status">
+                    @if (Model.StatusFilter == "all")
+                    {
+                        <option value="all" selected>Tümü</option>
+                    }
+                    else
+                    {
+                        <option value="all">Tümü</option>
+                    }
+                    @if (Model.StatusFilter == "active")
+                    {
+                        <option value="active" selected>Aktif</option>
+                    }
+                    else
+                    {
+                        <option value="active">Aktif</option>
+                    }
+                    @if (Model.StatusFilter == "passive")
+                    {
+                        <option value="passive" selected>Pasif</option>
+                    }
+                    else
+                    {
+                        <option value="passive">Pasif</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="search" class="form-label small mb-1">Arama</label>
+                <input type="text" class="form-control form-control-sm" id="search" name="search" value="@Model.Search" placeholder="Ürün adı veya açıklama" />
+            </div>
+            <div class="col-md-2">
+                <label for="minPrice" class="form-label small mb-1">Min Fiyat</label>
+                <input type="number" step="0.01" min="0" class="form-control form-control-sm" id="minPrice" name="minPrice" value="@(Model.MinPrice?.ToString(culture))" />
+            </div>
+            <div class="col-md-2">
+                <label for="maxPrice" class="form-label small mb-1">Max Fiyat</label>
+                <input type="number" step="0.01" min="0" class="form-control form-control-sm" id="maxPrice" name="maxPrice" value="@(Model.MaxPrice?.ToString(culture))" />
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">Uygula</button>
+                <a href="/Business/Products" class="btn btn-outline-secondary btn-sm">Temizle</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<form method="post" action="/Business/Products/BulkAction" id="bulk-action-form">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+    <div class="panel-card mb-3">
+        <div class="panel-card-body d-flex flex-wrap align-items-end gap-2">
+            <div>
+                <span class="small text-muted" id="selected-count-label">0 ürün seçildi</span>
+            </div>
+            <div class="ms-auto d-flex flex-wrap gap-2 align-items-end">
+                <div>
+                    <label for="actionType" class="form-label small mb-1">Toplu İşlem</label>
+                    <select class="form-select form-select-sm" id="actionType" name="actionType" required>
+                        <option value="">Seçin...</option>
+                        <option value="activate">Seçilenleri Aktif Yap</option>
+                        <option value="deactivate">Seçilenleri Pasif Yap</option>
+                        <option value="priceIncreasePercent">Fiyatı % Artır</option>
+                        <option value="priceDecreasePercent">Fiyatı % Azalt</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="percentValue" class="form-label small mb-1">Yüzde</label>
+                    <input type="number" step="1" min="0" max="100" class="form-control form-control-sm" id="percentValue" name="percentValue" placeholder="%" style="width: 80px;" />
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary">Uygula</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="panel-card">
+        <div class="panel-card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 36px;">
+                                <input type="checkbox" class="form-check-input" id="select-all-products" title="Tümünü seç" />
+                            </th>
+                            <th>Ürün</th>
+                            <th>Kategori</th>
+                            <th>Fiyat</th>
+                            <th>Durum</th>
+                            <th>Public Menü</th>
+                            <th class="text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (!Model.Products.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">Filtreye uygun ürün bulunamadı.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Products)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input product-select-checkbox" form="bulk-action-form" name="selectedProductIds" value="@item.Id" />
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@item.Name</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <div class="text-muted small text-truncate" style="max-width: 220px;">@item.Description</div>
+                                    }
+                                </td>
+                                <td>
+                                    @item.CategoryName
+                                    @if (!item.CategoryIsActive)
+                                    {
+                                        <span class="badge bg-secondary ms-1">Pasif kategori</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form method="post" action="/Business/Products/UpdatePrice/@item.Id" class="d-flex align-items-center gap-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <input type="number" step="0.01" min="0" name="price" value="@item.Price.ToString("0.##", culture)" class="form-control form-control-sm" style="width: 90px;" required />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary" title="Fiyatı kaydet">✓</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Aktif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pasif</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.IsPublicVisible)
+                                    {
+                                        <span class="badge bg-success">Görünür</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Gizli</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex flex-wrap justify-content-end gap-1">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                        <form method="post" action="/Business/Products/ToggleActive/@item.Id" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                            <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+                                                @(item.IsActive ? "Pasif Yap" : "Aktif Yap")
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/Business/Products/Duplicate/@item.Id" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Kopyala</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var selectAll = document.getElementById('select-all-products');
+            var checkboxes = document.querySelectorAll('.product-select-checkbox');
+            var countLabel = document.getElementById('selected-count-label');
+
+            function updateCount() {
+                var count = document.querySelectorAll('.product-select-checkbox:checked').length;
+                if (countLabel) countLabel.textContent = count + ' ürün seçildi';
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(function (cb) { cb.checked = selectAll.checked; });
+                    updateCount();
+                });
+            }
+
+            checkboxes.forEach(function (cb) {
+                cb.addEventListener('change', updateCount);
+            });
+        })();
+    </script>
+}

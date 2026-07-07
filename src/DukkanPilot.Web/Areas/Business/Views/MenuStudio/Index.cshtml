@@ -1,0 +1,231 @@
+@model MenuStudioViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Menü Stüdyosu";
+    ViewData["Subtitle"] = Model.BusinessName;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var completedChecks = Model.HealthChecks.Count(h => h.IsComplete);
+    var totalChecks = Model.HealthChecks.Count;
+    var readinessPercent = totalChecks > 0 ? (int)Math.Round(completedChecks * 100.0 / totalChecks) : 0;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Menü Stüdyosu</h2>
+        <p class="text-muted mb-0">Menünüzün durumunu tek ekranda yönetin ve public menüye hızlı geçiş yapın.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/Products/Create" class="btn btn-primary btn-sm">+ Yeni Ürün</a>
+        <a href="/Business/Categories/Create" class="btn btn-outline-primary btn-sm">+ Yeni Kategori</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="panel-card h-100">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Menü Sağlık Kontrolü</h3>
+                <span class="badge @(readinessPercent >= 80 ? "bg-success" : readinessPercent >= 50 ? "bg-warning text-dark" : "bg-secondary")">
+                    @completedChecks / @totalChecks tamamlandı
+                </span>
+            </div>
+            <div class="panel-card-body">
+                <div class="progress mb-3" style="height: 8px;" role="progressbar" aria-valuenow="@readinessPercent" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar @(readinessPercent >= 80 ? "bg-success" : readinessPercent >= 50 ? "bg-warning" : "bg-secondary")" style="width: @readinessPercent%"></div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var check in Model.HealthChecks)
+                    {
+                        <li class="list-group-item px-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                @if (check.IsComplete)
+                                {
+                                    <span class="badge bg-success">Tamamlandı</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Eksik</span>
+                                }
+                                <span>@check.Label</span>
+                            </div>
+                            @if (!check.IsComplete && !string.IsNullOrWhiteSpace(check.ActionUrl) && !string.IsNullOrWhiteSpace(check.ActionLabel))
+                            {
+                                <a href="@check.ActionUrl" class="btn btn-sm btn-outline-primary">@check.ActionLabel</a>
+                            }
+                            else if (check.IsComplete && !string.IsNullOrWhiteSpace(check.ActionUrl) && !string.IsNullOrWhiteSpace(check.ActionLabel))
+                            {
+                                <a href="@check.ActionUrl" class="btn btn-sm btn-outline-secondary">@check.ActionLabel</a>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel-card h-100" style="@(string.IsNullOrWhiteSpace(Model.ThemeColor) ? "" : $"border-top: 4px solid {Model.ThemeColor}")">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Public Menü Önizleme</h3>
+            </div>
+            <div class="panel-card-body">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+                    {
+                        <img src="@Model.LogoUrl" alt="@Model.BusinessName logo" class="rounded" style="width: 48px; height: 48px; object-fit: cover;" />
+                    }
+                    <div class="min-w-0">
+                        <div class="fw-semibold">@Model.BusinessName</div>
+                        @if (!string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <p class="text-muted small mb-0">@Model.Description</p>
+                        }
+                    </div>
+                </div>
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" class="form-control" id="public-menu-url" value="@Model.PublicMenuUrl" readonly />
+                    <button type="button" class="btn btn-outline-secondary" id="copy-menu-url-btn" data-url="@Model.PublicMenuUrl">Kopyala</button>
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="/m/@Model.BusinessSlug" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Menüyü Görüntüle</a>
+                    <a href="/Business/QrMenu" class="btn btn-outline-primary btn-sm">QR Menü Yönetimi</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Kategori</div>
+            <div class="stat-value">@Model.TotalCategories</div>
+            <div class="text-muted small">@Model.ActiveCategories aktif</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Toplam Ürün</div>
+            <div class="stat-value">@Model.TotalProducts</div>
+            <div class="text-muted small">@Model.ActiveProducts aktif · @Model.PassiveProducts pasif</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Ortalama Fiyat</div>
+            <div class="stat-value fs-5">@Model.AverageProductPrice.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Fiyat Aralığı</div>
+            <div class="stat-value fs-6">@Model.MinProductPrice.ToString("N2", culture) – @Model.MaxProductPrice.ToString("N2", culture) ₺</div>
+            <div class="text-muted small">Plan: @Model.ProductPlanUsage.UsageDisplay ürün</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Hızlı Aksiyonlar</h3>
+    </div>
+    <div class="panel-card-body d-flex flex-wrap gap-2">
+        <a href="/Business/Categories/Create" class="btn btn-outline-primary btn-sm">Yeni Kategori</a>
+        <a href="/Business/Products/Create" class="btn btn-outline-primary btn-sm">Yeni Ürün</a>
+        <a href="/Business/Products/ImportCsv" class="btn btn-outline-primary btn-sm">CSV ile Ürün İçe Aktar</a>
+        <a href="/Business/Products/DownloadImportTemplate" class="btn btn-outline-secondary btn-sm">Ürün Şablonu İndir</a>
+        <a href="/m/@Model.BusinessSlug" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">QR Menüyü Gör</a>
+        <a href="/Business/QrMenu/Print" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">QR Afişi Yazdır</a>
+        @if (Model.IsBusinessOwner)
+        {
+            <a href="/Business/Settings" class="btn btn-outline-secondary btn-sm">İşletme Ayarları</a>
+        }
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-menu-url-btn-2" data-url="@Model.PublicMenuUrl">Public Menü Linkini Kopyala</button>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Kategori Bazlı Ürün Özeti</h3>
+        <a href="/Business/Categories" class="btn btn-sm btn-outline-primary">Tüm Kategoriler</a>
+    </div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Kategori</th>
+                        <th>Ürün</th>
+                        <th>Aktif Ürün</th>
+                        <th>Ort. Fiyat</th>
+                        <th>Public Menü</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.CategorySummaries.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Henüz kategori yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var category in Model.CategorySummaries)
+                    {
+                        <tr>
+                            <td class="fw-semibold">
+                                @category.Name
+                                @if (!category.IsActive)
+                                {
+                                    <span class="badge bg-secondary ms-1">Pasif</span>
+                                }
+                            </td>
+                            <td>@category.ProductCount</td>
+                            <td>@category.ActiveProductCount</td>
+                            <td>@category.AveragePrice.ToString("N2", culture) ₺</td>
+                            <td>
+                                @if (category.IsPublicVisible)
+                                {
+                                    <span class="badge bg-success">Görünür</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Gizli</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a href="/Business/Products?categoryId=@category.Id" class="btn btn-sm btn-outline-primary">Ürünleri Gör</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            function copyUrl(btn) {
+                var url = btn.getAttribute('data-url');
+                if (!url) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(function () {
+                        btn.textContent = 'Kopyalandı!';
+                        setTimeout(function () { btn.textContent = 'Kopyala'; }, 2000);
+                    });
+                } else {
+                    var input = document.getElementById('public-menu-url');
+                    if (input) { input.select(); document.execCommand('copy'); }
+                }
+            }
+            var btn1 = document.getElementById('copy-menu-url-btn');
+            var btn2 = document.getElementById('copy-menu-url-btn-2');
+            if (btn1) btn1.addEventListener('click', function () { copyUrl(btn1); });
+            if (btn2) btn2.addEventListener('click', function () { copyUrl(btn2); });
+        })();
+    </script>
+}

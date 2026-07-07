@@ -33,7 +33,7 @@ public class CategoriesController : BusinessBaseController
             return forbidResult;
         }
 
-        var items = await _context.Categories
+        var categories = await _context.Categories
             .AsNoTracking()
             .Where(c => c.BusinessId == businessId)
             .OrderBy(c => c.SortOrder)
@@ -44,11 +44,51 @@ public class CategoriesController : BusinessBaseController
                 Name = c.Name,
                 SortOrder = c.SortOrder,
                 IsActive = c.IsActive,
-                ProductCount = c.Products.Count
+                ProductCount = c.Products.Count,
+                ActiveProductCount = c.Products.Count(p => p.IsActive),
+                AveragePrice = c.Products.Any() ? c.Products.Average(p => p.Price) : 0m,
+                IsPublicVisible = c.IsActive && c.Products.Any(p => p.IsActive)
             })
             .ToListAsync();
 
-        return View(items);
+        var model = new CategoriesIndexViewModel
+        {
+            TotalCategories = categories.Count,
+            ActiveCategories = categories.Count(c => c.IsActive),
+            PassiveCategories = categories.Count(c => !c.IsActive),
+            Categories = categories
+        };
+
+        return View(model);
+    }
+
+    [HttpPost("ToggleActive/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleActive(int id)
+    {
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var category = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Id == id && c.BusinessId == businessId);
+
+        if (category is null)
+        {
+            return NotFound();
+        }
+
+        category.IsActive = !category.IsActive;
+        category.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = category.IsActive
+            ? "Kategori aktif duruma alındı."
+            : "Kategori pasif duruma alındı.";
+
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpGet("Create")]
@@ -225,6 +265,7 @@ public class CategoriesController : BusinessBaseController
         TempData["Success"] = "Kategori pasif duruma alındı.";
         return RedirectToAction(nameof(Index));
     }
+
     private async Task<bool> IsCategoryNameAvailableAsync(int businessId, string name, int? excludeId = null)
     {
         var normalizedName = name.Trim();

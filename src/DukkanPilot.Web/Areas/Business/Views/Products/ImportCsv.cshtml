@@ -1,0 +1,178 @@
+@model ProductImportCsvPageViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "CSV ile Ürün İçe Aktar";
+    ViewData["Subtitle"] = "Toplu ürün yükleme";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var result = Model.Result;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">CSV ile Ürün İçe Aktar</h2>
+        <p class="text-muted mb-0">Ürünlerinizi toplu olarak menünüze ekleyin.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/Products/DownloadImportTemplate" class="btn btn-outline-success btn-sm">Şablon İndir</a>
+        <a href="/Business/Products" class="btn btn-outline-secondary btn-sm">Ürünlere Dön</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">CSV Dosyası Yükle</h3>
+            </div>
+            <div class="panel-card-body">
+                <form method="post" action="/Business/Products/ImportCsv" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="file" class="form-label">CSV Dosyası</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".csv,text/csv" required />
+                        <div class="form-text">Yalnızca .csv dosyaları, en fazla 1 MB ve 500 satır.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mod</label>
+                        <div class="form-check">
+                            @if (Model.Mode != "import" && Model.Mode != "apply")
+                            {
+                                <input class="form-check-input" type="radio" name="mode" id="modePreview" value="preview" checked />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="radio" name="mode" id="modePreview" value="preview" />
+                            }
+                            <label class="form-check-label" for="modePreview">Sadece kontrol et (önizleme)</label>
+                        </div>
+                        <div class="form-check">
+                            @if (Model.Mode == "import" || Model.Mode == "apply")
+                            {
+                                <input class="form-check-input" type="radio" name="mode" id="modeImport" value="import" checked />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="radio" name="mode" id="modeImport" value="import" />
+                            }
+                            <label class="form-check-label" for="modeImport">İçe aktar</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Yükle ve İşle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Kurallar</h3>
+            </div>
+            <div class="panel-card-body small">
+                <ul class="mb-0 ps-3">
+                    <li>Başlık satırı zorunludur: <code>CategoryName, ProductName, Description, Price, IsActive</code></li>
+                    <li>Kategori adı mevcut olmalıdır; bilinmeyen kategori satır hatası alır.</li>
+                    <li>Ürün adı zorunludur; aynı isimde ürün varsa satır atlanır.</li>
+                    <li>Fiyat zorunludur ve ≥ 0 olmalıdır (<code>120</code> veya <code>120,50</code>).</li>
+                    <li><code>IsActive</code> boşsa <code>true</code> kabul edilir.</li>
+                    <li>Virgül içeren alanları çift tırnak içinde yazın.</li>
+                    <li>Plan ürün limiti aşılırsa kalan satırlar atlanır.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (result is not null)
+{
+    @if (result.HasFileError)
+    {
+        <div class="alert alert-danger" role="alert">@result.FileErrorMessage</div>
+    }
+    else
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Toplam Satır</div>
+                    <div class="stat-value">@result.TotalRows</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Geçerli Satır</div>
+                    <div class="stat-value text-success">@result.ValidRows</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Hatalı Satır</div>
+                    <div class="stat-value text-danger">@result.ErrorRows</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">@(result.IsDryRun ? "İçe Aktarılabilir" : "İçe Aktarılan")</div>
+                    <div class="stat-value">@(result.IsDryRun ? result.ValidRows - result.SkippedByPlanLimitRows : result.ImportedRows)</div>
+                    <div class="text-muted small">Plan limiti atlanan: @result.SkippedByPlanLimitRows</div>
+                </div>
+            </div>
+        </div>
+
+        @if (result.IsDryRun)
+        {
+            <div class="alert alert-info py-2 small" role="alert">
+                Önizleme modu — veritabanına yazılmadı. Kalan içe aktarma kotası: @result.RemainingImportSlots
+            </div>
+        }
+
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Satır Sonuçları</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Satır</th>
+                                <th>Kategori</th>
+                                <th>Ürün</th>
+                                <th>Fiyat</th>
+                                <th>Aktif</th>
+                                <th>Durum</th>
+                                <th>Mesaj</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var row in result.PreviewRows)
+                        {
+                            <tr>
+                                <td>@row.RowNumber</td>
+                                <td>@row.CategoryName</td>
+                                <td class="fw-semibold">@row.ProductName</td>
+                                <td>@(row.Price > 0 || string.IsNullOrWhiteSpace(row.ErrorMessage) ? row.Price.ToString("N2", culture) + " ₺" : "-")</td>
+                                <td>@(row.IsActive ? "Evet" : "Hayır")</td>
+                                <td>
+                                    @if (row.Status is "Geçerli" or "İçe aktarıldı")
+                                    {
+                                        <span class="badge bg-success">@row.Status</span>
+                                    }
+                                    else if (row.Status is "Hata")
+                                    {
+                                        <span class="badge bg-danger">@row.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">@row.Status</span>
+                                    }
+                                </td>
+                                <td class="small text-muted">@(row.ErrorMessage ?? "-")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
