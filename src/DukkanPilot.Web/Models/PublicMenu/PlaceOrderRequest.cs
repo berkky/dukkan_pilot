@@ -6,4 +6,5 @@ public class PlaceOrderRequest
     public string? CustomerName { get; set; }
     public string? CustomerPhone { get; set; }
     public string? Notes { get; set; }
+    public string? RewardRequestName { get; set; }
 }

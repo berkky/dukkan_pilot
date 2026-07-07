@@ -52,6 +52,18 @@ public class PublicOrderStatusViewModel
 
     public string? Description { get; set; }
 
+    public bool HasLoyaltyProgram { get; set; }
+
+    public int? EarnedPointsPreview { get; set; }
+
+    public string? LoyaltyPreviewMessage { get; set; }
+
+    public string? RewardRequestText { get; set; }
+
+    public string? CampaignInfoText { get; set; }
+
+    public string TrackingPageUrl { get; set; } = string.Empty;
+
     public bool HasWhatsAppUrl => !string.IsNullOrWhiteSpace(WhatsAppUrl);
 }
 

@@ -1,5 +1,6 @@
 @model PublicOrderStatusViewModel
 @using System.Globalization
+@using DukkanPilot.Core.Enums
 @{
     var culture = CultureInfo.GetCultureInfo("tr-TR");
     string FormatAmount(decimal amount)
@@ -50,7 +51,7 @@
                 <div class="public-order-status-hero-icon" aria-hidden="true">✓</div>
                 <h2 class="public-order-status-title">Siparişiniz Alındı</h2>
                 <p class="public-order-status-subtitle mb-0">
-                    Siparişiniz kaydedildi. Durumunuzu bu ekrandan takip edebilirsiniz.
+                    Siparişiniz kaydedildi. İşletme siparişinizi onayladığında durum burada güncellenecek.
                 </p>
             </div>
         }
@@ -90,6 +91,37 @@
                 }
             </div>
         </div>
+
+        @if (Model.Status == OrderStatus.Completed)
+        {
+            <div class="public-order-success-box">
+                <strong>Sipariş tamamlandı.</strong> Afiyet olsun!
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.CampaignInfoText))
+        {
+            <div class="public-order-info-box">
+                <div class="public-order-info-label">Kampanya Bilgisi</div>
+                <div>@Model.CampaignInfoText</div>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.RewardRequestText))
+        {
+            <div class="public-order-info-box">
+                <div class="public-order-info-label">Ödül Talebi</div>
+                <div>@Model.RewardRequestText</div>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.LoyaltyPreviewMessage))
+        {
+            <div class="public-order-loyalty-box">
+                <div class="public-order-loyalty-title">Sadakat Programı</div>
+                <div>@Model.LoyaltyPreviewMessage</div>
+            </div>
+        }
 
         <div class="order-status-card order-status-summary-card">
             <div class="order-status-meta">
@@ -147,6 +179,12 @@
             }
 
             <div class="order-action-secondary">
+                @if (Model.IsConfirmationPage)
+                {
+                    <a href="@Model.TrackingPageUrl" class="btn btn-primary w-100">
+                        Siparişi Takip Et
+                    </a>
+                }
                 <button type="button" class="btn btn-outline-primary w-100" id="copy-tracking-link-btn">
                     Takip Linkini Kopyala
                 </button>

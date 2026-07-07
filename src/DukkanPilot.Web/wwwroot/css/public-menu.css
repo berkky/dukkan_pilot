@@ -849,3 +849,213 @@ body:has(#cartOffcanvas.show) #cart-bar {
     gap: 0.625rem;
     margin-top: 1rem;
 }
+
+/* 25A — Campaign, rewards, smart cart */
+.public-promotions-section,
+.public-rewards-section {
+    margin: 1rem 1rem 0;
+}
+
+.public-promotions-header {
+    margin-bottom: 0.75rem;
+}
+
+.public-promotions-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.public-promotions-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.public-campaign-scroll {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+}
+
+.public-campaign-card {
+    flex: 0 0 85%;
+    max-width: 320px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--menu-theme, #2563eb) 12%, #fff), #fff);
+    border: 1px solid color-mix(in srgb, var(--menu-theme, #2563eb) 25%, #e2e8f0);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.public-campaign-image {
+    width: 100%;
+    height: 96px;
+    object-fit: cover;
+    background: #f1f5f9;
+}
+
+.public-campaign-body {
+    padding: 0.875rem 1rem 1rem;
+}
+
+.public-campaign-title {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+}
+
+.public-campaign-desc {
+    font-size: 0.85rem;
+    color: #475569;
+    margin-bottom: 0.5rem;
+}
+
+.public-campaign-meta {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.public-campaign-badge {
+    background: color-mix(in srgb, var(--menu-theme, #2563eb) 15%, #fff);
+    color: var(--menu-theme, #2563eb);
+    border: 1px solid color-mix(in srgb, var(--menu-theme, #2563eb) 30%, transparent);
+}
+
+.public-reward-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+}
+
+.public-reward-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.875rem;
+    padding: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.public-reward-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.public-reward-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.public-reward-points {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--menu-theme, #2563eb);
+}
+
+.public-selected-reward {
+    margin-top: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.public-product-offer-badge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.cart-pricing-summary {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.875rem;
+    margin-top: 0.75rem;
+}
+
+.cart-pricing-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+}
+
+.cart-pricing-row:last-child {
+    margin-bottom: 0;
+}
+
+.cart-pricing-discount {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.cart-campaign-message {
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+.cart-loyalty-preview {
+    margin-top: 0.625rem;
+    padding: 0.625rem 0.75rem;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 0.625rem;
+    font-size: 0.82rem;
+    color: #92400e;
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.cart-loyalty-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.public-order-info-box,
+.public-order-loyalty-box,
+.public-order-success-box {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.875rem;
+    padding: 0.875rem 1rem;
+    margin-bottom: 0.875rem;
+    font-size: 0.9rem;
+}
+
+.public-order-info-label,
+.public-order-loyalty-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+}
+
+.public-order-loyalty-box {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.public-order-success-box {
+    background: #ecfdf5;
+    border-color: #86efac;
+    color: #166534;
+}

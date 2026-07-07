@@ -13,13 +13,21 @@ namespace DukkanPilot.Web.Controllers;
 
 public class PublicMenuController : Controller
 {
+    private const string RewardRequestPrefix = "Ödül talebi:";
+    private const string CampaignInfoPrefix = "Kampanya:";
+
     private readonly AppDbContext _context;
     private readonly PublicOrderTrackingTokenHelper _trackingTokenHelper;
+    private readonly PublicOrderPricingHelper _pricingHelper;
 
-    public PublicMenuController(AppDbContext context, PublicOrderTrackingTokenHelper trackingTokenHelper)
+    public PublicMenuController(
+        AppDbContext context,
+        PublicOrderTrackingTokenHelper trackingTokenHelper,
+        PublicOrderPricingHelper pricingHelper)
     {
         _context = context;
         _trackingTokenHelper = trackingTokenHelper;
+        _pricingHelper = pricingHelper;
     }
 
     [HttpGet("/m/{slug}")]
@@ -49,10 +57,26 @@ public class PublicMenuController : Controller
             .OrderByDescending(c => c.StartDate)
             .Select(c => new PublicMenuCampaignViewModel
             {
+                Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
                 StartDate = c.StartDate,
-                EndDate = c.EndDate
+                EndDate = c.EndDate,
+                ImageUrl = c.ImageUrl
+            })
+            .ToListAsync();
+
+        var rewards = await _context.Rewards
+            .AsNoTracking()
+            .Where(r => r.BusinessId == business.Id && r.IsActive)
+            .OrderBy(r => r.RequiredPoints)
+            .ThenBy(r => r.Name)
+            .Select(r => new PublicRewardViewModel
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Description = r.Description,
+                RequiredPoints = r.RequiredPoints
             })
             .ToListAsync();
 
@@ -100,12 +124,53 @@ public class PublicMenuController : Controller
             Currency = currency,
             WhatsAppNumber = whatsAppNumber,
             Campaigns = campaigns,
+            Rewards = rewards,
             Categories = categories
         };
 
         ViewData["Title"] = $"{business.Name} Menü | DukkanPilot";
 
         return View(model);
+    }
+
+    [HttpPost("/m/{slug}/preview-order")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PreviewOrder(string slug, [FromBody] PlaceOrderRequest request)
+    {
+        var normalizedSlug = slug.Trim().ToLowerInvariant();
+
+        var business = await _context.Businesses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Slug == normalizedSlug && b.IsActive);
+
+        if (business is null)
+        {
+            return NotFound(new { errors = new[] { "İşletme bulunamadı." } });
+        }
+
+        var pricing = await _pricingHelper.CalculateAsync(
+            business.Id,
+            request.Items,
+            request.RewardRequestName);
+
+        if (!pricing.IsValid)
+        {
+            return BadRequest(new PublicOrderPreviewResponse
+            {
+                Errors = pricing.Errors
+            });
+        }
+
+        return Ok(new PublicOrderPreviewResponse
+        {
+            Subtotal = pricing.Subtotal,
+            DiscountAmount = pricing.DiscountAmount,
+            Total = pricing.Total,
+            CampaignMessage = pricing.CampaignMessage,
+            AppliedCampaignName = pricing.AppliedCampaignName,
+            EarnedPointsPreview = pricing.EarnedPointsPreview,
+            LoyaltyPreviewMessage = pricing.LoyaltyPreviewMessage
+        });
     }
 
     [HttpPost("/m/{slug}/order")]
@@ -134,52 +199,17 @@ public class PublicMenuController : Controller
             return BadRequest(new { error = "İşletmenin WhatsApp numarası tanımlı değil." });
         }
 
+        var pricing = await _pricingHelper.CalculateAsync(
+            business.Id,
+            request.Items,
+            request.RewardRequestName);
+
+        if (!pricing.IsValid)
+        {
+            return BadRequest(new { error = pricing.Errors.FirstOrDefault() ?? "Sepet doğrulanamadı." });
+        }
+
         var currency = ResolveCurrency(business.Setting?.Currency);
-
-        var requestedItems = request.Items
-            .Where(i => i.Quantity > 0)
-            .GroupBy(i => i.ProductId)
-            .Select(g => new { ProductId = g.Key, Quantity = g.Sum(i => i.Quantity) })
-            .ToList();
-
-        if (requestedItems.Count == 0)
-        {
-            return BadRequest(new { error = "Geçerli ürün bulunamadı." });
-        }
-
-        var productIds = requestedItems.Select(i => i.ProductId).ToList();
-
-        var products = await _context.Products
-            .AsNoTracking()
-            .Where(p => p.BusinessId == business.Id && p.IsActive && productIds.Contains(p.Id))
-            .ToDictionaryAsync(p => p.Id);
-
-        if (products.Count != productIds.Count)
-        {
-            return BadRequest(new { error = "Sepetteki bazı ürünler artık mevcut değil." });
-        }
-
-        var orderItems = new List<OrderItem>();
-        decimal totalAmount = 0m;
-        var messageLines = new List<(string Name, int Quantity, decimal UnitPrice)>();
-
-        foreach (var item in requestedItems)
-        {
-            var product = products[item.ProductId];
-            var lineTotal = product.Price * item.Quantity;
-            totalAmount += lineTotal;
-
-            orderItems.Add(new OrderItem
-            {
-                ProductId = product.Id,
-                ProductName = product.Name,
-                Quantity = item.Quantity,
-                UnitPrice = product.Price
-            });
-
-            messageLines.Add((product.Name, item.Quantity, product.Price));
-        }
-
         var orderNumber = GenerateOrderNumber();
 
         var order = new Order
@@ -187,31 +217,45 @@ public class PublicMenuController : Controller
             BusinessId = business.Id,
             CustomerId = null,
             OrderNumber = orderNumber,
-            TotalAmount = totalAmount,
+            TotalAmount = pricing.Total,
             Status = OrderStatus.Pending,
             Source = OrderSource.WhatsApp,
-            Notes = TrimToMax(request.Notes, 1000),
+            Notes = BuildOrderNotes(request.Notes, pricing),
             CustomerName = TrimToMax(request.CustomerName, 200),
             CustomerPhone = TrimToMax(request.CustomerPhone, 20)
         };
 
-        foreach (var orderItem in orderItems)
+        foreach (var item in pricing.Items)
         {
-            order.Items.Add(orderItem);
+            order.Items.Add(new OrderItem
+            {
+                ProductId = item.ProductId,
+                ProductName = item.ProductName,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice
+            });
         }
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
 
+        var messageLines = pricing.Items
+            .Select(i => (i.ProductName, i.Quantity, i.UnitPrice))
+            .ToList();
+
         var message = BuildWhatsAppMessage(
             business.Name,
             orderNumber,
             messageLines,
-            totalAmount,
+            pricing.Subtotal,
+            pricing.DiscountAmount,
+            pricing.Total,
             currency,
             order.CustomerName,
             order.CustomerPhone,
-            order.Notes);
+            pricing.RewardRequestName,
+            pricing.CampaignMessage,
+            ExtractCustomerNote(order.Notes));
 
         var whatsAppUrl = $"https://wa.me/{whatsAppNumber}?text={Uri.EscapeDataString(message)}";
         var trackingToken = _trackingTokenHelper.CreateToken(order.Id, business.Id, order.CreatedAt);
@@ -333,18 +377,54 @@ public class PublicMenuController : Controller
             .Select(i => (i.ProductName, i.Quantity, i.UnitPrice))
             .ToList();
 
+        var rewardRequestText = ExtractRewardRequest(order.Notes);
+        var campaignInfoText = ExtractCampaignInfo(order.Notes);
+        var customerNote = ExtractCustomerNote(order.Notes);
+
+        var loyaltyRule = await _pricingHelper.GetActiveLoyaltyRuleAsync(business.Id);
+        int? earnedPointsPreview = null;
+        string? loyaltyPreviewMessage = null;
+
+        if (loyaltyRule is not null && order.Status != OrderStatus.Cancelled)
+        {
+            if (order.TotalAmount >= loyaltyRule.MinimumOrderAmount)
+            {
+                var points = Areas.Business.Models.OrderLoyaltyHelper.CalculateEarnedPoints(
+                    order.TotalAmount,
+                    loyaltyRule.PointsPerAmount);
+
+                if (points > 0)
+                {
+                    earnedPointsPreview = points;
+                    loyaltyPreviewMessage = order.Status == OrderStatus.Completed
+                        ? $"Bu sipariş tamamlandığında yaklaşık {points} sadakat puanı kazanılmış olabilir."
+                        : $"Sipariş tamamlandığında yaklaşık {points} sadakat puanı kazanabilirsiniz.";
+                }
+            }
+            else
+            {
+                loyaltyPreviewMessage =
+                    $"Sadakat puanı için minimum sipariş tutarı {loyaltyRule.MinimumOrderAmount:N0} ₺.";
+            }
+        }
+
         string? whatsAppUrl = null;
         if (whatsAppNumber is not null)
         {
+            var subtotal = messageLines.Sum(i => i.Quantity * i.UnitPrice);
             var message = BuildWhatsAppMessage(
                 business.Name,
                 order.OrderNumber,
                 messageLines,
+                subtotal,
+                0m,
                 order.TotalAmount,
                 currency,
                 order.CustomerName,
                 order.CustomerPhone,
-                order.Notes);
+                rewardRequestText,
+                campaignInfoText,
+                customerNote);
             whatsAppUrl = $"https://wa.me/{whatsAppNumber}?text={Uri.EscapeDataString(message)}";
         }
 
@@ -371,11 +451,17 @@ public class PublicMenuController : Controller
                 .ToList(),
             WhatsAppUrl = whatsAppUrl,
             TrackingUrl = trackingUrl,
+            TrackingPageUrl = trackingUrl,
             PublicMenuUrl = $"/m/{normalizedSlug}",
             SummaryUrl = $"/m/{normalizedSlug}/order-status/{token}/summary",
             ThemeColor = themeColor,
             LogoUrl = business.LogoUrl,
-            Description = business.Description
+            Description = business.Description,
+            HasLoyaltyProgram = loyaltyRule is not null,
+            EarnedPointsPreview = earnedPointsPreview,
+            LoyaltyPreviewMessage = loyaltyPreviewMessage,
+            RewardRequestText = rewardRequestText,
+            CampaignInfoText = campaignInfoText
         };
 
         ViewData["Title"] = isConfirmationPage
@@ -383,6 +469,85 @@ public class PublicMenuController : Controller
             : $"Sipariş Takibi | {business.Name}";
 
         return View("OrderStatus", model);
+    }
+
+    private static string? BuildOrderNotes(string? customerNotes, PublicOrderPricingResult pricing)
+    {
+        var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(customerNotes))
+        {
+            parts.Add(customerNotes.Trim());
+        }
+
+        if (!string.IsNullOrWhiteSpace(pricing.RewardRequestName))
+        {
+            parts.Add($"{RewardRequestPrefix} {pricing.RewardRequestName.Trim()}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(pricing.CampaignMessage))
+        {
+            parts.Add($"{CampaignInfoPrefix} {pricing.CampaignMessage.Trim()}");
+        }
+
+        if (parts.Count == 0)
+        {
+            return null;
+        }
+
+        return TrimToMax(string.Join(" | ", parts), 1000);
+    }
+
+    private static string? ExtractRewardRequest(string? notes)
+    {
+        if (string.IsNullOrWhiteSpace(notes))
+        {
+            return null;
+        }
+
+        foreach (var part in notes.Split(" | ", StringSplitOptions.TrimEntries))
+        {
+            if (part.StartsWith(RewardRequestPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return part[RewardRequestPrefix.Length..].Trim();
+            }
+        }
+
+        return null;
+    }
+
+    private static string? ExtractCampaignInfo(string? notes)
+    {
+        if (string.IsNullOrWhiteSpace(notes))
+        {
+            return null;
+        }
+
+        foreach (var part in notes.Split(" | ", StringSplitOptions.TrimEntries))
+        {
+            if (part.StartsWith(CampaignInfoPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return part[CampaignInfoPrefix.Length..].Trim();
+            }
+        }
+
+        return null;
+    }
+
+    private static string? ExtractCustomerNote(string? notes)
+    {
+        if (string.IsNullOrWhiteSpace(notes))
+        {
+            return null;
+        }
+
+        var customerParts = notes.Split(" | ", StringSplitOptions.TrimEntries)
+            .Where(part =>
+                !part.StartsWith(RewardRequestPrefix, StringComparison.OrdinalIgnoreCase) &&
+                !part.StartsWith(CampaignInfoPrefix, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        return customerParts.Count > 0 ? string.Join(" | ", customerParts) : null;
     }
 
     private static string BuildTrackingUrl(string slug, string token)
@@ -466,10 +631,14 @@ public class PublicMenuController : Controller
         string businessName,
         string orderNumber,
         IReadOnlyList<(string Name, int Quantity, decimal UnitPrice)> items,
+        decimal subtotal,
+        decimal discountAmount,
         decimal total,
         string currency,
         string? customerName,
         string? customerPhone,
+        string? rewardRequest,
+        string? campaignInfo,
         string? notes)
     {
         var culture = CultureInfo.GetCultureInfo("tr-TR");
@@ -498,7 +667,26 @@ public class PublicMenuController : Controller
         }
 
         sb.AppendLine("---");
+        sb.AppendLine($"Ara Toplam: {FormatAmount(subtotal, currency, culture)}");
+
+        if (discountAmount > 0)
+        {
+            sb.AppendLine($"İndirim: -{FormatAmount(discountAmount, currency, culture)}");
+        }
+
         sb.AppendLine($"Toplam: {FormatAmount(total, currency, culture)}");
+
+        if (!string.IsNullOrWhiteSpace(campaignInfo))
+        {
+            sb.AppendLine();
+            sb.AppendLine($"Kampanya: {campaignInfo}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(rewardRequest))
+        {
+            sb.AppendLine();
+            sb.AppendLine($"Ödül talebi: {rewardRequest}");
+        }
 
         if (!string.IsNullOrWhiteSpace(notes))
         {

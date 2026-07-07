@@ -7,6 +7,7 @@
      style="--dp-theme-color: @Model.ThemeColor; --menu-theme: @Model.ThemeColor"
      data-business-id="@Model.BusinessId"
      data-order-url="/m/@Model.Slug/order"
+     data-preview-url="/m/@Model.Slug/preview-order"
      data-whatsapp-number="@(Model.WhatsAppNumber ?? string.Empty)"
      data-currency="@Model.Currency">
 
@@ -56,16 +57,68 @@
 
     @if (Model.Campaigns.Any())
     {
-        @foreach (var campaign in Model.Campaigns)
-        {
-            <div class="public-menu-campaign">
-                <div class="public-menu-campaign-title">🎯 @campaign.Title</div>
-                @if (!string.IsNullOrEmpty(campaign.Description))
+        <section class="public-promotions-section" aria-label="Aktif kampanyalar">
+            <div class="public-promotions-header">
+                <h2 class="public-promotions-title">Aktif Fırsatlar</h2>
+            </div>
+            <div class="public-campaign-scroll">
+                @foreach (var campaign in Model.Campaigns)
                 {
-                    <p class="public-menu-campaign-desc">@campaign.Description</p>
+                    <article class="public-campaign-card">
+                        @if (!string.IsNullOrWhiteSpace(campaign.ImageUrl))
+                        {
+                            <img src="@campaign.ImageUrl" alt="" class="public-campaign-image" loading="lazy" />
+                        }
+                        <div class="public-campaign-body">
+                            <div class="public-campaign-title">@campaign.Title</div>
+                            @if (!string.IsNullOrWhiteSpace(campaign.Description))
+                            {
+                                <p class="public-campaign-desc">@campaign.Description</p>
+                            }
+                            @if (campaign.EndDate.HasValue)
+                            {
+                                <div class="public-campaign-meta">
+                                    @campaign.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy") tarihine kadar
+                                </div>
+                            }
+                            <span class="badge public-campaign-badge">Sepette bilgilendirilir</span>
+                        </div>
+                    </article>
                 }
             </div>
-        }
+        </section>
+    }
+
+    @if (Model.Rewards.Any())
+    {
+        <section class="public-rewards-section" aria-label="Ödül vitrini">
+            <div class="public-promotions-header">
+                <h2 class="public-promotions-title">Sadakat Ödülleri</h2>
+                <p class="public-promotions-subtitle mb-0">Puan harcama otomatik yapılmaz. Talebinizi sipariş notuna ekleyebilirsiniz.</p>
+            </div>
+            <div class="public-reward-grid">
+                @foreach (var reward in Model.Rewards)
+                {
+                    <article class="public-reward-card" data-reward-id="@reward.Id" data-reward-name="@reward.Name">
+                        <div class="public-reward-name">@reward.Name</div>
+                        @if (!string.IsNullOrWhiteSpace(reward.Description))
+                        {
+                            <p class="public-reward-desc">@reward.Description</p>
+                        }
+                        <div class="public-reward-points">@reward.RequiredPoints puan</div>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary public-reward-select-btn"
+                                data-reward-name="@reward.Name">
+                            Siparişe Ekle
+                        </button>
+                    </article>
+                }
+            </div>
+            <div id="selected-reward-banner" class="public-selected-reward" hidden>
+                <span>Seçili ödül talebi: <strong id="selected-reward-name"></strong></span>
+                <button type="button" class="btn btn-sm btn-link text-danger" id="clear-reward-btn">Kaldır</button>
+            </div>
+        </section>
     }
 
     @if (!Model.Categories.Any())
@@ -89,7 +142,13 @@
         @foreach (var category in Model.Categories)
         {
             <section id="category-@category.Id" class="menu-category-section">
-                <h2 class="menu-category-title">@category.Name</h2>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                    <h2 class="menu-category-title mb-0">@category.Name</h2>
+                    @if (Model.HasActiveCampaigns)
+                    {
+                        <span class="badge bg-warning text-dark">Fırsat Dönemi</span>
+                    }
+                </div>
 
                 @if (!category.Products.Any())
                 {
@@ -109,7 +168,13 @@
                                 <div class="product-card-image-placeholder" aria-hidden="true">🍽️</div>
                             }
                             <div class="product-card-body">
-                                <div class="product-card-name">@product.Name</div>
+                                <div class="d-flex align-items-start gap-2">
+                                    <div class="product-card-name flex-grow-1">@product.Name</div>
+                                    @if (Model.HasActiveCampaigns)
+                                    {
+                                        <span class="badge public-product-offer-badge">Fırsat</span>
+                                    }
+                                </div>
                                 @if (!string.IsNullOrEmpty(product.Description))
                                 {
                                     <p class="product-card-desc">@product.Description</p>
@@ -164,6 +229,22 @@
         </div>
 
         <div id="cart-items" class="cart-items flex-grow-1"></div>
+
+        <div id="cart-pricing-summary" class="cart-pricing-summary" hidden>
+            <div class="cart-pricing-row">
+                <span>Ara Toplam</span>
+                <span id="cart-subtotal">@Model.FormatPrice(0)</span>
+            </div>
+            <div class="cart-pricing-row cart-pricing-discount" id="cart-discount-row" hidden>
+                <span>İndirim</span>
+                <span id="cart-discount">@Model.FormatPrice(0)</span>
+            </div>
+            <div id="cart-campaign-message" class="cart-campaign-message small text-muted" hidden></div>
+            <div id="cart-loyalty-preview" class="cart-loyalty-preview" hidden>
+                <span class="cart-loyalty-icon" aria-hidden="true">★</span>
+                <span id="cart-loyalty-text"></span>
+            </div>
+        </div>
 
         <div class="cart-customer-fields mt-3">
             <div class="mb-2">

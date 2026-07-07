@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 24B aşaması (Admin İşletme Operasyonları / Platform Kontrol Merkezi) tamamlandı.
+> Son güncelleme: 25A aşaması (Public Sipariş Deneyimi Premium / Kampanya + Sadakat Akıllı Sepet) tamamlandı.
 
 ---
 
@@ -437,6 +437,18 @@ DukkanPilot.sln
 - Public menü, sepet, confirmation ve tracking akışı bozulmadı
 - Migration / Identity / SignalR / yeni NuGet dependency yok
 
+### 25A aşaması — Public Sipariş Deneyimi Premium / Kampanya + Sadakat Akıllı Sepet
+- **Kampanya vitrini:** `/m/{slug}` üst bölümde aktif kampanya kartları (IsActive + tarih aralığı + BusinessId filtresi)
+- **Ödül vitrini:** aktif Reward listesi; otomatik puan harcama yok — ödül talebi sipariş notuna eklenir
+- **Akıllı sepet:** ara toplam, kampanya bilgilendirme, sadakat kazanım önizlemesi (`PublicOrderPricingHelper`)
+- **Server-side doğrulama:** `POST /m/{slug}/order` ve `POST /m/{slug}/preview-order` — DB fiyatları, aktif ürün/kategori, BusinessId kontrolü
+- **Kampanya indirimi:** Campaign entity’de indirim alanı olmadığı için otomatik sepet indirimi uygulanmaz; banner + bilgilendirme mesajı gösterilir
+- **Sadakat önizlemesi:** LoyaltyRule ile tahmini puan; gerçek kazanım 9C Completed akışında (bozulmadı)
+- **WhatsApp mesajı:** ara toplam, toplam, kampanya/ödül talebi/not satırları
+- **Confirmation/tracking:** premium bilgi kutuları, sadakat mesajı, “Siparişi Takip Et” butonu
+- Public sepet, confirmation token, tracking polling ve Business/Admin akışları korundu
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -498,7 +510,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-24B tamamlandı — Admin işletme operasyon kontrol merkezi, sağlık skoru, CSV export ve hızlı aktif/pasif toggle eklendi.
+25A tamamlandı — Public premium menü deneyimi, kampanya/ödül vitrini, akıllı sepet ve server-side fiyat doğrulaması eklendi.
 
 ---
 

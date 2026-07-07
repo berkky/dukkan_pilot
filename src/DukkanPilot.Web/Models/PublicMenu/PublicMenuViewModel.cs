@@ -16,6 +16,13 @@ public class PublicMenuViewModel
     public string? WhatsAppNumber { get; set; }
 
     public List<PublicMenuCampaignViewModel> Campaigns { get; set; } = new();
+
+    public List<PublicRewardViewModel> Rewards { get; set; } = new();
+
+    public bool HasActiveCampaigns => Campaigns.Count > 0;
+
+    public bool HasRewards => Rewards.Count > 0;
+
     public List<PublicMenuCategoryViewModel> Categories { get; set; } = new();
 
     public string FormatPrice(decimal price)
