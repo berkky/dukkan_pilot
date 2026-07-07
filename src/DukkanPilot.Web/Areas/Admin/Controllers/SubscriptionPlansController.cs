@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 namespace DukkanPilot.Web.Areas.Admin.Controllers;
 
 [Route("Admin/SubscriptionPlans")]
-public class AdminSubscriptionPlansController : AdminBaseController
+public class SubscriptionPlansController : AdminBaseController
 {
     private readonly AppDbContext _context;
 
-    public AdminSubscriptionPlansController(AppDbContext context)
+    public SubscriptionPlansController(AppDbContext context)
     {
         _context = context;
     }

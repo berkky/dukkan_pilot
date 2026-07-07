@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 15A aşaması (abonelik durumu ve subscription gate) tamamlandı.
+> Son güncelleme: 21A aşaması (business dashboard analitik iyileştirme) tamamlandı.
 
 ---
 
@@ -249,6 +249,126 @@ DukkanPilot.sln
 - Sidebar: Abonelik linki (yalnızca BusinessOwner)
 - Migration / Identity yok
 
+### 15B aşaması — Plan kullanım limitleri
+- **`BusinessPlanLimitHelper`:** plan limitleri (`MaxProducts`, `MaxCampaigns` + plan adına göre fallback)
+- **Kullanım sayımı:** Products, Categories, Staff (aktif), Campaigns, Rewards, QrCodes — tenant bazlı
+- **Dashboard:** kullanım/limit kartları (`_PlanUsageSummary`)
+- **Billing:** kullanım/limit tablosu (`_PlanUsageTable`)
+- **Create POST limit kontrolü:** Products, Categories, Staff, Campaigns, Rewards, QrMenu Generate
+- **Limitsiz:** Enterprise planında `-1` = Limitsiz
+- Migration / Identity yok
+
+### 16A aşaması — Admin manuel abonelik yönetimi
+- **Abonelik yönetimi:** `/Admin/Businesses/Subscription/{businessId}` (GET/POST)
+- Admin işletme detayında ve listesinde **Abonelik Yönet** butonu
+- Plan, status, başlangıç/bitiş tarihi ve `IsActive` düzenleme
+- Mevcut en güncel `BusinessSubscription` güncellenir; yoksa yeni kayıt oluşturulur
+- `BusinessSubscriptionEditViewModel` (`Areas/Admin/Models/`)
+- Business Billing/Dashboard ve 15A/15B helper'lar yeni planı otomatik yansıtır
+- Migration / Identity yok
+
+### 16B aşaması — Owner plan karşılaştırma ve yükseltme talebi
+- **Billing plan karşılaştırma:** `/Business/Billing` — aktif planlar, limit özeti, mevcut plan etiketi
+- **Yükseltme talebi:** `/Business/Billing/RequestUpgrade/{planId}` (GET/POST, yalnızca BusinessOwner)
+- **Onay ekranı:** `/Business/Billing/RequestUpgradeConfirmation` — hazır talep metni (kopyalanabilir)
+- Talep DB'ye kaydedilmez; plan otomatik değişmez
+- Admin plan güncellemesi: `/Admin/Businesses/Subscription/{businessId}` (16A)
+- Billing ve RequestUpgrade subscription gate dışında
+- Migration / Identity yok
+
+### 17A aşaması — Business ayarları ekranı
+- **Ayarlar:** `/Business/Settings` (GET/POST, yalnızca BusinessOwner)
+- Owner işletme bilgileri ve `BusinessSetting` alanlarını düzenler
+- Slug readonly; public menü linki (`/m/{slug}`) gösterilir
+- `BusinessSetting` yoksa POST sırasında oluşturulur
+- Subscription gate dışında; expired abonelikte erişilebilir
+- Sidebar: Ayarlar linki (yalnızca BusinessOwner)
+- Migration / Identity yok
+
+### 17B aşaması — QR Menü görünüm kişiselleştirme
+- Public QR menü (`/m/{slug}`) işletme ayarlarından kişiselleştirildi
+- `PublicMenuViewModel`: logo, açıklama, adres, telefon, WhatsApp, tema rengi, para birimi
+- WhatsApp önceliği: `BusinessSetting.WhatsAppNumber` → `Business.Phone` → sipariş engeli
+- Tema rengi geçersizse `#2563eb` fallback; `--dp-theme-color` + `--menu-theme` CSS değişkenleri
+- Para birimi: TRY → `₺`; diğerleri → `125,00 USD` formatı (tr-TR sayı formatı korunur)
+- Header: logo, işletme adı, açıklama; bilgi kartı: adres, telefon
+- Sepet + WhatsApp sipariş akışı korundu; `public-menu-cart.js` para birimi desteği
+- Migration / Identity yok
+
+### 18A aşaması — QR Menü paylaşım ve önizleme ekranı
+- **QR Menü:** `/Business/QrMenu` — paylaşım ve önizleme ekranı geliştirildi
+- Link kopyalama, Menüyü Görüntüle, WhatsApp'ta Paylaş (`wa.me/?text=...`)
+- QR kod önizleme/indirme: DB kaydı varsa qrcodejs önizleme + PNG indir; yoksa Oluştur butonu
+- Yeniden Oluştur: mevcut `Generate` POST + 15B plan limit kontrolü korundu
+- Mobil önizleme kartı: işletme adı, açıklama, logo, tema rengi
+- `[RequireActiveSubscription]` ve plan limitleri bozulmadı
+- Migration / Identity yok
+
+### 18B aşaması — QR Menü yazdırılabilir masa kartı / afiş
+- **Yazdırılabilir afiş:** `/Business/QrMenu/Print` — browser print / PDF olarak kaydet
+- `QrMenuPrintViewModel`; işletme adı, logo, açıklama, adres, telefon, tema rengi
+- qrcodejs ile client-side QR (public menü URL); QR DB kaydı gerekmez
+- Print CSS: A4, `@media print`, toolbar/sidebar gizleme
+- `/Business/QrMenu` ekranına **Yazdırılabilir QR Afişi** butonu (yeni sekme)
+- `[RequireActiveSubscription]` korundu; PDF kütüphanesi yok
+- Migration / Identity yok
+
+### 19A aşaması — Sipariş ekranı profesyonelleştirme
+- **Sipariş listesi:** `/Business/Orders` — özet kartları (bugün, bekleyen, hazırlanan, ciro)
+- Durum + tarih (bugün/7 gün/tümü) + müşteri/telefon/sipariş no arama filtreleri
+- Durum rozetleri; liste satırında hızlı durum değiştirme (POST + antiforgery)
+- **Sipariş detay:** hızlı aksiyonlar, WhatsApp iletişim butonu, sadakat paneli korundu
+- `UpdateStatus` — Completed geçişinde 9C sadakat puanı mantığı korundu; çift puan engeli
+- **Dashboard:** Sipariş Özeti kartı + Son 5 Sipariş tablosu
+- Tenant filtresi `BusinessId == CurrentBusinessId` korundu
+- Public menü ve WhatsApp sipariş akışı bozulmadı
+- Migration / Identity yok
+
+### 19B aşaması — Canlı sipariş takibi / yeni sipariş uyarısı
+- **LiveSummary JSON:** `GET /Business/Orders/LiveSummary` — pending, preparing, today, revenue, latest order
+- `[RequireActiveSubscription]` + `GetCurrentBusinessIdOrForbid()` + `ResponseCache(NoStore)`
+- **Polling:** `wwwroot/js/business-orders-live.js` — 30 sn, `document.hidden` atlanır
+- **Orders Index:** yeni sipariş uyarısı, özet kartları canlı güncelleme, opsiyonel sesli uyarı
+- **Dashboard:** canlı takip badge + yeni sipariş uyarısı (aktif abonelikte)
+- SignalR yok; yeni NuGet dependency yok; localStorage/sessionStorage minimal baseline
+- Migration / Identity yok
+
+### 19C aşaması — Mutfak / Operasyon Modu
+- **Mutfak modu:** `GET /Business/Orders/Kitchen` — tablet dostu kolonlu kart görünümü
+- Bekleyen, Hazırlanıyor, Bugün Tamamlanan, Bugün İptal kolonları
+- Büyük dokunmatik aksiyon butonları; `UpdateStatus` POST + `returnTo=kitchen`
+- LiveSummary polling + yeni sipariş uyarısı entegrasyonu
+- Sidebar: Mutfak Modu linki; Dashboard: Mutfak Modunu Aç butonu
+- Tenant filtresi ve 9C sadakat puanı akışı korundu
+- Migration / Identity / SignalR yok
+
+### 20A aşaması — Müşteri Sipariş Onay ve Takip Sayfası
+- **Sipariş onay/takip:** `GET /m/{slug}/order-confirmation/{token}`, `GET /m/{slug}/order-status/{token}`
+- DataProtection tabanlı public takip token'ı (`PublicOrderTrackingTokenHelper`, 48 saat geçerlilik)
+- Token payload: OrderId, BusinessId, CreatedAtUtc — URL-safe Base64Url encoding
+- **POST** `/m/{slug}/order` sonrası confirmation sayfasına yönlendirme; WhatsApp akışı korundu
+- Confirmation/status sayfası: sipariş özeti, durum badge, WhatsApp'a devam et, takip linki kopyala, menüye dön
+- **JSON özet:** `GET /m/{slug}/order-status/{token}/summary` — polling için minimal durum bilgisi
+- `wwwroot/js/public-order-status.js` — 18 sn polling; Completed/Cancelled'da yavaşlatma
+- Business Orders/Kitchen `UpdateStatus` değişikliği public takip ekranına DB üzerinden yansır
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
+### 20B aşaması — Müşteri Sipariş Takip Ekranı UI İyileştirme
+- Public sipariş onay/takip ekranı (`OrderStatus.cshtml`) modernleştirildi — kart düzeni, büyük badge, okunaklı ürün listesi
+- Durum zaman çizelgesi eklendi (Sipariş Alındı → Hazırlanıyor → Tamamlandı; İptal ayrı akış)
+- `PublicOrderDisplayHelper`: durum mesajları + timeline adım mantığı
+- Summary JSON: `statusMessage`, `timelineSteps` — polling ile badge, mesaj ve timeline güncellenir
+- WhatsApp akışı ve tracking token güvenliği korundu
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
+### 21A aşaması — Business Dashboard Analitik İyileştirme
+- **Dashboard KPI:** bugünkü ciro, son 7 gün ciro, aylık ciro, ortalama sepet tutarı
+- **Operasyon:** bekleyen + hazırlanan sipariş (LiveSummary ile canlı güncelleme)
+- **Sipariş durum dağılımı:** progress bar ile Pending/Preparing/Completed/Cancelled
+- **En çok satan ürünler:** top 5 liste (iptal hariç)
+- **Son siparişler** tablosu + **Hızlı aksiyonlar** (tenant slug ile QR menü linki)
+- Migration / Identity / SignalR / yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -308,7 +428,9 @@ DukkanPilot.sln
 
 ## 9. Sıradaki aşama
 
-Sonraki MVP aşaması proje ihtiyacına göre belirlenecek (ör. ödeme entegrasyonu, public menü abonelik kontrolü, AI entegrasyonu).
+Sonraki MVP aşaması proje ihtiyacına göre belirlenecek (ör. public menü abonelik kontrolü, ödeme entegrasyonu, AI entegrasyonu).
+
+21A tamamlandı — business dashboard analitik KPI'lar, durum dağılımı ve en çok satan ürünler eklendi.
 
 ---
 
@@ -329,11 +451,14 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/` | Ana sayfa |
 | `/Admin/Dashboard` | Admin özet |
 | `/Admin/Businesses` | İşletme listesi |
+| `/Admin/Businesses/Subscription/{id}` | İşletme abonelik yönetimi |
 | `/Admin/SubscriptionPlans` | Plan listesi |
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
 | `/Business/Categories` | Kategori listesi |
 | `/Business/Products` | Ürün listesi |
 | `/Business/Orders` | Sipariş listesi |
+| `/Business/Orders/LiveSummary` | Canlı sipariş özeti (JSON) |
+| `/Business/Orders/Kitchen` | Mutfak / operasyon modu |
 | `/Business/Orders/Details/{id}` | Sipariş detayı |
 | `/Business/Customers` | Müşteri listesi |
 | `/Business/Customers/Details/{id}` | Müşteri detayı + sipariş/puan geçmişi |
@@ -357,8 +482,12 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Business/Reports/Products` | Ürün raporu |
 | `/Business/Reports/Customers` | Müşteri raporu |
 | `/Business/QrMenu` | QR menü yönetimi + QR kod |
+| `/Business/QrMenu/Print` | Yazdırılabilir QR masa kartı / afiş |
 | `/Business/Billing` | Abonelik durumu (BusinessOwner) |
+| `/Business/Billing/RequestUpgrade/{planId}` | Plan yükseltme talebi (BusinessOwner) |
+| `/Business/Billing/RequestUpgradeConfirmation` | Talep onay metni |
 | `/Business/Billing/Required` | Abonelik gerekli uyarı ekranı |
+| `/Business/Settings` | İşletme ayarları (BusinessOwner) |
 | `/Business/Staff` | Personel listesi (BusinessOwner) |
 | `/Business/Staff/Create` | Yeni personel |
 | `/Business/Staff/Edit/{id}` | Personel düzenleme |
@@ -373,6 +502,9 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Account/Logout` | Çıkış (POST) |
 | `/Account/AccessDenied` | Erişim reddedildi |
 | `/m/demo-kafe` | Demo QR menü + sepet |
+| `/m/{slug}/order-confirmation/{token}` | Sipariş onay ekranı (login gerekmez) |
+| `/m/{slug}/order-status/{token}` | Sipariş takip ekranı |
+| `/m/{slug}/order-status/{token}/summary` | Sipariş durum özeti (JSON, polling) |
 | `POST /Business/Loyalty/EditRule` | Kural kaydetme |
 | `POST /Business/Loyalty/AddTransaction` | Manuel puan kaydı |
 | `POST /Business/Rewards/Redeem/{id}` | Ödül kullanım kaydı |

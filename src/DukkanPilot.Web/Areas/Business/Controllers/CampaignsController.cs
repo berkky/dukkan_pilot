@@ -1,7 +1,9 @@
 using DukkanPilot.Core.Entities;
+using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,10 +14,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class CampaignsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly BusinessPlanLimitHelper _planLimitHelper;
 
-    public CampaignsController(AppDbContext context)
+    public CampaignsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
     {
         _context = context;
+        _planLimitHelper = planLimitHelper;
     }
 
     [HttpGet("")]
@@ -51,9 +55,18 @@ public class CampaignsController : BusinessBaseController
     }
 
     [HttpGet("Create")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
         ViewData["ActiveMenu"] = "campaigns-create";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        await PlanLimitViewDataHelper.SetLimitWarningAsync(this, _planLimitHelper, businessId, PlanLimitResource.Campaigns);
+
         return View(new CampaignFormViewModel());
     }
 
@@ -67,6 +80,12 @@ public class CampaignsController : BusinessBaseController
         if (forbidResult is not null)
         {
             return forbidResult;
+        }
+
+        if (await _planLimitHelper.IsLimitReachedAsync(businessId, PlanLimitResource.Campaigns))
+        {
+            ModelState.AddModelError(string.Empty,
+                _planLimitHelper.GetLimitReachedMessage(PlanLimitResource.Campaigns, User.IsInRole(nameof(UserRole.BusinessOwner))));
         }
 
         if (!await IsCampaignTitleAvailableAsync(businessId, model.Title))

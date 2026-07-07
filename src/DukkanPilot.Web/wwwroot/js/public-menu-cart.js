@@ -9,6 +9,7 @@
     const businessId = root.dataset.businessId;
     const orderUrl = root.dataset.orderUrl;
     const whatsAppNumber = root.dataset.whatsappNumber || '';
+    const currency = (root.dataset.currency || 'TRY').toUpperCase();
     const storageKey = 'cart-' + businessId;
 
     const cartBar = document.getElementById('cart-bar');
@@ -33,7 +34,11 @@
     });
 
     function formatPrice(amount) {
-        return currencyFormatter.format(amount) + ' ₺';
+        const formatted = currencyFormatter.format(amount);
+        if (currency === 'TRY') {
+            return formatted + ' ₺';
+        }
+        return formatted + ' ' + currency;
     }
 
     function loadCart() {
@@ -271,7 +276,12 @@
                 }
             }
 
-            window.location.href = data.whatsAppUrl;
+            var redirectUrl = data.confirmationUrl || data.whatsAppUrl;
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                showOrderError('Sipariş kaydedildi ancak yönlendirme bağlantısı alınamadı.');
+            }
         } catch {
             showOrderError('Bağlantı hatası. Lütfen tekrar deneyin.');
         } finally {

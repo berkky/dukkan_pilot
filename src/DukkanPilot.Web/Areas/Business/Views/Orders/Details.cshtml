@@ -3,239 +3,134 @@
 @using System.Globalization
 
 @{
-
     ViewData["Title"] = "Sipariş Detayı";
-
     ViewData["Subtitle"] = Model.OrderNumber;
-
     var culture = CultureInfo.GetCultureInfo("tr-TR");
-
+    var whatsAppUrl = OrderDisplayHelper.BuildWhatsAppContactUrl(Model.CustomerPhone);
 }
 
-
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-    <h2 class="h4 mb-0">@Model.OrderNumber</h2>
-
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@Model.OrderNumber</h2>
+        <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(Model.Status)">
+            @OrderDisplayHelper.GetStatusLabel(Model.Status)
+        </span>
+    </div>
     <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
-
 </div>
 
-
-
 <div class="row g-4">
-
     <div class="col-lg-8">
-
         <div class="panel-card mb-4">
-
-            <div class="panel-card-header d-flex justify-content-between align-items-center">
-
+            <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h3 class="h6 mb-0">Sipariş Bilgileri</h3>
-
-                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(Model.Status)">
-
-                    @OrderDisplayHelper.GetStatusLabel(Model.Status)
-
+                <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(Model.Source)">
+                    @OrderDisplayHelper.GetSourceLabel(Model.Source)
                 </span>
-
             </div>
-
             <div class="panel-card-body">
-
                 <dl class="row mb-0">
-
                     <dt class="col-sm-4">Sipariş No</dt>
-
                     <dd class="col-sm-8 fw-semibold">@Model.OrderNumber</dd>
 
-
-
-                    <dt class="col-sm-4">Durum</dt>
-
-                    <dd class="col-sm-8">
-
-                        <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(Model.Status)">
-
-                            @OrderDisplayHelper.GetStatusLabel(Model.Status)
-
-                        </span>
-
-                    </dd>
-
-
-
-                    <dt class="col-sm-4">Kaynak</dt>
-
-                    <dd class="col-sm-8">
-
-                        <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(Model.Source)">
-
-                            @OrderDisplayHelper.GetSourceLabel(Model.Source)
-
-                        </span>
-
-                    </dd>
-
-
-
                     <dt class="col-sm-4">Müşteri Adı</dt>
-
                     <dd class="col-sm-8">@(Model.CustomerName ?? "-")</dd>
 
-
-
                     <dt class="col-sm-4">Müşteri Telefonu</dt>
-
-                    <dd class="col-sm-8">@(Model.CustomerPhone ?? "-")</dd>
-
-
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+                        {
+                            <span>@Model.CustomerPhone</span>
+                            @if (!string.IsNullOrWhiteSpace(whatsAppUrl))
+                            {
+                                <a href="@whatsAppUrl" target="_blank" rel="noopener" class="btn btn-sm btn-success ms-2">WhatsApp</a>
+                            }
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </dd>
 
                     <dt class="col-sm-4">Sipariş Notu</dt>
-
                     <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</dd>
 
-
-
                     <dt class="col-sm-4">Toplam Tutar</dt>
-
                     <dd class="col-sm-8 fw-bold text-primary">@Model.TotalAmount.ToString("N2", culture) ₺</dd>
 
-
-
                     <dt class="col-sm-4">Oluşturulma Tarihi</dt>
-
                     <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
-
                 </dl>
-
             </div>
-
         </div>
-
-
 
         <div class="panel-card">
-
             <div class="panel-card-header">
-
                 <h3 class="h6 mb-0">Sipariş Kalemleri</h3>
-
             </div>
-
             <div class="panel-card-body p-0">
-
                 <div class="table-responsive">
-
                     <table class="table table-hover align-middle mb-0">
-
                         <thead class="table-light">
-
                             <tr>
-
                                 <th>Ürün Adı</th>
-
                                 <th class="text-center">Adet</th>
-
                                 <th class="text-end">Birim Fiyat</th>
-
                                 <th class="text-end">Satır Toplamı</th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                         @if (!Model.Items.Any())
-
                         {
-
                             <tr>
-
                                 <td colspan="4" class="text-center text-muted py-3">Sipariş kalemi bulunamadı.</td>
-
                             </tr>
-
                         }
-
                         else
-
                         {
-
                             foreach (var item in Model.Items)
-
                             {
-
                                 <tr>
-
                                     <td class="fw-semibold">@item.ProductName</td>
-
                                     <td class="text-center">@item.Quantity</td>
-
                                     <td class="text-end">@item.UnitPrice.ToString("N2", culture) ₺</td>
-
                                     <td class="text-end fw-semibold">@item.LineTotal.ToString("N2", culture) ₺</td>
-
                                 </tr>
-
                             }
-
                         }
-
                         </tbody>
-
                         @if (Model.Items.Any())
-
                         {
-
                             <tfoot class="table-light">
-
                                 <tr>
-
                                     <th colspan="3" class="text-end">Genel Toplam</th>
-
                                     <th class="text-end">@Model.TotalAmount.ToString("N2", culture) ₺</th>
-
                                 </tr>
-
                             </tfoot>
-
                         }
-
                     </table>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
-
     <div class="col-lg-4">
-
         <div class="panel-card">
-
             <div class="panel-card-header">
-
-                <h3 class="h6 mb-0">Durum Güncelle</h3>
-
+                <h3 class="h6 mb-0">Hızlı Durum Değiştir</h3>
             </div>
-
             <div class="panel-card-body">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <partial name="_OrderQuickActions" model='new OrderQuickActionsViewModel { OrderId = Model.Id, Status = Model.Status, ReturnTo = "details" }' />
+                </div>
+
+                <hr class="my-3" />
 
                 <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
-
                     @Html.AntiForgeryToken()
-
+                    <input type="hidden" name="returnTo" value="details" />
                     <div class="mb-3">
-
-                        <label for="status" class="form-label">Yeni Durum</label>
-
+                        <label for="status" class="form-label">Manuel Durum Seçimi</label>
                         <select name="status" id="status" class="form-select" required>
                             @{
                                 var statusOptions = new[]
@@ -258,15 +153,10 @@
                                 }
                             }
                         </select>
-
                     </div>
-
                     <button type="submit" class="btn btn-primary w-100">Durumu Güncelle</button>
-
                 </form>
-
             </div>
-
         </div>
 
         <div class="panel-card mt-4">
@@ -302,8 +192,5 @@
                 }
             </div>
         </div>
-
     </div>
-
 </div>
-

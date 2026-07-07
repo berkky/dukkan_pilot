@@ -7,7 +7,9 @@
 
 <div class="panel-card">
     <div class="panel-card-body">
+        <partial name="_PlanLimitWarning" />
         <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
             <partial name="_FormFields" model="Model" />
             <div class="d-flex gap-2 mt-4">
                 <button type="submit" class="btn btn-primary">Kaydet</button>

@@ -10,6 +10,7 @@
         <p class="text-muted mb-0"><code>@Model.Slug</code></p>
     </div>
     <div class="d-flex gap-2">
+        <a asp-action="Subscription" asp-route-businessId="@Model.Id" class="btn btn-outline-primary">Abonelik Yönet</a>
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
         <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
     </div>

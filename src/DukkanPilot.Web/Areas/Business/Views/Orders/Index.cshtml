@@ -1,138 +1,191 @@
-@model IEnumerable<OrderListViewModel>
+@model OrderIndexViewModel
 
 @using System.Globalization
 
 @{
-
     ViewData["Title"] = "Siparişler";
-
-    ViewData["Subtitle"] = "WhatsApp siparişleri";
-
+    ViewData["Subtitle"] = "Sipariş takibi";
     var culture = CultureInfo.GetCultureInfo("tr-TR");
-
 }
 
-
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-
         <h2 class="h4 mb-1">Siparişler</h2>
-
-        <p class="text-muted mb-0">Demo Kafe sipariş listesi</p>
-
+        <p class="text-muted mb-0">WhatsApp ve diğer kaynaklardan gelen siparişler</p>
     </div>
-
+    <button type="button" id="live-sound-toggle" class="btn btn-sm btn-outline-secondary">Sesli uyarıyı etkinleştir</button>
 </div>
 
+<div id="live-orders-root"
+     data-live-orders="true"
+     data-live-url="/Business/Orders/LiveSummary"
+     data-live-page-key="orders-index"
+     data-initial-latest-order-id="@(Model.Summary.LatestOrderId?.ToString() ?? "")"
+     data-initial-pending-count="@Model.Summary.PendingCount">
+</div>
 
+<div id="live-new-order-alert" class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4" hidden role="alert">
+    <div>
+        <strong>Yeni sipariş var.</strong> Listeyi yenileyerek görüntüleyebilirsiniz.
+    </div>
+    <button type="button" id="live-reload-btn" class="btn btn-sm btn-warning">Listeyi Yenile</button>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Bugünkü Sipariş</div>
+            <div class="stat-value" data-live-today-count>@Model.Summary.TodayOrderCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Bekleyen Sipariş</div>
+            <div class="stat-value text-warning" data-live-pending-count>@Model.Summary.PendingCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Hazırlanan Sipariş</div>
+            <div class="stat-value text-info" data-live-preparing-count>@Model.Summary.PreparingCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Bugünkü Ciro</div>
+            <div class="stat-value" data-live-today-revenue>@Model.Summary.TodayRevenue.ToString("N2", culture) ₺</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-body">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small mb-1" for="status">Durum</label>
+                <select name="status" id="status" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @{
+                        var statusOptions = new[]
+                        {
+                            OrderStatus.Pending,
+                            OrderStatus.Preparing,
+                            OrderStatus.Completed,
+                            OrderStatus.Cancelled
+                        };
+                    }
+                    @foreach (var statusOption in statusOptions)
+                    {
+                        var value = statusOption.ToString();
+                        if (string.Equals(Model.StatusFilter, value, StringComparison.OrdinalIgnoreCase))
+                        {
+                            <option value="@value" selected>@OrderDisplayHelper.GetStatusLabel(statusOption)</option>
+                        }
+                        else
+                        {
+                            <option value="@value">@OrderDisplayHelper.GetStatusLabel(statusOption)</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small mb-1" for="period">Tarih</label>
+                <select name="period" id="period" class="form-select form-select-sm">
+                    @if (Model.PeriodFilter == "all")
+                    {
+                        <option value="all" selected>Tümü</option>
+                    }
+                    else
+                    {
+                        <option value="all">Tümü</option>
+                    }
+                    @if (Model.PeriodFilter == "today")
+                    {
+                        <option value="today" selected>Bugün</option>
+                    }
+                    else
+                    {
+                        <option value="today">Bugün</option>
+                    }
+                    @if (Model.PeriodFilter == "week")
+                    {
+                        <option value="week" selected>Son 7 gün</option>
+                    }
+                    else
+                    {
+                        <option value="week">Son 7 gün</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small mb-1" for="search">Ara</label>
+                <input type="text"
+                       name="search"
+                       id="search"
+                       class="form-control form-control-sm"
+                       value="@Model.Search"
+                       placeholder="Sipariş no, müşteri adı veya telefon" />
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filtrele</button>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Temizle</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="panel-card">
-
     <div class="panel-card-body p-0">
-
         <div class="table-responsive">
-
             <table class="table table-hover align-middle mb-0">
-
                 <thead class="table-light">
-
                     <tr>
-
                         <th>Sipariş No</th>
-
-                        <th>Müşteri Adı</th>
-
-                        <th>Müşteri Telefonu</th>
-
-                        <th>Toplam Tutar</th>
-
+                        <th>Müşteri</th>
+                        <th>Telefon</th>
+                        <th>Tarih</th>
+                        <th>Toplam</th>
                         <th>Durum</th>
-
-                        <th>Kaynak</th>
-
-                        <th>Oluşturulma Tarihi</th>
-
-                        <th class="text-end">İşlem</th>
-
+                        <th class="text-end">İşlemler</th>
                     </tr>
-
                 </thead>
-
                 <tbody>
-
-                @if (!Model.Any())
-
+                @if (!Model.Orders.Any())
                 {
-
                     <tr>
-
-                        <td colspan="8" class="text-center text-muted py-4">Henüz sipariş yok.</td>
-
+                        <td colspan="7" class="text-center text-muted py-4">Filtreye uygun sipariş bulunamadı.</td>
                     </tr>
-
                 }
-
                 else
-
                 {
-
-                    foreach (var item in Model)
-
+                    foreach (var item in Model.Orders)
                     {
-
                         <tr>
-
                             <td class="fw-semibold">@item.OrderNumber</td>
-
                             <td>@(item.CustomerName ?? "-")</td>
-
                             <td>@(item.CustomerPhone ?? "-")</td>
-
-                            <td>@item.TotalAmount.ToString("N2", culture) ₺</td>
-
-                            <td>
-
-                                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(item.Status)">
-
-                                    @OrderDisplayHelper.GetStatusLabel(item.Status)
-
-                                </span>
-
-                            </td>
-
-                            <td>
-
-                                <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(item.Source)">
-
-                                    @OrderDisplayHelper.GetSourceLabel(item.Source)
-
-                                </span>
-
-                            </td>
-
                             <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
-
-                            <td class="text-end">
-
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a>
-
+                            <td>@item.TotalAmount.ToString("N2", culture) ₺</td>
+                            <td>
+                                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(item.Status)">
+                                    @OrderDisplayHelper.GetStatusLabel(item.Status)
+                                </span>
                             </td>
-
+                            <td class="text-end">
+                                <div class="d-flex flex-wrap justify-content-end gap-1">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a>
+                                    <partial name="_OrderQuickActions" model='new OrderQuickActionsViewModel { OrderId = item.Id, Status = item.Status, StatusFilter = Model.StatusFilter, PeriodFilter = Model.PeriodFilter, Search = Model.Search, ReturnTo = "list" }' />
+                                </div>
+                            </td>
                         </tr>
-
                     }
-
                 }
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
 
+@section Scripts {
+    <script src="~/js/business-orders-live.js" asp-append-version="true"></script>
+}

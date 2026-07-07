@@ -1,7 +1,9 @@
 using DukkanPilot.Core.Entities;
+using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,10 +14,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class CategoriesController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly BusinessPlanLimitHelper _planLimitHelper;
 
-    public CategoriesController(AppDbContext context)
+    public CategoriesController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
     {
         _context = context;
+        _planLimitHelper = planLimitHelper;
     }
 
     [HttpGet("")]
@@ -48,9 +52,18 @@ public class CategoriesController : BusinessBaseController
     }
 
     [HttpGet("Create")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
         ViewData["ActiveMenu"] = "categories-create";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        await PlanLimitViewDataHelper.SetLimitWarningAsync(this, _planLimitHelper, businessId, PlanLimitResource.Categories);
+
         return View(new CategoryFormViewModel());
     }
 
@@ -64,6 +77,12 @@ public class CategoriesController : BusinessBaseController
         if (forbidResult is not null)
         {
             return forbidResult;
+        }
+
+        if (await _planLimitHelper.IsLimitReachedAsync(businessId, PlanLimitResource.Categories))
+        {
+            ModelState.AddModelError(string.Empty,
+                _planLimitHelper.GetLimitReachedMessage(PlanLimitResource.Categories, User.IsInRole(nameof(UserRole.BusinessOwner))));
         }
 
         if (!await IsCategoryNameAvailableAsync(businessId, model.Name))

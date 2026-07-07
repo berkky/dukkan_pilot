@@ -1,0 +1,187 @@
+/* QR Menu printable poster — screen + print */
+
+.qr-print-body {
+    background: #f1f5f9;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1.5rem 1rem 2rem;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.qr-print-toolbar {
+    max-width: 210mm;
+    margin: 0 auto 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.qr-print-page {
+    max-width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.qr-print-poster {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 2rem 2rem;
+}
+
+.qr-print-header {
+    width: 100%;
+    padding: 1.75rem 1.5rem;
+    margin: -2.5rem -2rem 1.75rem;
+    color: #fff;
+    background: linear-gradient(
+        135deg,
+        var(--qr-print-theme, #2563eb),
+        color-mix(in srgb, var(--qr-print-theme, #2563eb) 72%, #000)
+    );
+}
+
+.qr-print-logo {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 1rem;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    margin-bottom: 1rem;
+}
+
+.qr-print-logo-placeholder {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.qr-print-title {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.02em;
+}
+
+.qr-print-subtitle {
+    font-size: 1rem;
+    opacity: 0.92;
+    margin: 0;
+    line-height: 1.45;
+    max-width: 28rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.qr-print-qr-wrap {
+    padding: 1rem;
+    background: #fff;
+    border: 3px solid var(--qr-print-theme, #2563eb);
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.qr-print-qr-wrap canvas,
+.qr-print-qr-wrap img {
+    display: block !important;
+    margin: 0 auto;
+}
+
+.qr-print-instructions {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+    line-height: 1.4;
+}
+
+.qr-print-instructions-secondary {
+    font-size: 1rem;
+    color: #475569;
+    margin-bottom: 1.25rem;
+    line-height: 1.45;
+}
+
+.qr-print-link {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--qr-print-theme, #2563eb);
+    word-break: break-all;
+    margin-bottom: 1.25rem;
+}
+
+.qr-print-contact {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    width: 100%;
+    max-width: 24rem;
+}
+
+.qr-print-contact-item {
+    margin-bottom: 0.25rem;
+}
+
+.qr-print-footer {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    padding: 0.75rem 1rem 1rem;
+    text-align: center;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 12mm;
+    }
+
+    .qr-print-body {
+        background: #fff !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .qr-print-page {
+        max-width: none;
+        min-height: auto;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid;
+    }
+
+    .qr-print-poster {
+        padding: 1.5rem 1rem;
+    }
+
+    .qr-print-header {
+        margin: -1.5rem -1rem 1.25rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

@@ -37,4 +37,32 @@ public static class OrderDisplayHelper
         OrderSource.Other => "bg-secondary",
         _ => "bg-secondary"
     };
+
+    public static IReadOnlyList<OrderStatusAction> GetQuickStatusActions(OrderStatus current) => current switch
+    {
+        OrderStatus.Pending =>
+        [
+            new OrderStatusAction(OrderStatus.Preparing, "Hazırla", "btn-outline-info"),
+            new OrderStatusAction(OrderStatus.Cancelled, "İptal", "btn-outline-secondary")
+        ],
+        OrderStatus.Preparing =>
+        [
+            new OrderStatusAction(OrderStatus.Completed, "Tamamla", "btn-outline-success"),
+            new OrderStatusAction(OrderStatus.Cancelled, "İptal", "btn-outline-secondary")
+        ],
+        _ => Array.Empty<OrderStatusAction>()
+    };
+
+    public static string? BuildWhatsAppContactUrl(string? phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return null;
+        }
+
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        return digits.Length > 0 ? $"https://wa.me/{digits}" : null;
+    }
 }
+
+public readonly record struct OrderStatusAction(OrderStatus Status, string Label, string ButtonClass);

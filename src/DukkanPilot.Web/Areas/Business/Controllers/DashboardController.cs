@@ -11,11 +11,16 @@ public class DashboardController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
+    private readonly BusinessPlanLimitHelper _planLimitHelper;
 
-    public DashboardController(AppDbContext context, BusinessSubscriptionStatusHelper subscriptionStatusHelper)
+    public DashboardController(
+        AppDbContext context,
+        BusinessSubscriptionStatusHelper subscriptionStatusHelper,
+        BusinessPlanLimitHelper planLimitHelper)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
+        _planLimitHelper = planLimitHelper;
     }
 
     public async Task<IActionResult> Index()
@@ -46,19 +51,73 @@ public class DashboardController : BusinessBaseController
             .Select(c => new { c.Title, c.EndDate })
             .FirstOrDefaultAsync();
 
+        var (todayStartUtc, todayEndUtc) = OrderQueryHelper.GetTodayUtcRange();
+        var last7DaysStartUtc = OrderQueryHelper.GetWeekStartUtc();
+        var (monthStartUtc, monthEndUtc) = OrderQueryHelper.GetCurrentMonthUtcRange();
+        var ordersQuery = _context.Orders.AsNoTracking().Where(o => o.BusinessId == businessId);
+
+        var latestOrderSnapshot = await ordersQuery
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new { o.Id, o.CreatedAt })
+            .FirstOrDefaultAsync();
+
+        var hasOrders = await ordersQuery.AnyAsync();
+
+        var topProducts = await _context.OrderItems
+            .AsNoTracking()
+            .Where(i => i.Order.BusinessId == businessId && i.Order.Status != OrderStatus.Cancelled)
+            .GroupBy(i => new { i.ProductId, i.ProductName })
+            .Select(g => new ProductSalesRowViewModel
+            {
+                ProductName = g.Key.ProductName,
+                QuantitySold = g.Sum(i => i.Quantity),
+                TotalRevenue = g.Sum(i => i.UnitPrice * i.Quantity)
+            })
+            .OrderByDescending(p => p.QuantitySold)
+            .Take(5)
+            .ToListAsync();
+
         var model = new BusinessDashboardViewModel
         {
             BusinessName = business.Name,
+            BusinessSlug = business.Slug,
             TotalCategoryCount = await _context.Categories.CountAsync(c => c.BusinessId == businessId),
             ActiveCategoryCount = await _context.Categories.CountAsync(c => c.BusinessId == businessId && c.IsActive),
             TotalProductCount = await _context.Products.CountAsync(p => p.BusinessId == businessId),
             ActiveProductCount = await _context.Products.CountAsync(p => p.BusinessId == businessId && p.IsActive),
-            TotalOrderCount = await _context.Orders.CountAsync(o => o.BusinessId == businessId),
+            TotalOrderCount = await ordersQuery.CountAsync(),
             TotalCustomerCount = await _context.Customers.CountAsync(c => c.BusinessId == businessId),
             ActiveCustomerCount = await _context.Customers.CountAsync(c => c.BusinessId == businessId && c.IsActive),
-            RecentOrders = await _context.Orders
-                .AsNoTracking()
-                .Where(o => o.BusinessId == businessId)
+            OrderSummary = new DashboardOrderSummaryViewModel
+            {
+                TodayOrderCount = await ordersQuery.CountAsync(o =>
+                    o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc),
+                PendingCount = await ordersQuery.CountAsync(o => o.Status == OrderStatus.Pending),
+                PreparingCount = await ordersQuery.CountAsync(o => o.Status == OrderStatus.Preparing),
+                TodayRevenue = await ordersQuery
+                    .Where(o => o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc)
+                    .SumAsync(o => o.TotalAmount),
+                Last7DaysRevenue = await ordersQuery
+                    .Where(o => o.CreatedAt >= last7DaysStartUtc)
+                    .SumAsync(o => o.TotalAmount),
+                MonthlyRevenue = await ordersQuery
+                    .Where(o => o.CreatedAt >= monthStartUtc && o.CreatedAt < monthEndUtc)
+                    .SumAsync(o => o.TotalAmount),
+                AverageOrderAmount = hasOrders
+                    ? await ordersQuery.AverageAsync(o => o.TotalAmount)
+                    : 0,
+                LatestOrderId = latestOrderSnapshot?.Id,
+                LatestOrderCreatedAt = latestOrderSnapshot?.CreatedAt
+            },
+            StatusDistribution = new DashboardStatusDistributionViewModel
+            {
+                PendingCount = await ordersQuery.CountAsync(o => o.Status == OrderStatus.Pending),
+                PreparingCount = await ordersQuery.CountAsync(o => o.Status == OrderStatus.Preparing),
+                CompletedCount = await ordersQuery.CountAsync(o => o.Status == OrderStatus.Completed),
+                CancelledCount = await ordersQuery.CountAsync(o => o.Status == OrderStatus.Cancelled)
+            },
+            TopProducts = topProducts,
+            RecentOrders = await ordersQuery
                 .OrderByDescending(o => o.CreatedAt)
                 .Take(5)
                 .Select(o => new RecentOrderViewModel
@@ -94,6 +153,7 @@ public class DashboardController : BusinessBaseController
                 NearestEndingCampaignEndDate = nearestEnding?.EndDate
             },
             Subscription = await _subscriptionStatusHelper.GetStatusAsync(businessId),
+            PlanUsage = await _planLimitHelper.GetUsageAsync(businessId),
             IsBusinessOwner = User.IsInRole(nameof(UserRole.BusinessOwner))
         };
 

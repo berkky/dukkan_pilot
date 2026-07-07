@@ -1,0 +1,24 @@
+---
+description: DukkanPilot oturum protokolü — önce oku, varsayma, tekrar etme
+alwaysApply: true
+---
+
+# DukkanPilot — Oturum Protokolü
+
+## Her göreve başlamadan
+
+1. `docs/PROJECT_STATE.md` dosyasını oku (tamamlanan aşamalar, bilinçli yapılmayanlar, son checkpoint).
+2. İlgili dosyaların **gerçekten var olduğunu** Glob/Grep/Read ile doğrula; önceki sohbetten varsayma.
+3. Aynı özelliği tekrar yazma — önce mevcut controller/view/helper'ı kontrol et.
+
+## Kapsam disiplini
+
+- Yalnızca istenen aşamayı uygula; kapsam dışı refactor, rename veya "iyileştirme" yapma.
+- Mevcut mimariyi koru: MVC + Areas, Bootstrap 5, doğrudan `AppDbContext`, Repository/Service katmanı ekleme.
+- Aşama tamamlanınca `docs/PROJECT_STATE.md` içindeki checkpoint'i güncelle.
+
+## Teknoloji kısıtları (değiştirme)
+
+- ASP.NET Core Identity **yok** — cookie auth (`PasswordHelper`, claims).
+- Ödeme, WhatsApp API, OpenAI entegrasyonu yok (açıkça istenmedikçe).
+- Soft delete: `IsActive = false`; hard delete kullanma.

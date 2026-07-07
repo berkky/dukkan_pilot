@@ -1,0 +1,61 @@
+@model PlanUpgradeRequestViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Plan Yükseltme Talebi";
+    ViewData["Subtitle"] = Model.RequestedPlanName;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var requestedAtLocal = Model.RequestedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4 mb-1">Plan Yükseltme Talebi</h2>
+        <p class="text-muted mb-0">Talep özetini kontrol edin ve onaylayın</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Billing'e Dön</a>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Talep Özeti</h3>
+    </div>
+    <div class="panel-card-body">
+        <dl class="row mb-4">
+            <dt class="col-sm-4">İşletme</dt>
+            <dd class="col-sm-8">@Model.BusinessName <code class="ms-1">@Model.BusinessSlug</code></dd>
+
+            <dt class="col-sm-4">Owner E-posta</dt>
+            <dd class="col-sm-8">@Model.OwnerEmail</dd>
+
+            <dt class="col-sm-4">Mevcut Plan</dt>
+            <dd class="col-sm-8">@Model.CurrentPlanName</dd>
+
+            <dt class="col-sm-4">İstenen Plan</dt>
+            <dd class="col-sm-8 fw-semibold">@Model.RequestedPlanName (@Model.RequestedPlanPrice.ToString("N2", culture) ₺)</dd>
+
+            <dt class="col-sm-4">Talep Tarihi</dt>
+            <dd class="col-sm-8">@requestedAtLocal</dd>
+        </dl>
+
+        <div class="alert alert-info small">
+            Bu işlem planınızı otomatik değiştirmez. Talep onaylandığında hazır metin oluşturulur; admin panelinden manuel plan güncellemesi yapılmalıdır.
+        </div>
+
+        <form asp-action="RequestUpgrade" asp-route-planId="@Model.RequestedPlanId" method="post">
+            <input type="hidden" asp-for="BusinessId" />
+            <input type="hidden" asp-for="BusinessName" />
+            <input type="hidden" asp-for="BusinessSlug" />
+            <input type="hidden" asp-for="OwnerEmail" />
+            <input type="hidden" asp-for="CurrentPlanName" />
+            <input type="hidden" asp-for="RequestedPlanId" />
+            <input type="hidden" asp-for="RequestedPlanName" />
+            <input type="hidden" asp-for="RequestedPlanPrice" />
+            <input type="hidden" asp-for="RequestedAtUtc" />
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Talebi Oluştur</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Geri Dön</a>
+            </div>
+        </form>
+    </div>
+</div>

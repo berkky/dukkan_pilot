@@ -21,7 +21,9 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddDataProtection();
 builder.Services.AddSingleton<PasswordResetTokenHelper>();
+builder.Services.AddSingleton<PublicOrderTrackingTokenHelper>();
 builder.Services.AddScoped<BusinessSubscriptionStatusHelper>();
+builder.Services.AddScoped<BusinessPlanLimitHelper>();
 builder.Services.AddScoped<RequireActiveSubscriptionFilter>();
 
 builder.Services.AddAntiforgery(options =>

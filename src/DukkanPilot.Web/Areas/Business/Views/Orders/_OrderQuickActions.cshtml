@@ -1,0 +1,23 @@
+@model OrderQuickActionsViewModel
+
+@foreach (var action in OrderDisplayHelper.GetQuickStatusActions(Model.Status))
+{
+    <form asp-controller="Orders" asp-action="UpdateStatus" asp-route-id="@Model.OrderId" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="status" value="@((int)action.Status)" />
+        <input type="hidden" name="returnTo" value="@Model.ReturnTo" />
+        @if (!string.IsNullOrWhiteSpace(Model.StatusFilter))
+        {
+            <input type="hidden" name="statusFilter" value="@Model.StatusFilter" />
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.PeriodFilter))
+        {
+            <input type="hidden" name="period" value="@Model.PeriodFilter" />
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Search))
+        {
+            <input type="hidden" name="search" value="@Model.Search" />
+        }
+        <button type="submit" class="btn btn-sm @action.ButtonClass">@action.Label</button>
+    </form>
+}

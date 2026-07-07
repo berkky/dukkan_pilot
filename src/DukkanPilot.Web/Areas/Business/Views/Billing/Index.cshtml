@@ -1,9 +1,10 @@
-@model BusinessSubscriptionStatusViewModel
+@model BillingIndexViewModel
 @using System.Globalization
 @{
     ViewData["Title"] = "Abonelik";
     ViewData["Subtitle"] = "Abonelik durumu";
     var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var subscription = Model.Subscription;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -14,33 +15,33 @@
     <a href="/Business/Dashboard" class="btn btn-outline-secondary">Dashboard</a>
 </div>
 
-<div class="panel-card">
+<div class="panel-card mb-4">
     <div class="panel-card-header d-flex justify-content-between align-items-center">
         <h3 class="h6 mb-0">Mevcut Abonelik</h3>
-        <span class="badge @Model.StatusCssClass">@Model.StatusText</span>
+        <span class="badge @subscription.StatusCssClass">@subscription.StatusText</span>
     </div>
     <div class="panel-card-body">
-        @if (Model.HasValidSubscription)
+        @if (subscription.HasValidSubscription)
         {
             <div class="alert alert-success small">
-                @Model.Message
+                @subscription.Message
             </div>
         }
         else
         {
             <div class="alert alert-warning small">
-                @Model.Message Yönetim modüllerine erişim kısıtlanmıştır.
+                @subscription.Message Yönetim modüllerine erişim kısıtlanmıştır.
             </div>
         }
 
         <dl class="row mb-0">
             <dt class="col-sm-4">Plan</dt>
-            <dd class="col-sm-8 fw-semibold">@Model.PlanName</dd>
+            <dd class="col-sm-8 fw-semibold">@subscription.PlanName</dd>
 
             <dt class="col-sm-4">Durum</dt>
             <dd class="col-sm-8">
-                <span class="badge @Model.StatusCssClass">@Model.StatusText</span>
-                @if (Model.IsTrial)
+                <span class="badge @subscription.StatusCssClass">@subscription.StatusText</span>
+                @if (subscription.IsTrial)
                 {
                     <span class="badge bg-info ms-1">Deneme</span>
                 }
@@ -48,26 +49,97 @@
 
             <dt class="col-sm-4">Başlangıç</dt>
             <dd class="col-sm-8">
-                @(Model.StartDate.HasValue
-                    ? Model.StartDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                @(subscription.StartDate.HasValue
+                    ? subscription.StartDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
                     : "-")
             </dd>
 
             <dt class="col-sm-4">Bitiş</dt>
             <dd class="col-sm-8">
-                @(Model.EndDate.HasValue
-                    ? Model.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                @(subscription.EndDate.HasValue
+                    ? subscription.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
                     : "Süresiz")
             </dd>
 
             <dt class="col-sm-4">Kalan Gün</dt>
             <dd class="col-sm-8">
-                @(Model.DaysRemaining.HasValue ? $"{Model.DaysRemaining} gün" : "Süresiz")
+                @(subscription.DaysRemaining.HasValue ? $"{subscription.DaysRemaining} gün" : "Süresiz")
             </dd>
         </dl>
+    </div>
+</div>
 
-        <div class="alert alert-light border small mt-4 mb-0">
-            Plan yükseltme ve ödeme entegrasyonu sonraki aşamada eklenecektir.
-        </div>
+<div class="panel-card mb-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Kullanım / Limit Tablosu</h3>
+    </div>
+    <div class="panel-card-body p-0">
+        <partial name="_PlanUsageTable" model="Model.Usage" />
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Planlar</h3>
+    </div>
+    <div class="panel-card-body">
+        @if (!Model.AvailablePlans.Any())
+        {
+            <p class="text-muted mb-0">Aktif plan bulunamadı.</p>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var plan in Model.AvailablePlans)
+                {
+                    <div class="col-lg-6">
+                        <div class="border rounded p-3 h-100 @(plan.IsCurrentPlan ? "border-primary bg-primary-subtle" : "")">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h4 class="h6 mb-1">@plan.Name</h4>
+                                    @if (plan.IsCurrentPlan)
+                                    {
+                                        <span class="badge bg-primary">Mevcut Plan</span>
+                                    }
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-semibold">@plan.Price.ToString("N2", culture) ₺</div>
+                                    <small class="text-muted">/ ay</small>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(plan.Description))
+                            {
+                                <p class="small text-muted mb-2">@plan.Description</p>
+                            }
+
+                            <ul class="small mb-3 ps-3">
+                                <li>Ürün: @plan.ProductLimitText</li>
+                                <li>Kategori: @plan.CategoryLimitText</li>
+                                <li>Personel: @plan.StaffLimitText</li>
+                                <li>Kampanya: @plan.CampaignLimitText</li>
+                                <li>Ödül: @plan.RewardLimitText</li>
+                                <li>QR Kod: @plan.QrCodeLimitText</li>
+                            </ul>
+
+                            @if (plan.IsCurrentPlan)
+                            {
+                                <button type="button" class="btn btn-outline-primary btn-sm" disabled>Mevcut Plan</button>
+                            }
+                            else
+                            {
+                                <a asp-action="RequestUpgrade" asp-route-planId="@plan.PlanId" class="btn btn-primary btn-sm">
+                                    Yükseltme Talebi Oluştur
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="alert alert-light border small mt-3 mb-0">
+                Plan yükseltme talepleri bu aşamada veritabanına kaydedilmez. Talep oluşturduktan sonra metni kopyalayıp yöneticiye iletebilirsiniz; plan değişikliği admin panelinden manuel yapılır.
+            </div>
+        }
     </div>
 </div>

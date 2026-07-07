@@ -1,363 +1,206 @@
 @model PublicMenuViewModel
 
-@using System.Globalization
-
-
-
 @Html.AntiForgeryToken()
 
-
-
 <div class="public-menu-page"
-
      id="public-menu-root"
-
-     style="--menu-theme: @Model.ThemeColor"
-
+     style="--dp-theme-color: @Model.ThemeColor; --menu-theme: @Model.ThemeColor"
      data-business-id="@Model.BusinessId"
-
      data-order-url="/m/@Model.Slug/order"
-
-     data-whatsapp-number="@(Model.WhatsAppNumber ?? string.Empty)">
+     data-whatsapp-number="@(Model.WhatsAppNumber ?? string.Empty)"
+     data-currency="@Model.Currency">
 
     <header class="public-menu-header" style="background: linear-gradient(135deg, @Model.ThemeColor, color-mix(in srgb, @Model.ThemeColor 75%, #000))">
-
-        <div class="d-flex align-items-center gap-3">
-
-            @if (!string.IsNullOrEmpty(Model.LogoUrl))
-
+        <div class="d-flex align-items-start gap-3">
+            @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
             {
-
-                <img src="@Model.LogoUrl" alt="@Model.BusinessName" class="public-menu-logo" />
-
+                <img src="@Model.LogoUrl"
+                     alt="@Model.BusinessName"
+                     class="public-menu-logo"
+                     onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />
+                <div class="public-menu-logo-placeholder" hidden aria-hidden="true">☕</div>
             }
-
             else
-
             {
-
-                <div class="public-menu-logo-placeholder">☕</div>
-
+                <div class="public-menu-logo-placeholder" aria-hidden="true">☕</div>
             }
-
-            <div>
-
+            <div class="flex-grow-1 min-w-0">
                 <h1 class="h4 mb-1 fw-bold">@Model.BusinessName</h1>
-
-                @if (!string.IsNullOrEmpty(Model.Phone))
-
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
                 {
-
-                    <p class="mb-0 small opacity-75">@Model.Phone</p>
-
+                    <p class="public-menu-header-desc mb-0">@Model.Description</p>
                 }
-
             </div>
-
         </div>
-
     </header>
 
-
+    @if (!string.IsNullOrWhiteSpace(Model.Address) || !string.IsNullOrWhiteSpace(Model.Phone))
+    {
+        <div class="public-menu-info">
+            @if (!string.IsNullOrWhiteSpace(Model.Address))
+            {
+                <div class="public-menu-info-item">
+                    <span class="public-menu-info-icon" aria-hidden="true">📍</span>
+                    <span>@Model.Address</span>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Phone))
+            {
+                <div class="public-menu-info-item">
+                    <span class="public-menu-info-icon" aria-hidden="true">📞</span>
+                    <a class="public-menu-info-link" href="tel:@Model.Phone">@Model.Phone</a>
+                </div>
+            }
+        </div>
+    }
 
     @if (Model.Campaigns.Any())
-
     {
-
         @foreach (var campaign in Model.Campaigns)
-
         {
-
             <div class="public-menu-campaign">
-
                 <div class="public-menu-campaign-title">🎯 @campaign.Title</div>
-
                 @if (!string.IsNullOrEmpty(campaign.Description))
-
                 {
-
                     <p class="public-menu-campaign-desc">@campaign.Description</p>
-
                 }
-
             </div>
-
         }
-
     }
-
-
 
     @if (!Model.Categories.Any())
-
     {
-
         <div class="public-menu-empty">
-
             <div class="public-menu-empty-icon">📋</div>
-
             <p class="mb-0">Henüz menüde kategori bulunmuyor.</p>
-
         </div>
-
     }
-
     else
-
     {
-
         <nav class="category-nav-wrapper">
-
             <div class="category-nav">
-
                 @foreach (var category in Model.Categories)
-
                 {
-
                     <a class="category-nav-link" href="#category-@category.Id">@category.Name</a>
-
                 }
-
             </div>
-
         </nav>
 
-
-
         @foreach (var category in Model.Categories)
-
         {
-
             <section id="category-@category.Id" class="menu-category-section">
-
                 <h2 class="menu-category-title">@category.Name</h2>
 
-
-
                 @if (!category.Products.Any())
-
                 {
-
                     <p class="text-muted small">Bu kategoride ürün bulunmuyor.</p>
-
                 }
-
                 else
-
                 {
-
                     @foreach (var product in category.Products)
-
                     {
-
                         <article class="product-card">
-
                             @if (!string.IsNullOrEmpty(product.ImageUrl))
-
                             {
-
                                 <img src="@product.ImageUrl" alt="@product.Name" class="product-card-image" loading="lazy" />
-
                             }
-
                             else
-
                             {
-
                                 <div class="product-card-image-placeholder" aria-hidden="true">🍽️</div>
-
                             }
-
                             <div class="product-card-body">
-
                                 <div class="product-card-name">@product.Name</div>
-
                                 @if (!string.IsNullOrEmpty(product.Description))
-
                                 {
-
                                     <p class="product-card-desc">@product.Description</p>
-
                                 }
-
                                 <div class="d-flex align-items-center justify-content-between gap-2 mt-1">
-
                                     <div class="product-card-price mb-0">
-
-                                        @product.Price.ToString("N2", CultureInfo.GetCultureInfo("tr-TR")) ₺
-
+                                        @Model.FormatPrice(product.Price)
                                     </div>
-
                                     <button type="button"
-
                                             class="btn btn-sm btn-add-to-cart"
-
                                             style="background: var(--menu-theme); border-color: var(--menu-theme); color: #fff;"
-
                                             data-product-id="@product.Id"
-
                                             data-product-name="@product.Name"
-
-                                            data-product-price="@product.Price.ToString(CultureInfo.InvariantCulture)">
-
+                                            data-product-price="@product.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)">
                                         Sepete Ekle
-
                                     </button>
-
                                 </div>
-
                             </div>
-
                         </article>
-
                     }
-
                 }
-
             </section>
-
         }
-
     }
 
-
-
     <footer class="public-menu-footer">
-
         DükkanPilot ile oluşturuldu
-
     </footer>
-
 </div>
 
-
-
-<div id="cart-bar" class="cart-bar" style="--menu-theme: @Model.ThemeColor" hidden>
-
+<div id="cart-bar" class="cart-bar" style="--dp-theme-color: @Model.ThemeColor; --menu-theme: @Model.ThemeColor" hidden>
     <button type="button"
-
             class="cart-bar-button"
-
             data-bs-toggle="offcanvas"
-
             data-bs-target="#cartOffcanvas"
-
             aria-controls="cartOffcanvas">
-
         <span class="cart-bar-label">Sepetim</span>
-
         <span class="cart-bar-meta">
-
-            <span id="cart-item-count">0</span> ürün · <span id="cart-total">0,00 ₺</span>
-
+            <span id="cart-item-count">0</span> ürün · <span id="cart-total">@Model.FormatPrice(0)</span>
         </span>
-
     </button>
-
 </div>
 
-
-
-<div class="offcanvas offcanvas-bottom cart-offcanvas" style="--menu-theme: @Model.ThemeColor" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
-
+<div class="offcanvas offcanvas-bottom cart-offcanvas" style="--dp-theme-color: @Model.ThemeColor; --menu-theme: @Model.ThemeColor" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
     <div class="offcanvas-header border-bottom">
-
         <h5 class="offcanvas-title fw-bold" id="cartOffcanvasLabel">Sipariş Özeti</h5>
-
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
-
     </div>
-
     <div class="offcanvas-body d-flex flex-column">
-
         <div id="cart-empty" class="cart-empty text-muted text-center py-3" hidden>
-
             Sepetiniz boş.
-
         </div>
-
-
 
         <div id="cart-items" class="cart-items flex-grow-1"></div>
 
-
-
         <div class="cart-customer-fields mt-3">
-
             <div class="mb-2">
-
                 <label for="customer-name" class="form-label small mb-1">Ad Soyad (opsiyonel)</label>
-
                 <input type="text" class="form-control form-control-sm" id="customer-name" maxlength="200" placeholder="Adınız" />
-
             </div>
-
             <div class="mb-2">
-
                 <label for="customer-phone" class="form-label small mb-1">Telefon (opsiyonel)</label>
-
                 <input type="tel" class="form-control form-control-sm" id="customer-phone" maxlength="20" placeholder="05xx xxx xx xx" />
-
             </div>
-
             <div class="mb-2">
-
                 <label for="order-notes" class="form-label small mb-1">Sipariş notu (opsiyonel)</label>
-
                 <textarea class="form-control form-control-sm" id="order-notes" rows="2" maxlength="1000" placeholder="Örn. şekersiz olsun"></textarea>
-
             </div>
-
         </div>
-
-
 
         <div id="whatsapp-warning" class="alert alert-warning py-2 small mb-2" hidden>
-
             Bu işletme için WhatsApp numarası tanımlı değil. Sipariş verilemiyor.
-
         </div>
-
-
 
         <div id="cart-order-error" class="alert alert-danger py-2 small mb-2" hidden role="alert"></div>
 
-
-
         <div class="cart-footer border-top pt-3 mt-auto">
-
             <div class="d-flex justify-content-between align-items-center mb-3">
-
                 <span class="fw-semibold">Toplam</span>
-
-                <span class="fw-bold fs-5" id="cart-summary-total" style="color: var(--menu-theme);">0,00 ₺</span>
-
+                <span class="fw-bold fs-5" id="cart-summary-total" style="color: var(--menu-theme);">@Model.FormatPrice(0)</span>
             </div>
-
             <div class="d-flex gap-2">
-
                 <button type="button" class="btn btn-outline-secondary flex-shrink-0" id="cart-clear-btn">Temizle</button>
-
                 <button type="button" class="btn flex-grow-1 text-white" id="cart-place-order-btn" style="background: var(--menu-theme); border-color: var(--menu-theme);">
-
                     WhatsApp ile Sipariş Ver
-
                 </button>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
-
-
 @section Scripts {
-
     <script src="~/js/public-menu-cart.js" asp-append-version="true"></script>
-
 }
-
-

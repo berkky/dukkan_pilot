@@ -3,6 +3,7 @@ using DukkanPilot.Core.Entities;
 using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
+using DukkanPilot.Web.Areas.Business.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 namespace DukkanPilot.Web.Areas.Admin.Controllers;
 
 [Route("Admin/Businesses")]
-public class AdminBusinessesController : AdminBaseController
+public class BusinessesController : AdminBaseController
 {
     private readonly AppDbContext _context;
 
-    public AdminBusinessesController(AppDbContext context)
+    public BusinessesController(AppDbContext context)
     {
         _context = context;
     }
@@ -221,6 +222,199 @@ public class AdminBusinessesController : AdminBaseController
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet("Subscription/{businessId:int}")]
+    public async Task<IActionResult> Subscription(int businessId)
+    {
+        ViewData["ActiveMenu"] = "businesses";
+
+        var model = await BuildSubscriptionEditViewModelAsync(businessId);
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
+
+    [HttpPost("Subscription/{businessId:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Subscription(int businessId, BusinessSubscriptionEditViewModel model)
+    {
+        ViewData["ActiveMenu"] = "businesses";
+
+        if (businessId != model.BusinessId)
+        {
+            return BadRequest();
+        }
+
+        if (!Enum.IsDefined(model.Status))
+        {
+            ModelState.AddModelError(nameof(model.Status), "Geçersiz abonelik durumu.");
+        }
+
+        if (!await _context.SubscriptionPlans.AnyAsync(p => p.Id == model.SubscriptionPlanId && p.IsActive))
+        {
+            ModelState.AddModelError(nameof(model.SubscriptionPlanId), "Seçilen abonelik planı geçerli değil.");
+        }
+
+        if (!await _context.Businesses.AnyAsync(b => b.Id == businessId))
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await PopulateSubscriptionSelectListsAsync(model);
+            return View(model);
+        }
+
+        var startDate = ToStartOfUtcDay(model.StartDate);
+        var endDate = model.EndDate.HasValue ? ToEndOfUtcDay(model.EndDate.Value) : (DateTime?)null;
+
+        BusinessSubscription? subscription = null;
+        if (model.SubscriptionId.HasValue)
+        {
+            subscription = await _context.BusinessSubscriptions
+                .FirstOrDefaultAsync(s => s.Id == model.SubscriptionId.Value && s.BusinessId == businessId);
+        }
+
+        if (subscription is null)
+        {
+            subscription = await GetLatestSubscriptionAsync(businessId);
+        }
+
+        if (subscription is null)
+        {
+            subscription = new BusinessSubscription
+            {
+                BusinessId = businessId,
+                SubscriptionPlanId = model.SubscriptionPlanId,
+                StartDate = startDate,
+                EndDate = endDate,
+                Status = model.Status,
+                IsActive = model.IsActive
+            };
+            _context.BusinessSubscriptions.Add(subscription);
+        }
+        else
+        {
+            subscription.SubscriptionPlanId = model.SubscriptionPlanId;
+            subscription.StartDate = startDate;
+            subscription.EndDate = endDate;
+            subscription.Status = model.Status;
+            subscription.IsActive = model.IsActive;
+            subscription.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Abonelik başarıyla güncellendi.";
+        return RedirectToAction(nameof(Details), new { id = businessId });
+    }
+
+    private async Task<BusinessSubscriptionEditViewModel?> BuildSubscriptionEditViewModelAsync(int businessId)
+    {
+        var business = await _context.Businesses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == businessId);
+
+        if (business is null)
+        {
+            return null;
+        }
+
+        var latestSubscription = await GetLatestSubscriptionTrackedAsync(businessId, asNoTracking: true);
+
+        var model = new BusinessSubscriptionEditViewModel
+        {
+            BusinessId = business.Id,
+            BusinessName = business.Name,
+            BusinessSlug = business.Slug,
+            CurrentPlanName = latestSubscription?.SubscriptionPlan?.Name ?? "-",
+            CurrentStatusText = latestSubscription is not null
+                ? SubscriptionDisplayHelper.GetStatusLabel(latestSubscription.Status)
+                : "-"
+        };
+
+        if (latestSubscription is not null)
+        {
+            model.SubscriptionId = latestSubscription.Id;
+            model.SubscriptionPlanId = latestSubscription.SubscriptionPlanId;
+            model.Status = latestSubscription.Status;
+            model.StartDate = latestSubscription.StartDate.Date;
+            model.EndDate = latestSubscription.EndDate?.Date;
+            model.IsActive = latestSubscription.IsActive;
+        }
+        else
+        {
+            var defaultPlanId = await _context.SubscriptionPlans
+                .AsNoTracking()
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.SortOrder)
+                .Select(p => p.Id)
+                .FirstOrDefaultAsync();
+
+            model.SubscriptionPlanId = defaultPlanId;
+            model.Status = SubscriptionStatus.Active;
+            model.StartDate = DateTime.UtcNow.Date;
+            model.EndDate = DateTime.UtcNow.Date.AddDays(30);
+            model.IsActive = true;
+        }
+
+        await PopulateSubscriptionSelectListsAsync(model);
+        return model;
+    }
+
+    private async Task<BusinessSubscription?> GetLatestSubscriptionAsync(int businessId)
+    {
+        return await GetLatestSubscriptionTrackedAsync(businessId, asNoTracking: false);
+    }
+
+    private async Task<BusinessSubscription?> GetLatestSubscriptionTrackedAsync(int businessId, bool asNoTracking)
+    {
+        IQueryable<BusinessSubscription> query = _context.BusinessSubscriptions
+            .Include(s => s.SubscriptionPlan)
+            .Where(s => s.BusinessId == businessId);
+
+        if (asNoTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query
+            .OrderByDescending(s => s.StartDate)
+            .ThenByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync();
+    }
+
+    private async Task PopulateSubscriptionSelectListsAsync(BusinessSubscriptionEditViewModel model)
+    {
+        model.AvailablePlans = await GetPlanSelectListAsync(model.SubscriptionPlanId);
+        model.AvailableStatuses = GetStatusSelectList(model.Status);
+    }
+
+    private static List<SelectListItem> GetStatusSelectList(SubscriptionStatus selectedStatus)
+    {
+        return Enum.GetValues<SubscriptionStatus>()
+            .Select(status => new SelectListItem
+            {
+                Value = ((int)status).ToString(),
+                Text = SubscriptionDisplayHelper.GetStatusLabel(status),
+                Selected = status == selectedStatus
+            })
+            .ToList();
+    }
+
+    private static DateTime ToStartOfUtcDay(DateTime date)
+    {
+        return DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+    }
+
+    private static DateTime ToEndOfUtcDay(DateTime date)
+    {
+        return DateTime.SpecifyKind(date.Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc);
+    }
+
     private async Task<BusinessFormViewModel?> BuildFormViewModelAsync(int? id = null)
     {
         if (id is null)
@@ -313,16 +507,17 @@ public class AdminBusinessesController : AdminBaseController
         };
     }
 
-    private async Task<List<SelectListItem>> GetPlanSelectListAsync()
+    private async Task<List<SelectListItem>> GetPlanSelectListAsync(int? selectedPlanId = null)
     {
         return await _context.SubscriptionPlans
             .AsNoTracking()
-            .Where(p => p.IsActive)
+            .Where(p => p.IsActive || (selectedPlanId.HasValue && p.Id == selectedPlanId.Value))
             .OrderBy(p => p.SortOrder)
             .Select(p => new SelectListItem
             {
                 Value = p.Id.ToString(),
-                Text = p.Name
+                Text = p.Name,
+                Selected = selectedPlanId.HasValue && p.Id == selectedPlanId.Value
             })
             .ToListAsync();
     }

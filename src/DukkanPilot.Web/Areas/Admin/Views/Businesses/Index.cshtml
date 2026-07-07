@@ -58,6 +58,7 @@
                             <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td class="text-end">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                <a asp-action="Subscription" asp-route-businessId="@item.Id" class="btn btn-sm btn-outline-info">Abonelik</a>
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
                                 <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Sil</a>
                             </td>

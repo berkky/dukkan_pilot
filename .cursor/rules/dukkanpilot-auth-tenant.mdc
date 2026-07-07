@@ -1,0 +1,35 @@
+---
+description: Auth ve tenant kuralları — Business panel ve Account
+globs: src/DukkanPilot.Web/Areas/Business/**/*.cs,src/DukkanPilot.Web/Controllers/Account*.cs,src/DukkanPilot.Web/Helpers/Password*.cs
+alwaysApply: false
+---
+
+# Auth & Tenant
+
+## Kimlik doğrulama
+
+- Cookie authentication; claims: `NameIdentifier`, `Name`, `Email`, `Role`, `BusinessId`, `BusinessRole`.
+- Admin Area → `[Authorize(Roles = SuperAdmin)]`.
+- Business Area → `BusinessBaseController` üzerinden `BusinessOwner` veya `Staff`.
+
+## Tenant (işletme izolasyonu)
+
+- Tenant kaynağı: claim içindeki `BusinessId`. Sabit slug (`demo-kafe`) veya `DemoTenant` **kullanma**.
+- Her sorguda `BusinessId == businessId` filtresi zorunlu (`GetCurrentBusinessIdOrForbid` ile).
+- Claim yoksa → `Forbid()` (AccessDenied).
+- Staff yönetimi yalnızca `BusinessOwner` (`StaffController`).
+
+## Abonelik
+
+- İş mantığı controller'larına `[RequireActiveSubscription]` ekle (Dashboard, Billing muaf).
+- Create POST'larda `BusinessPlanLimitHelper` ile limit kontrolü yap.
+
+## Örnek (doğru)
+
+```csharp
+var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+if (forbidResult is not null) return forbidResult;
+
+var item = await _context.Products
+    .FirstOrDefaultAsync(p => p.Id == id && p.BusinessId == businessId);
+```

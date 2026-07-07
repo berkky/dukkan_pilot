@@ -1,0 +1,12 @@
+@if (ViewData["LimitWarning"] is string limitWarning)
+{
+    <div class="alert alert-warning small">
+        @limitWarning
+        @if (ViewData["IsBusinessOwner"] as bool? == true)
+        {
+            <span>
+                <a href="/Business/Billing" class="alert-link">Abonelik durumunu görüntüle</a>
+            </span>
+        }
+    </div>
+}

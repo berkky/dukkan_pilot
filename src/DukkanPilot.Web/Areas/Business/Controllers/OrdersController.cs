@@ -20,7 +20,7 @@ public class OrdersController : BusinessBaseController
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? status, string? period, string? search)
     {
         ViewData["ActiveMenu"] = "orders";
 
@@ -30,9 +30,59 @@ public class OrdersController : BusinessBaseController
             return forbidResult;
         }
 
-        var items = await _context.Orders
-            .AsNoTracking()
-            .Where(o => o.BusinessId == businessId)
+        var (todayStartUtc, todayEndUtc) = OrderQueryHelper.GetTodayUtcRange();
+        var weekStartUtc = OrderQueryHelper.GetWeekStartUtc();
+        var baseQuery = _context.Orders.AsNoTracking().Where(o => o.BusinessId == businessId);
+
+        var latestOrderSnapshot = await baseQuery
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new { o.Id, o.CreatedAt })
+            .FirstOrDefaultAsync();
+
+        var model = new OrderIndexViewModel
+        {
+            StatusFilter = status,
+            PeriodFilter = string.IsNullOrWhiteSpace(period) ? "all" : period.Trim().ToLowerInvariant(),
+            Search = search?.Trim(),
+            Summary = new OrderSummaryViewModel
+            {
+                TodayOrderCount = await baseQuery.CountAsync(o =>
+                    o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc),
+                PendingCount = await baseQuery.CountAsync(o => o.Status == OrderStatus.Pending),
+                PreparingCount = await baseQuery.CountAsync(o => o.Status == OrderStatus.Preparing),
+                TodayRevenue = await baseQuery
+                    .Where(o => o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc)
+                    .SumAsync(o => o.TotalAmount),
+                LatestOrderId = latestOrderSnapshot?.Id,
+                LatestOrderCreatedAt = latestOrderSnapshot?.CreatedAt
+            }
+        };
+
+        var filteredQuery = baseQuery;
+
+        if (Enum.TryParse<OrderStatus>(status, ignoreCase: true, out var statusFilter) &&
+            Enum.IsDefined(statusFilter))
+        {
+            filteredQuery = filteredQuery.Where(o => o.Status == statusFilter);
+        }
+
+        filteredQuery = model.PeriodFilter switch
+        {
+            "today" => filteredQuery.Where(o => o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc),
+            "week" => filteredQuery.Where(o => o.CreatedAt >= weekStartUtc),
+            _ => filteredQuery
+        };
+
+        if (!string.IsNullOrWhiteSpace(model.Search))
+        {
+            var term = model.Search;
+            filteredQuery = filteredQuery.Where(o =>
+                o.OrderNumber.Contains(term) ||
+                (o.CustomerName != null && o.CustomerName.Contains(term)) ||
+                (o.CustomerPhone != null && o.CustomerPhone.Contains(term)));
+        }
+
+        model.Orders = await filteredQuery
             .OrderByDescending(o => o.CreatedAt)
             .Select(o => new OrderListViewModel
             {
@@ -47,7 +97,109 @@ public class OrdersController : BusinessBaseController
             })
             .ToListAsync();
 
-        return View(items);
+        return View(model);
+    }
+
+    [HttpGet("LiveSummary")]
+    [ResponseCache(NoStore = true, Duration = 0)]
+    public async Task<IActionResult> LiveSummary()
+    {
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var (todayStartUtc, todayEndUtc) = OrderQueryHelper.GetTodayUtcRange();
+        var baseQuery = _context.Orders.AsNoTracking().Where(o => o.BusinessId == businessId);
+
+        var latestOrder = await baseQuery
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new
+            {
+                o.Id,
+                o.CreatedAt,
+                o.CustomerName,
+                o.TotalAmount,
+                o.Status
+            })
+            .FirstOrDefaultAsync();
+
+        var model = new OrderLiveSummaryViewModel
+        {
+            PendingCount = await baseQuery.CountAsync(o => o.Status == OrderStatus.Pending),
+            PreparingCount = await baseQuery.CountAsync(o => o.Status == OrderStatus.Preparing),
+            TodayOrderCount = await baseQuery.CountAsync(o =>
+                o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc),
+            TodayRevenue = await baseQuery
+                .Where(o => o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc)
+                .SumAsync(o => o.TotalAmount),
+            LatestOrderId = latestOrder?.Id,
+            LatestOrderCreatedAt = latestOrder?.CreatedAt,
+            LatestOrderCustomerName = latestOrder?.CustomerName,
+            LatestOrderTotal = latestOrder?.TotalAmount,
+            LatestOrderStatus = latestOrder?.Status.ToString(),
+            LatestOrderStatusText = latestOrder is not null
+                ? OrderDisplayHelper.GetStatusLabel(latestOrder.Status)
+                : null,
+            LatestOrderStatusBadgeClass = latestOrder is not null
+                ? OrderDisplayHelper.GetStatusBadgeClass(latestOrder.Status)
+                : null,
+            ServerTime = DateTime.UtcNow
+        };
+
+        return Json(model);
+    }
+
+    [HttpGet("Kitchen")]
+    public async Task<IActionResult> Kitchen()
+    {
+        ViewData["ActiveMenu"] = "kitchen";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var (todayStartUtc, todayEndUtc) = OrderQueryHelper.GetTodayUtcRange();
+        var baseQuery = _context.Orders.AsNoTracking().Where(o => o.BusinessId == businessId);
+
+        var latestOrderSnapshot = await baseQuery
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new { o.Id, o.CreatedAt })
+            .FirstOrDefaultAsync();
+
+        var model = new OrderKitchenViewModel
+        {
+            PendingCount = await baseQuery.CountAsync(o => o.Status == OrderStatus.Pending),
+            PreparingCount = await baseQuery.CountAsync(o => o.Status == OrderStatus.Preparing),
+            CompletedTodayCount = await baseQuery.CountAsync(o =>
+                o.Status == OrderStatus.Completed &&
+                o.CreatedAt >= todayStartUtc &&
+                o.CreatedAt < todayEndUtc),
+            TodayRevenue = await baseQuery
+                .Where(o => o.CreatedAt >= todayStartUtc && o.CreatedAt < todayEndUtc)
+                .SumAsync(o => o.TotalAmount),
+            LatestOrderId = latestOrderSnapshot?.Id,
+            LatestOrderCreatedAt = latestOrderSnapshot?.CreatedAt,
+            PendingOrders = await MapKitchenOrdersAsync(
+                baseQuery.Where(o => o.Status == OrderStatus.Pending)),
+            PreparingOrders = await MapKitchenOrdersAsync(
+                baseQuery.Where(o => o.Status == OrderStatus.Preparing)),
+            CompletedTodayOrders = await MapKitchenOrdersAsync(
+                baseQuery.Where(o =>
+                    o.Status == OrderStatus.Completed &&
+                    o.CreatedAt >= todayStartUtc &&
+                    o.CreatedAt < todayEndUtc)),
+            CancelledTodayOrders = await MapKitchenOrdersAsync(
+                baseQuery.Where(o =>
+                    o.Status == OrderStatus.Cancelled &&
+                    o.CreatedAt >= todayStartUtc &&
+                    o.CreatedAt < todayEndUtc))
+        };
+
+        return View(model);
     }
 
     [HttpGet("Details/{id:int}")]
@@ -106,7 +258,13 @@ public class OrdersController : BusinessBaseController
 
     [HttpPost("UpdateStatus/{id:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateStatus(int id, OrderStatus status)
+    public async Task<IActionResult> UpdateStatus(
+        int id,
+        OrderStatus status,
+        string? returnTo = null,
+        string? statusFilter = null,
+        string? period = null,
+        string? search = null)
     {
         var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
         if (forbidResult is not null)
@@ -118,7 +276,7 @@ public class OrdersController : BusinessBaseController
             status is not (OrderStatus.Pending or OrderStatus.Preparing or OrderStatus.Completed or OrderStatus.Cancelled))
         {
             TempData["Error"] = "Geçersiz sipariş durumu.";
-            return RedirectToAction(nameof(Details), new { id });
+            return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
         }
 
         var order = await _context.Orders
@@ -146,7 +304,60 @@ public class OrdersController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = loyaltyMessage ?? $"Sipariş durumu \"{OrderDisplayHelper.GetStatusLabel(status)}\" olarak güncellendi.";
+        return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
+    }
+
+    private IActionResult RedirectAfterStatusUpdate(
+        string? returnTo,
+        int id,
+        string? statusFilter,
+        string? period,
+        string? search)
+    {
+        if (string.Equals(returnTo, "list", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction(nameof(Index), new
+            {
+                status = statusFilter,
+                period,
+                search
+            });
+        }
+
+        if (string.Equals(returnTo, "kitchen", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction(nameof(Kitchen));
+        }
+
         return RedirectToAction(nameof(Details), new { id });
+    }
+
+    private static async Task<List<KitchenOrderCardViewModel>> MapKitchenOrdersAsync(
+        IQueryable<Order> query)
+    {
+        return await query
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new KitchenOrderCardViewModel
+            {
+                Id = o.Id,
+                OrderNumber = o.OrderNumber,
+                CustomerName = o.CustomerName,
+                CustomerPhone = o.CustomerPhone,
+                CreatedAt = o.CreatedAt,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status,
+                Notes = o.Notes,
+                Items = o.Items
+                    .OrderBy(i => i.Id)
+                    .Select(i => new OrderItemViewModel
+                    {
+                        ProductName = i.ProductName,
+                        Quantity = i.Quantity,
+                        UnitPrice = i.UnitPrice
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
     }
 
     private async Task ApplyLoyaltyInfoAsync(OrderDetailsViewModel viewModel, Order order, int businessId)
@@ -254,6 +465,7 @@ public class OrdersController : BusinessBaseController
             .OrderByDescending(r => r.CreatedAt)
             .FirstOrDefaultAsync();
     }
+
     private sealed class LoyaltyAwardResult
     {
         public string? Message { get; init; }

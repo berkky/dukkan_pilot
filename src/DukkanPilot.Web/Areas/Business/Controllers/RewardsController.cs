@@ -4,6 +4,7 @@ using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using Microsoft.AspNetCore.Mvc;
 using DukkanPilot.Web.Filters;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +15,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class RewardsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly BusinessPlanLimitHelper _planLimitHelper;
 
-    public RewardsController(AppDbContext context)
+    public RewardsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
     {
         _context = context;
+        _planLimitHelper = planLimitHelper;
     }
 
     [HttpGet("")]
@@ -49,9 +52,18 @@ public class RewardsController : BusinessBaseController
     }
 
     [HttpGet("Create")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
         ViewData["ActiveMenu"] = "rewards-create";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        await PlanLimitViewDataHelper.SetLimitWarningAsync(this, _planLimitHelper, businessId, PlanLimitResource.Rewards);
+
         return View(new RewardFormViewModel());
     }
 
@@ -65,6 +77,12 @@ public class RewardsController : BusinessBaseController
         if (forbidResult is not null)
         {
             return forbidResult;
+        }
+
+        if (await _planLimitHelper.IsLimitReachedAsync(businessId, PlanLimitResource.Rewards))
+        {
+            ModelState.AddModelError(string.Empty,
+                _planLimitHelper.GetLimitReachedMessage(PlanLimitResource.Rewards, User.IsInRole(nameof(UserRole.BusinessOwner))));
         }
 
         if (!await IsRewardNameAvailableAsync(businessId, model.Name))

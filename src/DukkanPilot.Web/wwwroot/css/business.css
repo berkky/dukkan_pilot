@@ -89,3 +89,39 @@
         min-height: auto;
     }
 }
+
+.dashboard-status-distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dashboard-status-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.dashboard-status-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dashboard-status-count {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+.dashboard-status-bar {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.dashboard-top-products .list-group-item {
+    border-left: none;
+    border-right: none;
+}

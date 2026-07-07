@@ -4,6 +4,7 @@ using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Infrastructure.Security;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class StaffController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly BusinessPlanLimitHelper _planLimitHelper;
 
-    public StaffController(AppDbContext context)
+    public StaffController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
     {
         _context = context;
+        _planLimitHelper = planLimitHelper;
     }
 
     [HttpGet("")]
@@ -53,9 +56,18 @@ public class StaffController : BusinessBaseController
     }
 
     [HttpGet("Create")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
         ViewData["ActiveMenu"] = "staff-create";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        await PlanLimitViewDataHelper.SetLimitWarningAsync(this, _planLimitHelper, businessId, PlanLimitResource.StaffUsers);
+
         return View(new StaffFormViewModel());
     }
 
@@ -72,6 +84,13 @@ public class StaffController : BusinessBaseController
         }
 
         ValidatePasswordForCreate(model);
+
+        if (model.BusinessRole == BusinessRole.Staff &&
+            await _planLimitHelper.IsLimitReachedAsync(businessId, PlanLimitResource.StaffUsers))
+        {
+            ModelState.AddModelError(string.Empty,
+                _planLimitHelper.GetLimitReachedMessage(PlanLimitResource.StaffUsers, true));
+        }
 
         if (!await IsEmailAvailableAsync(model.Email))
         {

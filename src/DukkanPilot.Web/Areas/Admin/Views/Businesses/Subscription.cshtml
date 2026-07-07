@@ -1,0 +1,86 @@
+@model BusinessSubscriptionEditViewModel
+@{
+    ViewData["Title"] = "Abonelik Yönetimi";
+    ViewData["Subtitle"] = Model.BusinessName;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4 mb-1">Abonelik Yönetimi</h2>
+        <p class="text-muted mb-0">
+            <span class="fw-semibold">@Model.BusinessName</span>
+            <code class="ms-1">@Model.BusinessSlug</code>
+        </p>
+    </div>
+    <a asp-action="Details" asp-route-id="@Model.BusinessId" class="btn btn-outline-secondary">İşletme Detayına Dön</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Mevcut Durum</h3></div>
+            <div class="panel-card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Plan</dt>
+                    <dd class="col-sm-7">@Model.CurrentPlanName</dd>
+                    <dt class="col-sm-5">Durum</dt>
+                    <dd class="col-sm-7">@Model.CurrentStatusText</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Abonelik Düzenle</h3></div>
+            <div class="panel-card-body">
+                <form asp-action="Subscription" asp-route-businessId="@Model.BusinessId" method="post">
+                    <input type="hidden" asp-for="SubscriptionId" />
+                    <input type="hidden" asp-for="BusinessId" />
+                    <input type="hidden" asp-for="BusinessName" />
+                    <input type="hidden" asp-for="BusinessSlug" />
+                    <input type="hidden" asp-for="CurrentPlanName" />
+                    <input type="hidden" asp-for="CurrentStatusText" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="SubscriptionPlanId" class="form-label"></label>
+                            <select asp-for="SubscriptionPlanId" asp-items="Model.AvailablePlans" class="form-select"></select>
+                            <span asp-validation-for="SubscriptionPlanId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" asp-items="Model.AvailableStatuses" class="form-select"></select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="StartDate" class="form-label"></label>
+                            <input asp-for="StartDate" class="form-control" type="date" />
+                            <span asp-validation-for="StartDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EndDate" class="form-label"></label>
+                            <input asp-for="EndDate" class="form-control" type="date" />
+                            <span asp-validation-for="EndDate" class="text-danger small"></span>
+                            <div class="form-text">Boş bırakılırsa süresiz kabul edilir.</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                        <a asp-action="Details" asp-route-id="@Model.BusinessId" class="btn btn-outline-secondary">Geri Dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

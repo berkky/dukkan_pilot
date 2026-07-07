@@ -1,0 +1,31 @@
+---
+description: EF Core entity ve migration kuralları
+globs: src/DukkanPilot.Core/Entities/**/*.cs,src/DukkanPilot.Infrastructure/Data/AppDbContext.cs,src/DukkanPilot.Infrastructure/Data/Migrations/**
+alwaysApply: false
+---
+
+# Entity & Migration
+
+## Ne zaman migration gerekir?
+
+| Değişiklik | Migration |
+|------------|-----------|
+| Yeni entity / property / ilişki | **Zorunlu** |
+| Fluent API (`OnModelCreating`) değişikliği | **Zorunlu** |
+| Sadece controller, view, helper, seed mantığı | Gerekmez |
+
+Entity veya `AppDbContext` değiştirdiysen migration oluşturmayı **atlamayı unutma**.
+
+## Migration komutu
+
+```powershell
+cd src/DukkanPilot.Infrastructure
+dotnet ef migrations add <MigrationAdi> --startup-project ../DukkanPilot.Web
+```
+
+## Kurallar
+
+- Mevcut `InitialCreate` migration'ını elle düzenleme; yeni migration ekle.
+- `AppDbContextModelSnapshot.cs` elle düzenleme.
+- Identity tabloları veya yeni auth tablosu ekleme (cookie auth yeterli).
+- Seed değişiklikleri `DbSeeder.cs` içinde idempotent kalır; yeni tablo gerektirmez.

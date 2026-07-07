@@ -1,0 +1,172 @@
+@model PublicOrderStatusViewModel
+@using System.Globalization
+@{
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string FormatAmount(decimal amount)
+    {
+        var formatted = amount.ToString("N2", culture);
+        return Model.Currency.Equals("TRY", StringComparison.OrdinalIgnoreCase)
+            ? $"{formatted} ₺"
+            : $"{formatted} {Model.Currency}";
+    }
+}
+
+<div class="public-menu-page public-order-status-page"
+     id="public-order-status-root"
+     style="--dp-theme-color: @Model.ThemeColor; --menu-theme: @Model.ThemeColor"
+     data-order-status="true"
+     data-summary-url="@Model.SummaryUrl"
+     data-status="@Model.Status"
+     data-currency="@Model.Currency">
+
+    <header class="public-menu-header" style="background: linear-gradient(135deg, @Model.ThemeColor, color-mix(in srgb, @Model.ThemeColor 75%, #000))">
+        <div class="d-flex align-items-start gap-3">
+            @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+            {
+                <img src="@Model.LogoUrl"
+                     alt="@Model.BusinessName"
+                     class="public-menu-logo"
+                     onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />
+                <div class="public-menu-logo-placeholder" hidden aria-hidden="true">☕</div>
+            }
+            else
+            {
+                <div class="public-menu-logo-placeholder" aria-hidden="true">☕</div>
+            }
+            <div class="flex-grow-1 min-w-0">
+                <h1 class="h5 mb-1 fw-bold">@Model.BusinessName</h1>
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="public-menu-header-desc mb-0">@Model.Description</p>
+                }
+            </div>
+        </div>
+    </header>
+
+    <div class="public-order-status-content">
+        @if (Model.IsConfirmationPage)
+        {
+            <div class="public-order-status-hero">
+                <div class="public-order-status-hero-icon" aria-hidden="true">✓</div>
+                <h2 class="public-order-status-title">Siparişiniz Alındı</h2>
+                <p class="public-order-status-subtitle mb-0">
+                    Siparişiniz kaydedildi. Durumunuzu bu ekrandan takip edebilirsiniz.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="public-order-status-hero public-order-status-hero-compact">
+                <h2 class="public-order-status-title h5 mb-1">Sipariş Takibi</h2>
+                <p class="public-order-status-subtitle mb-0">Sipariş durumunuzu bu ekrandan takip edebilirsiniz.</p>
+            </div>
+        }
+
+        <div class="order-status-card">
+            <div class="order-status-header">
+                <div class="order-status-number-block">
+                    <span class="order-status-number-label">Sipariş No</span>
+                    <span class="order-status-number">@Model.OrderNumber</span>
+                </div>
+                <span class="badge order-status-badge @Model.StatusBadgeClass" id="order-status-badge">@Model.StatusText</span>
+            </div>
+
+            <p class="order-status-message" id="order-status-message">@Model.StatusMessage</p>
+
+            <div id="order-status-polling-error" class="alert alert-warning py-2 small mb-0" hidden role="alert"></div>
+
+            <div class="order-timeline" id="order-status-timeline" aria-label="Sipariş durumu">
+                @foreach (var step in Model.TimelineSteps)
+                {
+                    var stepClass = "order-timeline-step";
+                    if (step.IsActive) { stepClass += " active"; }
+                    if (step.IsCurrent) { stepClass += " current"; }
+                    if (step.IsCancelled) { stepClass += " cancelled"; }
+
+                    <div class="@stepClass" data-step-key="@step.Key">
+                        <div class="order-timeline-marker" aria-hidden="true"></div>
+                        <div class="order-timeline-label">@step.Label</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="order-status-card order-status-summary-card">
+            <div class="order-status-meta">
+                <div class="order-status-meta-item">
+                    <span class="order-status-meta-label">Sipariş Zamanı</span>
+                    <span class="order-status-meta-value">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerName))
+                {
+                    <div class="order-status-meta-item">
+                        <span class="order-status-meta-label">Müşteri</span>
+                        <span class="order-status-meta-value">@Model.CustomerName</span>
+                    </div>
+                }
+                <div class="order-status-meta-item">
+                    <span class="order-status-meta-label">Toplam Tutar</span>
+                    <span class="order-status-meta-value order-status-meta-total" id="order-status-total">@FormatAmount(Model.TotalAmount)</span>
+                </div>
+            </div>
+
+            <hr class="order-status-divider" />
+
+            <div class="order-status-items">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="order-status-item">
+                        <div class="order-status-item-info">
+                            <div class="order-status-item-name">@item.ProductName</div>
+                            <div class="order-status-item-qty">@item.Quantity x @FormatAmount(item.UnitPrice)</div>
+                        </div>
+                        <div class="order-status-item-total">@FormatAmount(item.LineTotal)</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="order-action-buttons">
+            @if (Model.HasWhatsAppUrl)
+            {
+                <a href="@Model.WhatsAppUrl"
+                   class="btn btn-success btn-lg w-100 order-action-whatsapp"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    WhatsApp'ta Siparişi Gönder
+                </a>
+            }
+            else
+            {
+                <button type="button" class="btn btn-success btn-lg w-100 order-action-whatsapp" disabled>
+                    WhatsApp'ta Siparişi Gönder
+                </button>
+                <p class="order-action-warning text-muted small text-center mb-0">
+                    İşletmenin WhatsApp numarası tanımlı değil. Lütfen işletmeyle doğrudan iletişime geçin.
+                </p>
+            }
+
+            <div class="order-action-secondary">
+                <button type="button" class="btn btn-outline-primary w-100" id="copy-tracking-link-btn">
+                    Takip Linkini Kopyala
+                </button>
+                <a href="@Model.PublicMenuUrl" class="btn btn-outline-secondary w-100">
+                    Menüye Dön
+                </a>
+            </div>
+        </div>
+
+        <p class="public-order-status-note text-muted small text-center mb-0">
+            Bu bağlantı geçici olarak geçerlidir.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.publicOrderStatusConfig = {
+            trackingUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrackingUrl))
+        };
+    </script>
+    <script src="~/js/public-order-status.js" asp-append-version="true"></script>
+}

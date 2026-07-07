@@ -1,0 +1,94 @@
+@model KitchenOrderCardViewModel
+@using System.Globalization
+@{
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var showPrimaryActions = Model.Status is OrderStatus.Pending or OrderStatus.Preparing;
+}
+
+<article class="kitchen-order-card">
+    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+        <div>
+            <div class="kitchen-order-number">@Model.OrderNumber</div>
+            <div class="kitchen-order-time text-muted small">
+                @Model.CreatedAt.ToLocalTime().ToString("HH:mm", culture)
+            </div>
+        </div>
+        <span class="badge @Model.StatusBadgeClass">@Model.StatusText</span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.CustomerName) || !string.IsNullOrWhiteSpace(Model.CustomerPhone))
+    {
+        <div class="kitchen-order-customer mb-2">
+            @if (!string.IsNullOrWhiteSpace(Model.CustomerName))
+            {
+                <div class="fw-semibold">@Model.CustomerName</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+            {
+                <div class="small text-muted">
+                    @Model.CustomerPhone
+                    @if (!string.IsNullOrWhiteSpace(Model.WhatsAppContactUrl))
+                    {
+                        <a href="@Model.WhatsAppContactUrl" target="_blank" rel="noopener" class="ms-1">WhatsApp</a>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (Model.Items.Any())
+    {
+        <ul class="kitchen-order-items list-unstyled mb-2">
+            @foreach (var item in Model.Items)
+            {
+                <li><span class="fw-semibold">@item.Quantity×</span> @item.ProductName</li>
+            }
+        </ul>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+    {
+        <div class="kitchen-order-note small text-muted mb-2">Not: @Model.Notes</div>
+    }
+
+    <div class="kitchen-order-total fw-bold mb-3">
+        @Model.TotalAmount.ToString("N2", culture) ₺
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        @if (Model.Status == OrderStatus.Pending)
+        {
+            <form asp-controller="Orders" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post" class="flex-grow-1">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="status" value="@((int)OrderStatus.Preparing)" />
+                <input type="hidden" name="returnTo" value="kitchen" />
+                <button type="submit" class="btn btn-info btn-lg w-100">Hazırla</button>
+            </form>
+            <form asp-controller="Orders" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="status" value="@((int)OrderStatus.Cancelled)" />
+                <input type="hidden" name="returnTo" value="kitchen" />
+                <button type="submit" class="btn btn-outline-secondary btn-lg">İptal</button>
+            </form>
+        }
+        else if (Model.Status == OrderStatus.Preparing)
+        {
+            <form asp-controller="Orders" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post" class="flex-grow-1">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="status" value="@((int)OrderStatus.Completed)" />
+                <input type="hidden" name="returnTo" value="kitchen" />
+                <button type="submit" class="btn btn-success btn-lg w-100">Tamamla</button>
+            </form>
+            <form asp-controller="Orders" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="status" value="@((int)OrderStatus.Cancelled)" />
+                <input type="hidden" name="returnTo" value="kitchen" />
+                <button type="submit" class="btn btn-outline-secondary btn-lg">İptal</button>
+            </form>
+        }
+
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary @(showPrimaryActions ? "" : "btn-lg flex-grow-1")">
+            Detay
+        </a>
+    </div>
+</article>

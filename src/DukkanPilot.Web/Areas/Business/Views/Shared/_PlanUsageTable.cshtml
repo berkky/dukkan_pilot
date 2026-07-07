@@ -1,0 +1,28 @@
+@model BusinessPlanUsageViewModel
+
+@if (Model is not null && Model.HasValidSubscription)
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Modül</th>
+                    <th>Kullanım</th>
+                    <th>Limit</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var metric in Model.AllMetrics)
+            {
+                <tr>
+                    <td class="fw-semibold">@metric.Name</td>
+                    <td>@metric.Used</td>
+                    <td>@metric.LimitDisplay</td>
+                    <td class="@metric.StatusCssClass">@metric.StatusText</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

@@ -6,51 +6,55 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <h2 class="h4 mb-1">QR Menü Yönetimi</h2>
-        <p class="text-muted mb-0">Dijital menü linki ve QR kod</p>
+        <h2 class="h4 mb-1">QR Menü</h2>
+        <p class="text-muted mb-0">@Model.BusinessName · Kayıtlı QR: @Model.QrCodesUsed</p>
     </div>
-    <a href="@Model.PublicMenuUrl" target="_blank" rel="noopener" class="btn btn-primary">Menüyü Aç</a>
+    <a href="/Business/QrMenu/Print" target="_blank" rel="noopener" class="btn btn-outline-secondary">
+        Yazdırılabilir QR Afişi
+    </a>
 </div>
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success small">@successMessage</div>
+}
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-danger small">@errorMessage</div>
+}
+@if (Model.QrLimitReached && !string.IsNullOrWhiteSpace(Model.QrLimitMessage))
+{
+    <div class="alert alert-warning small">
+        @Model.QrLimitMessage
+        @if (ViewData["IsBusinessOwner"] as bool? == true)
+        {
+            <a href="/Business/Billing" class="alert-link">Abonelik durumunu görüntüle</a>
+        }
+    </div>
+}
 
 <div class="row g-4">
     <div class="col-lg-6">
         <div class="panel-card h-100">
             <div class="panel-card-header">
-                <h3 class="h6 mb-0">Menü Bilgileri</h3>
+                <h3 class="h6 mb-0">QR Menü Linki</h3>
             </div>
             <div class="panel-card-body">
-                <dl class="row mb-4">
-                    <dt class="col-sm-4">İşletme</dt>
-                    <dd class="col-sm-8 fw-semibold">@Model.BusinessName</dd>
-
-                    <dt class="col-sm-4">Slug</dt>
-                    <dd class="col-sm-8"><code>@Model.Slug</code></dd>
-
-                    <dt class="col-sm-4">Tema Rengi</dt>
-                    <dd class="col-sm-8">
-                        <span class="d-inline-block rounded-circle align-middle me-2"
-                              style="width: 16px; height: 16px; background-color: @Model.ThemeColor;"></span>
-                        @Model.ThemeColor
-                    </dd>
-
-                    @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
-                    {
-                        <dt class="col-sm-4">Logo</dt>
-                        <dd class="col-sm-8">
-                            <img src="@Model.LogoUrl" alt="@Model.BusinessName logo" class="img-thumbnail" style="max-height: 64px;" />
-                        </dd>
-                    }
-                </dl>
-
-                <label class="form-label fw-semibold">Public Menü URL</label>
+                <label class="form-label fw-semibold" for="publicMenuUrl">Public Menü URL</label>
                 <div class="input-group mb-2">
                     <input type="text" class="form-control" id="publicMenuUrl" value="@Model.PublicMenuUrl" readonly />
                     <button type="button" class="btn btn-outline-primary" id="copyUrlBtn">Linki Kopyala</button>
                 </div>
-                <div id="copyFeedback" class="text-success small d-none">Kopyalandı!</div>
-                <p class="text-muted small mb-0 mt-3">
-                    Bu linki müşterilerinizle paylaşabilir veya QR kodu yazdırıp masalara koyabilirsiniz.
-                </p>
+                <div id="copyFeedback" class="text-success small d-none mb-3">Kopyalandı!</div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="@Model.PublicMenuPath" target="_blank" rel="noopener" class="btn btn-primary">
+                        Menüyü Görüntüle
+                    </a>
+                    <a href="@Model.WhatsAppShareUrl" target="_blank" rel="noopener" class="btn btn-success">
+                        WhatsApp'ta Paylaş
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -61,62 +65,249 @@
                 <h3 class="h6 mb-0">QR Kod</h3>
             </div>
             <div class="panel-card-body text-center">
-                <div id="qrcode" class="d-inline-block p-3 bg-white border rounded mb-4"></div>
-                <div class="d-flex flex-wrap justify-content-center gap-2">
-                    <a href="@Model.PublicMenuUrl" target="_blank" rel="noopener" class="btn btn-outline-primary">
-                        Menüyü Aç
-                    </a>
-                    <button type="button" class="btn btn-success" id="downloadQrBtn">PNG İndir</button>
-                </div>
+                @if (Model.HasQrCode)
+                {
+                    <div id="qrcode" class="d-inline-block p-3 bg-white border rounded mb-3"></div>
+
+                    @if (Model.LastGeneratedAt.HasValue)
+                    {
+                        <p class="text-muted small mb-3">
+                            Son oluşturma: @Model.LastGeneratedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                        </p>
+                    }
+
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <button type="button" class="btn btn-success" id="downloadQrBtn">QR Kod İndir</button>
+                        @if (!Model.QrLimitReached)
+                        {
+                            <form asp-action="Generate" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-secondary">Yeniden Oluştur</button>
+                            </form>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="py-4 mb-3">
+                        <div class="text-muted mb-3" style="font-size: 3rem; line-height: 1;" aria-hidden="true">📱</div>
+                        <p class="text-muted mb-0">Henüz QR kod kaydı oluşturulmadı.</p>
+                    </div>
+
+                    @if (!Model.QrLimitReached)
+                    {
+                        <form asp-action="Generate" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary">QR Kod Oluştur</button>
+                        </form>
+                    }
+                }
+
                 <p class="text-muted small mt-3 mb-0">
                     QR kod tarandığında müşteriler doğrudan dijital menünüze yönlendirilir.
                 </p>
             </div>
         </div>
     </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Mobil Önizleme</h3>
+            </div>
+            <div class="panel-card-body">
+                <div class="qr-menu-preview" style="--preview-theme: @Model.ThemeColor;">
+                    <div class="qr-menu-preview-header">
+                        <div class="d-flex align-items-center gap-2">
+                            @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+                            {
+                                <img src="@Model.LogoUrl"
+                                     alt="@Model.BusinessName"
+                                     class="qr-menu-preview-logo"
+                                     onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />
+                                <div class="qr-menu-preview-logo-placeholder" hidden aria-hidden="true">☕</div>
+                            }
+                            else
+                            {
+                                <div class="qr-menu-preview-logo-placeholder" aria-hidden="true">☕</div>
+                            }
+                            <div class="min-w-0">
+                                <div class="qr-menu-preview-name">@Model.BusinessName</div>
+                                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                                {
+                                    <div class="qr-menu-preview-desc">@Model.Description</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qr-menu-preview-body">
+                        <div class="qr-menu-preview-line"></div>
+                        <div class="qr-menu-preview-line short"></div>
+                        <div class="qr-menu-preview-line"></div>
+                    </div>
+                    <a href="@Model.PublicMenuPath" target="_blank" rel="noopener" class="btn btn-sm w-100 text-white qr-menu-preview-btn">
+                        Public Menüye Git
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="alert alert-info small mb-0 h-100 d-flex align-items-center">
+            <div>
+                Bu link müşterileriniz tarafından giriş yapmadan görüntülenebilir.
+            </div>
+        </div>
+    </div>
 </div>
 
+@section Styles {
+    <style>
+        .qr-menu-preview {
+            max-width: 280px;
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        .qr-menu-preview-header {
+            padding: 1rem;
+            color: #fff;
+            background: linear-gradient(135deg, var(--preview-theme, #2563eb), color-mix(in srgb, var(--preview-theme, #2563eb) 75%, #000));
+        }
+
+        .qr-menu-preview-logo {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .qr-menu-preview-logo-placeholder {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .qr-menu-preview-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
+        .qr-menu-preview-desc {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.15rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .qr-menu-preview-body {
+            padding: 1rem;
+        }
+
+        .qr-menu-preview-line {
+            height: 0.5rem;
+            background: #f1f5f9;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-menu-preview-line.short {
+            width: 60%;
+        }
+
+        .qr-menu-preview-btn {
+            border-radius: 0;
+            background: var(--preview-theme, #2563eb);
+            border-color: var(--preview-theme, #2563eb);
+        }
+    </style>
+}
+
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    @if (Model.HasQrCode)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+        <script>
+            (function () {
+                const menuUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PublicMenuUrl));
+                const downloadFileName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.QrDownloadFileName));
+
+                new QRCode(document.getElementById('qrcode'), {
+                    text: menuUrl,
+                    width: 220,
+                    height: 220,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                document.getElementById('downloadQrBtn').addEventListener('click', function () {
+                    const canvas = document.querySelector('#qrcode canvas');
+                    if (!canvas) {
+                        return;
+                    }
+
+                    const link = document.createElement('a');
+                    link.download = downloadFileName;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            })();
+        </script>
+    }
+
     <script>
         (function () {
             const menuUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PublicMenuUrl));
-            const downloadFileName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.QrDownloadFileName));
+            const copyBtn = document.getElementById('copyUrlBtn');
+            const feedback = document.getElementById('copyFeedback');
+            const input = document.getElementById('publicMenuUrl');
 
-            new QRCode(document.getElementById('qrcode'), {
-                text: menuUrl,
-                width: 220,
-                height: 220,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            if (!copyBtn || !input) {
+                return;
+            }
 
-            document.getElementById('copyUrlBtn').addEventListener('click', async function () {
-                const feedback = document.getElementById('copyFeedback');
+            copyBtn.addEventListener('click', async function () {
                 try {
-                    await navigator.clipboard.writeText(menuUrl);
-                    feedback.classList.remove('d-none');
-                    setTimeout(function () { feedback.classList.add('d-none'); }, 2000);
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(menuUrl);
+                    } else {
+                        input.select();
+                        input.setSelectionRange(0, menuUrl.length);
+                        document.execCommand('copy');
+                    }
+
+                    if (feedback) {
+                        feedback.classList.remove('d-none');
+                        setTimeout(function () { feedback.classList.add('d-none'); }, 2000);
+                    }
                 } catch {
-                    const input = document.getElementById('publicMenuUrl');
                     input.select();
+                    input.setSelectionRange(0, menuUrl.length);
                     document.execCommand('copy');
-                    feedback.classList.remove('d-none');
-                    setTimeout(function () { feedback.classList.add('d-none'); }, 2000);
-                }
-            });
 
-            document.getElementById('downloadQrBtn').addEventListener('click', function () {
-                const canvas = document.querySelector('#qrcode canvas');
-                if (!canvas) {
-                    return;
+                    if (feedback) {
+                        feedback.classList.remove('d-none');
+                        setTimeout(function () { feedback.classList.add('d-none'); }, 2000);
+                    }
                 }
-
-                const link = document.createElement('a');
-                link.download = downloadFileName;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
             });
         })();
     </script>

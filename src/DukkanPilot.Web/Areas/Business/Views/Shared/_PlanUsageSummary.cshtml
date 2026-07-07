@@ -1,0 +1,34 @@
+@model BusinessPlanUsageViewModel
+
+@if (Model is not null && Model.HasValidSubscription)
+{
+    <div class="row g-3">
+        @foreach (var metric in Model.AllMetrics)
+        {
+            <div class="col-md-6 col-xl-4">
+                <div class="border rounded p-3 h-100 bg-white">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="fw-semibold small">@metric.Name</span>
+                        <span class="small @metric.StatusCssClass">@metric.StatusText</span>
+                    </div>
+                    <div class="mb-2 small text-muted">@metric.UsageDisplay</div>
+                    @if (!metric.IsUnlimited)
+                    {
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar @metric.ProgressBarClass"
+                                 role="progressbar"
+                                 style="width: @metric.UsagePercent%"
+                                 aria-valuenow="@metric.UsagePercent"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        @if (metric.IsNearLimit)
+                        {
+                            <div class="small text-warning mt-2 mb-0">Limitin %80'ine ulaşıldı.</div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
