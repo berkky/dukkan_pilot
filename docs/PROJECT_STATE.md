@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 34A (ROI Calculator / Değer Hesaplayıcı) tamamlandı.
+> Son güncelleme: **34B — Vertical Demo Packs** tamamlandı (34B-FIX housekeeping uygulandı).
 
 ---
 
@@ -661,14 +661,22 @@ DukkanPilot.sln
 
 ### 34B — Vertical Demo Packs
 - Public demo gallery: `/DemoPacks` (alias: `/Demo/Packs`)
+- `DemoPackHelper` + `DemoPacksController` + `DemoPackViewModels`
 - Demo slugs: `demo-kafe`, `demo-tatlici`, `demo-burgerci`, `demo-restoran`, `demo-nargile`
-- Seed: `DbSeeder` idempotent; mevcut gerçek veriler silinmez; `demo-kafe` korunur
+- Seed: `DbSeeder` idempotent vertical demo seed (`EnsureVerticalDemoBusinessesAsync`); mevcut gerçek veriler silinmez; `demo-kafe` korunur
 - Her demo işletmede: BusinessSetting, categories, products, campaign (public+auto-apply), reward, loyalty rule
 - CTA: Landing/Demo/Pricing/ROI + Help Center + Admin SalesCenter + Business DemoCenter
-- Scripts: smoke tests multi-demo; public demo readiness multi-slug
+- Scripts: `run-smoke-tests.ps1` multi-demo (44/44 PASS); `check-public-demo-readiness.ps1` multi-slug PASS
+- `release-quality-gate.ps1` demo readiness: tüm vertical slug’lar (`-DemoSlugs`)
 - Sitemap: `/DemoPacks` + demo menu slugs eklendi (Admin/Business sayfalar yok)
 - Docs: VERTICAL_DEMO_PACKS_GUIDE, DEMO_PACK_SALES_SCRIPT, DEMO_DATA_SEEDING_NOTES
 - Migration yok; Entity/DbContext değişmedi; NuGet/Identity/SignalR yok
+
+### 34B-FIX — Dokümantasyon ve kalite gate housekeeping
+- `PROJECT_STATE.md` checkpoint başlığı ve sıradaki aşama (35A) güncellendi
+- `release-quality-gate.ps1` demo readiness: 5 vertical slug tek adımda
+- Business sidebar: sabit `demo-kafe` metni kaldırıldı → `/DemoPacks` “Sektör demoları” linki
+- Migration yok; Entity/DbContext değişmedi
 
 ---
 
@@ -729,21 +737,13 @@ DukkanPilot.sln
 
 ## 9. Sıradaki aşama
 
-Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
+**Son tamamlanan checkpoint:** 34B — Vertical Demo Packs (+ 34B-FIX housekeeping)
 
-28B tamamlandı — Landing Demo/Pricing satış polish; /Business/DemoCenter; /Admin/SalesCenter; demo-kafe seed enrich; satış docs.
+**Sıradaki aşama:** **35A — Support / Ticket / Feedback Center**
 
-29A tamamlandı — Publish/check/smoke scripts; production example config; IIS/Kestrel/release/smoke/deployment docs.
-
-29B tamamlandı — DB backup/verify/restore-test scripts; idempotent migration SQL; Admin Operations Center; backup/migration/incident/ops security/first-release docs.
-
-30A tamamlandı — Legal/Trust pages; cookie notice; footer/account/business/admin legal polish; legal docs; sitemap.
-
-30B tamamlandı — SalesRequest entity/migration; public demo/plan forms; Business Billing pipeline; Admin SalesRequests; notifications/audit; sales pipeline docs.
-
-30B-FIX — Public sales Privacy/KVKK checkbox validation (`RequiredTrueAttribute`).
-
-31A — Customer Onboarding & Implementation Center (read-only helper + Business/Admin UI + docs; migration yok).
+- Business/Admin/public ticket oluşturma ve durum takibi (planlanan)
+- Mevcut Help Center, SalesRequests, Notifications ve Audit akışlarıyla entegrasyon
+- Migration/entity yalnızca 35A kapsamında planlanacak; bu FIX aşamasında yok
 
 ---
 
@@ -765,6 +765,9 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Features` | Özellikler |
 | `/Pricing` | Plan / fiyat karşılaştırma |
 | `/Demo` | Demo funnel rehberi |
+| `/DemoPacks` · `/Demo/Packs` | Sektör demo galerisi (vertical demo packs) |
+| `/RoiCalculator` · `/ValueCalculator` | Değer hesaplayıcı (public) |
+| `/Help` | Yardım merkezi (public) |
 | `/health` | Sistem durumu JSON |
 | `/robots.txt` | Arama motoru yönergeleri |
 | `/sitemap.xml` | Public sayfa sitemap |

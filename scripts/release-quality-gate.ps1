@@ -92,7 +92,8 @@ if ($SkipWebChecks) {
     Run-Step "run-smoke-tests.ps1" ".\\scripts\\run-smoke-tests.ps1 -BaseUrl $BaseUrl"
     Run-Step "check-security-headers.ps1" ".\\scripts\\check-security-headers.ps1 -BaseUrl $BaseUrl -Path /"
     Run-Step "check-seo-endpoints.ps1" ".\\scripts\\check-seo-endpoints.ps1 -BaseUrl $BaseUrl"
-    Run-Step "check-public-demo-readiness.ps1" ".\\scripts\\check-public-demo-readiness.ps1 -BaseUrl $BaseUrl -DemoSlug demo-kafe"
+    $demoSlugs = "demo-kafe,demo-tatlici,demo-burgerci,demo-restoran,demo-nargile"
+    Run-Step "check-public-demo-readiness.ps1" ".\\scripts\\check-public-demo-readiness.ps1 -BaseUrl $BaseUrl -DemoSlugs `"$demoSlugs`""
 }
 
 Write-Host ""
