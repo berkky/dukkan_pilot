@@ -2,6 +2,8 @@
 
 Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 
+**İlk 5–10 pilot müşteri:** `docs/PILOT_LAUNCH_PACKAGE.md` (demo, WhatsApp, teklif, kurulum, takip, referans).
+
 ## Akışlar
 
 ### Public demo / plan talebi

@@ -1,5 +1,7 @@
 # İlk Müşteri Kurulum Checklist
 
+> **Pilot kohort (5–10 müşteri):** `docs/PILOT_LAUNCH_PACKAGE.md` ve `docs/PILOT_ONBOARDING_CHECKLIST.md`
+
 ## Kurulum günü
 - [ ] İşletme kaydı (`/Account/Register`) veya Admin’den işletme oluşturma
 - [ ] İşletme adı, slug, telefon/WhatsApp (`/Business/Settings`)

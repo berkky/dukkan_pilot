@@ -605,13 +605,21 @@ public static class HelpContentHelper
             new[] { L("Sektör Demoları", "/DemoPacks", true), L("Demo Menü", "/m/demo-kafe", true), L("Satış Merkezi", "/Admin/SalesCenter"), L("Değer Hesaplayıcı", "/Admin/ValueCalculator") },
             related: new[] { "satis-pipeline" }),
 
+        A(ScopeAdmin, "pilot-launch-package", "Satış", "Pilot satış paketi (5–10 müşteri)",
+            "İlk pilot kohort: demo, WhatsApp mesajları, teklif, kurulum, teslim, takip, referans.",
+            9, "Orta",
+            new[] { "PILOT_LAUNCH_PACKAGE.md ana indeksini açın.", "PILOT_DEMO_FLOW.md ile 10 dk demo yapın.", "PILOT_WHATSAPP_SALES_MESSAGES.md şablonlarını kullanın.", "Teklif: PILOT_PRICE_QUOTE_TEMPLATES.md.", "Won sonrası PILOT_ONBOARDING_CHECKLIST.md + PILOT_CUSTOMER_DELIVERY_KIT.md.", "90 gün: PILOT_TRACKING_PLAN.md; referans: PILOT_TESTIMONIAL_PLAN.md." },
+            "pilot satış launch outreach teklif referans",
+            new[] { L("Satış Merkezi", "/Admin/SalesCenter"), L("Satış Talepleri", "/Admin/SalesRequests"), L("Sektör Demoları", "/DemoPacks", true), L("Kurulum Takibi", "/Admin/Onboarding") },
+            related: new[] { "demo-gorusmesi", "ilk-musteri-kurulumu", "satis-pipeline" }),
+
         A(ScopeAdmin, "ilk-musteri-kurulumu", "Onboarding & Go-Live", "İlk müşteri kurulumu",
             "İlk gerçek müşteri checklist.",
             8, "Orta",
-            new[] { "FIRST_CUSTOMER_CHECKLIST.md adımlarını uygulayın.", "İşletme + owner hesabı oluşturun.", "Menü, QR, test siparişi tamamlayın.", "Won → tahsilat → abonelik güncelleme zincirini kapatın." },
+            new[] { "FIRST_CUSTOMER_CHECKLIST.md adımlarını uygulayın.", "Pilot kohort için PILOT_ONBOARDING_CHECKLIST.md kullanın.", "İşletme + owner hesabı oluşturun.", "Menü, QR, test siparişi tamamlayın.", "Won → tahsilat → abonelik güncelleme zincirini kapatın." },
             "ilk müşteri kurulum checklist",
             new[] { L("İşletme Oluştur", "/Admin/Businesses/Create") },
-            related: new[] { "won-lead-onboarding", "manuel-tahsilat" }),
+            related: new[] { "pilot-launch-package", "won-lead-onboarding", "manuel-tahsilat" }),
 
         A(ScopeAdmin, "audit-notification-izleme", "Bildirimler & Audit", "Audit ve bildirim izleme",
             "Platform aktivite takibi.",

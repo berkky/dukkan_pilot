@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: **35B — Performance / Reliability Hardening** tamamlandı.
+> Son güncelleme: **36A — Pilot Launch Package (İlk 5–10 Müşteri Satış Paketi)** tamamlandı.
 
 ---
 
@@ -764,13 +764,20 @@ DukkanPilot.sln
 - Docs: `PERFORMANCE_HARDENING_GUIDE.md`, `RELIABILITY_RUNBOOK.md`, `PERFORMANCE_SMOKE_TESTS.md`
 - Migration yok; Entity/DbContext değişmedi; NuGet/cache/APM/Identity/SignalR yok
 
+### 36A — Pilot Launch Package / İlk 5–10 Müşteri Satış Paketi
+- **Docs:** `PILOT_LAUNCH_PACKAGE.md` (ana indeks), `PILOT_DEMO_FLOW.md`, `PILOT_WHATSAPP_SALES_MESSAGES.md`, `PILOT_PRICE_QUOTE_TEMPLATES.md`, `PILOT_ONBOARDING_CHECKLIST.md`, `PILOT_CUSTOMER_DELIVERY_KIT.md`, `PILOT_TRACKING_PLAN.md`, `PILOT_TESTIMONIAL_PLAN.md`
+- Admin: `/Admin/SalesCenter` pilot paket kartı + repo doc referansları
+- Help Center: `pilot-launch-package` admin makalesi; `ilk-musteri-kurulumu` pilot checklist bağlantısı
+- `FIRST_CUSTOMER_CHECKLIST.md`, `SALES_PIPELINE_RUNBOOK.md` pilot paket cross-link
+- Migration yok; Entity/DbContext değişmedi; ödeme/WhatsApp API/NuGet yok; mevcut Sales/Onboarding/CustomerSuccess akışları korunur
+
 ---
 
 ## 9. Sıradaki aşama
 
-**Son tamamlanan checkpoint:** 35B — Performance / Reliability Hardening
+**Son tamamlanan checkpoint:** 36A — Pilot Launch Package (İlk 5–10 Müşteri Satış Paketi)
 
-**Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36A+).
+**Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36B+).
 
 ---
 
@@ -914,6 +921,14 @@ Tarayıcı: `https://localhost:7136` veya `http://localhost:5139`
 | `docs/INCIDENT_RESPONSE_RUNBOOK.md` | Olay müdahalesi |
 | `docs/OPERATIONAL_SECURITY_CHECKLIST.md` | Ops güvenlik checklist |
 | `docs/FIRST_RELEASE_OPERATIONS.md` | İlk canlı kurulum |
+| `docs/PILOT_LAUNCH_PACKAGE.md` | İlk 5–10 pilot müşteri satış paketi (ana indeks) |
+| `docs/PILOT_DEMO_FLOW.md` | Pilot demo akışı |
+| `docs/PILOT_WHATSAPP_SALES_MESSAGES.md` | WhatsApp satış mesaj şablonları |
+| `docs/PILOT_PRICE_QUOTE_TEMPLATES.md` | Pilot fiyat teklifi metinleri |
+| `docs/PILOT_ONBOARDING_CHECKLIST.md` | Pilot kurulum/onboarding checklist |
+| `docs/PILOT_CUSTOMER_DELIVERY_KIT.md` | İlk müşteri teslim dokümanları |
+| `docs/PILOT_TRACKING_PLAN.md` | 90 gün pilot takip planı |
+| `docs/PILOT_TESTIMONIAL_PLAN.md` | Referans/testimonial toplama |
 | `/Admin/Operations` | Salt okunur operasyon durumu |
 | `/Trust` | Güven Merkezi |
 | `/Privacy` · `/Terms` · `/Kvkk` · `/Cookies` · `/DataProcessing` | Legal taslak sayfalar |
