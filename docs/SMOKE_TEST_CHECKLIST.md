@@ -94,6 +94,17 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Business/ValueCalculator` | Auth | 200 | Auth yok → 302 |
 | `/Admin/ValueCalculator` | SuperAdmin | 200 | Auth yok → 302 |
 
+## Demo Packs / Vertical Demos
+
+| URL | Rol | Beklenen | Not |
+|-----|-----|----------|-----|
+| `/DemoPacks` | Anon | 200 | Galeri |
+| `/m/demo-kafe` | Anon | 200 | Mevcut demo bozulmaz |
+| `/m/demo-tatlici` | Anon | 200 | Yeni demo |
+| `/m/demo-burgerci` | Anon | 200 | Yeni demo |
+| `/m/demo-restoran` | Anon | 200 | Yeni demo |
+| `/m/demo-nargile` | Anon | 200 | Yeni demo |
+
 ## Sipariş / kampanya
 
 | Adım | Beklenen |

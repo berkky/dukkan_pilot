@@ -659,6 +659,17 @@ DukkanPilot.sln
 - Docs: ROI_CALCULATOR_GUIDE, VALUE_SELLING_PLAYBOOK, ROI_CALCULATOR_ASSUMPTIONS
 - Migration yok; Entity/DbContext değişmedi; DB’ye sonuç yazılmaz; audit yok
 
+### 34B — Vertical Demo Packs
+- Public demo gallery: `/DemoPacks` (alias: `/Demo/Packs`)
+- Demo slugs: `demo-kafe`, `demo-tatlici`, `demo-burgerci`, `demo-restoran`, `demo-nargile`
+- Seed: `DbSeeder` idempotent; mevcut gerçek veriler silinmez; `demo-kafe` korunur
+- Her demo işletmede: BusinessSetting, categories, products, campaign (public+auto-apply), reward, loyalty rule
+- CTA: Landing/Demo/Pricing/ROI + Help Center + Admin SalesCenter + Business DemoCenter
+- Scripts: smoke tests multi-demo; public demo readiness multi-slug
+- Sitemap: `/DemoPacks` + demo menu slugs eklendi (Admin/Business sayfalar yok)
+- Docs: VERTICAL_DEMO_PACKS_GUIDE, DEMO_PACK_SALES_SCRIPT, DEMO_DATA_SEEDING_NOTES
+- Migration yok; Entity/DbContext değişmedi; NuGet/Identity/SignalR yok
+
 ---
 
 ## 6. Veritabanı

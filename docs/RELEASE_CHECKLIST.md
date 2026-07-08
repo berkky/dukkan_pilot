@@ -61,6 +61,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] BusinessOwner: Billing ledger (`/Business/Billing/Invoices`, `/Business/Billing/Payments`)
 - [ ] Help Center: `/Help` 200; `/Business/HelpCenter` `/Admin/HelpCenter` auth yok → 302
 - [ ] ROI Calculator: `/RoiCalculator` 200; Business/Admin calculator auth yok → 302; sitemap `/RoiCalculator` içerir
+- [ ] Demo Packs: `/DemoPacks` 200; `/m/demo-*` menüler 200; demo readiness script PASS/WARN
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`

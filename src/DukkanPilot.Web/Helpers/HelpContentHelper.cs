@@ -215,8 +215,8 @@ public static class HelpContentHelper
                 "Abonelik planları ile kullanım limitleri yönetilir; plan talebi panel veya web formu ile iletilir."
             },
             "nedir tanıtım özellik saas qr menü whatsapp",
-            new[] { L("Özellikler", "/Features"), L("Fiyatlar", "/Pricing"), L("Demo", "/Demo") },
-            new[] { "Canlı demo için /m/demo-kafe adresini telefonunuzdan açın." },
+            new[] { L("Özellikler", "/Features"), L("Fiyatlar", "/Pricing"), L("Demo", "/Demo"), L("Sektör Demoları", "/DemoPacks") },
+            new[] { "Canlı demo için /DemoPacks sayfasından sektörünüze uygun örneği seçin." },
             related: new[] { "demo-nasil-denenir", "isletme-baslangic" }),
 
         A(ScopePublic, "demo-nasil-denenir", "Başlangıç", "Demo nasıl denenir?",
@@ -224,14 +224,15 @@ public static class HelpContentHelper
             4, "Başlangıç",
             new[]
             {
-                "Tarayıcıda /Demo sayfasını açın veya doğrudan /m/demo-kafe adresine gidin.",
+                "Tarayıcıda /DemoPacks sayfasını açın ve işletme tipinize uygun demo menüyü seçin.",
+                "İsterseniz /Demo sayfasından da başlayabilirsiniz.",
                 "Kategoriler arasında gezinin; ürünleri sepete ekleyin.",
                 "Sepet çekmecesinden müşteri bilgilerini girin ve sipariş oluşturun.",
                 "WhatsApp mesajı hazırlanır; panel tarafı işletme hesabı ile görülür.",
                 "Kendi işletmeniz için /Account/Register ile ücretsiz başlayabilirsiniz."
             },
             "demo deneme qr menü sepet test",
-            new[] { L("Demo QR Menü", "/m/demo-kafe"), L("Ücretsiz Başla", "/Account/Register") },
+            new[] { L("Sektör Demoları", "/DemoPacks"), L("Demo QR Menü", "/m/demo-kafe"), L("Ücretsiz Başla", "/Account/Register") },
             new[] { "Demo ortamı gerçek müşteri verisi içermez; test amaçlıdır." },
             warnings: new[] { "Demo hesap şifreleri bu sayfada paylaşılmaz. Giriş bilgilerinizi yalnızca kayıt sonrası veya destek kanalından alın." },
             related: new[] { "qr-menu-nasil-calisir", "siparis-takibi" }),
@@ -596,9 +597,9 @@ public static class HelpContentHelper
         A(ScopeAdmin, "demo-gorusmesi", "Satış", "Demo görüşmesi",
             "Satış demo script özeti.",
             5, "Başlangıç",
-            new[] { "SALES_DEMO_SCRIPT.md akışını kullanın.", "Canlı /m/demo-kafe menüsünü gösterin.", "Sepet + kampanya + mutfak akışını anlatın.", "Değer hesaplayıcı ile tahmini senaryo gösterin (garanti değil).", "Plan talebi ve onboarding handoff'u kapatın." },
+            new[] { "SALES_DEMO_SCRIPT.md akışını kullanın.", "Lead sektörüne göre /DemoPacks üzerinden demo menü seçin.", "Sepet + kampanya + mutfak akışını anlatın.", "Değer hesaplayıcı ile tahmini senaryo gösterin (garanti değil).", "Plan talebi ve onboarding handoff'u kapatın." },
             "demo satış görüşme",
-            new[] { L("Demo Menü", "/m/demo-kafe"), L("Satış Merkezi", "/Admin/SalesCenter"), L("Değer Hesaplayıcı", "/Admin/ValueCalculator") },
+            new[] { L("Sektör Demoları", "/DemoPacks", true), L("Demo Menü", "/m/demo-kafe", true), L("Satış Merkezi", "/Admin/SalesCenter"), L("Değer Hesaplayıcı", "/Admin/ValueCalculator") },
             related: new[] { "satis-pipeline" }),
 
         A(ScopeAdmin, "ilk-musteri-kurulumu", "Onboarding & Go-Live", "İlk müşteri kurulumu",

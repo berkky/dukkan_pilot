@@ -40,6 +40,7 @@ public class SeoController : Controller
             ("/Features", "0.8", "weekly"),
             ("/Pricing", "0.8", "weekly"),
             ("/Demo", "0.7", "weekly"),
+            ("/DemoPacks", "0.7", "weekly"),
             ("/Help", "0.7", "weekly"),
             ("/RoiCalculator", "0.7", "weekly"),
             ("/ValueCalculator", "0.6", "weekly"),
@@ -51,7 +52,11 @@ public class SeoController : Controller
             ("/Kvkk", "0.5", "monthly"),
             ("/Cookies", "0.5", "monthly"),
             ("/DataProcessing", "0.5", "monthly"),
-            ("/m/demo-kafe", "0.7", "weekly")
+            ("/m/demo-kafe", "0.7", "weekly"),
+            ("/m/demo-tatlici", "0.7", "weekly"),
+            ("/m/demo-burgerci", "0.7", "weekly"),
+            ("/m/demo-restoran", "0.7", "weekly"),
+            ("/m/demo-nargile", "0.7", "weekly")
         };
 
         foreach (var slug in HelpContentHelper.GetPublicSitemapSlugs())

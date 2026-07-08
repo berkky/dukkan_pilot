@@ -140,6 +140,7 @@ Test-Url "PublicMarketing" "/Trust" @(200) "Trust Center"
 
 Test-Url "PublicMarketing" "/Help" @(200) "Help Center"
 Test-Url "PublicMarketing" "/Help/nedir" @(200) "Help article"
+Test-Url "PublicMarketing" "/DemoPacks" @(200) "Demo packs gallery"
 Test-Url "PublicMarketing" "/RoiCalculator" @(200) "ROI Calculator"
 Test-Url "PublicMarketing" "/ValueCalculator" @(200) "ROI Calculator alias"
 
@@ -153,6 +154,10 @@ Test-Url "Sales" "/Sales/RequestDemo" @(200) "Sales form"
 Test-Url "Sales" "/Sales/RequestPlan" @(200) "Sales form"
 
 Test-Url "PublicMenu" "/m/demo-kafe" @(200) "Public menu"
+Test-Url "PublicMenu" "/m/demo-tatlici" @(200) "Public menu (tatlıcı)"
+Test-Url "PublicMenu" "/m/demo-burgerci" @(200) "Public menu (burgerci)"
+Test-Url "PublicMenu" "/m/demo-restoran" @(200) "Public menu (restoran)"
+Test-Url "PublicMenu" "/m/demo-nargile" @(200) "Public menu (lounge)"
 
 Test-Url "System" "/health" @(200) "JSON health" -MustContain '"status"'
 Test-Url "System" "/robots.txt" @(200)

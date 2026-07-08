@@ -64,6 +64,7 @@ if ($sitemap.Status -eq 200) {
         "/Pricing",
         "/Features",
         "/Demo",
+        "/DemoPacks",
         "/Help",
         "/Trust",
         "/Privacy",

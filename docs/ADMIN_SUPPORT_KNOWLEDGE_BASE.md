@@ -22,6 +22,13 @@
 3. `IsAutoApply` ve public görünürlük
 4. Business rehber: `kampanya-olusturma`
 
+## Senaryo: Demo pack menüsü açılmıyor (vertical demos)
+
+1. Public URL: `/m/{slug}` 404 ise slug/aktiflik kontrol et
+2. Seed çalıştı mı? (Development'da otomatik seed)
+3. Demo galerisi: `/DemoPacks`
+4. Script: `scripts/check-public-demo-readiness.ps1 -DemoSlugs \"demo-kafe,demo-tatlici,demo-burgerci,demo-restoran,demo-nargile\"`
+
 ## Senaryo: Tahsilat kaydı görünmüyor
 
 1. Admin Billing'de kayıt var mı?

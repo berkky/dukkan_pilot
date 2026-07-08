@@ -21,6 +21,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 9. Manuel tahsilat operasyonu (Admin Billing + işletme tahsilat defteri; resmi e-Belge değil)
 10. Self-service Help Center + eğitim rehberleri (Public/Business/Admin)
 11. ROI / Değer Hesaplayıcı — tahmini senaryo (garanti gelir vaadi değil; satış dönüşümü)
+12. Vertical Demo Packs — sektörüne uygun demo menü örnekleri (kafe/tatlıcı/burgerci/restoran/lounge)
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon

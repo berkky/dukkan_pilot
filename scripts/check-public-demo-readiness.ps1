@@ -6,19 +6,30 @@
   Default http://localhost:5000
 .PARAMETER DemoSlug
   Default demo-kafe
+.PARAMETER DemoSlugs
+  Optional comma-separated demo slugs. If provided, runs checks for each slug.
 .NOTES
   Does not POST orders. Read-only GET checks.
 #>
 param(
     [string]$BaseUrl = "http://localhost:5000",
-    [string]$DemoSlug = "demo-kafe"
+    [string]$DemoSlug = "demo-kafe",
+    [string]$DemoSlugs = ""
 )
 
 $ErrorActionPreference = "Continue"
 Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
 $BaseUrl = $BaseUrl.TrimEnd("/")
 $DemoSlug = $DemoSlug.Trim()
+$DemoSlugs = $DemoSlugs.Trim()
 if ([string]::IsNullOrWhiteSpace($DemoSlug)) { $DemoSlug = "demo-kafe" }
+
+$slugs = @()
+if (-not [string]::IsNullOrWhiteSpace($DemoSlugs)) {
+    $slugs = $DemoSlugs.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+} else {
+    $slugs = @($DemoSlug)
+}
 
 $failed = $false
 $warned = $false
@@ -45,20 +56,25 @@ function Get-Body([string]$Url) {
 
 Write-Host "==> DukkanPilot public demo readiness" -ForegroundColor Cyan
 Write-Host "BaseUrl: $BaseUrl"
-Write-Host "DemoSlug: $DemoSlug"
+Write-Host ("DemoSlugs: " + ($slugs -join ", "))
 Write-Host ""
 
-$path = "/m/$DemoSlug"
-$resp = Get-Body "$BaseUrl$path"
-if ($null -eq $resp.Status) {
-    Write-Fail "Request failed: $($resp.Error)"
-} elseif ($resp.Status -ne 200) {
-    Write-Fail "$path expected 200 got $($resp.Status)"
-} else {
-    Write-Ok "$path 200"
-}
+foreach ($slug in $slugs) {
+    Write-Host ""
+    Write-Host ("-- Checking demo: " + $slug) -ForegroundColor Cyan
 
-if ($resp.Status -eq 200) {
+    $path = "/m/$slug"
+    $resp = Get-Body "$BaseUrl$path"
+    if ($null -eq $resp.Status) {
+        Write-Fail "Request failed: $($resp.Error)"
+        continue
+    } elseif ($resp.Status -ne 200) {
+        Write-Fail "$path expected 200 got $($resp.Status)"
+        continue
+    } else {
+        Write-Ok "$path 200"
+    }
+
     # Critical: no raw exceptions / stack traces
     $badPatterns = @("System.NullReferenceException", "StackTrace", "InvalidOperationException", "Unhandled", "Developer Exception Page", "at Microsoft.")
     foreach ($p in $badPatterns) {
@@ -77,13 +93,13 @@ if ($resp.Status -eq 200) {
 
     # Non-critical: campaigns / rewards can be empty; warn if missing on demo
     if ($resp.Body -notmatch 'Aktif Fırsatlar|public-campaign-card') {
-        Write-WarnMsg "No campaign showcase detected on demo page (ok, but demo is stronger with campaigns)."
+        Write-WarnMsg "No campaign showcase detected (ok, but demo is stronger with campaigns)."
     } else {
         Write-Ok "Campaign showcase detected"
     }
 
     if ($resp.Body -notmatch 'Sadakat Ödülleri|public-reward-card') {
-        Write-WarnMsg "No rewards showcase detected on demo page (ok, optional)."
+        Write-WarnMsg "No rewards showcase detected (ok, optional)."
     } else {
         Write-Ok "Rewards showcase detected"
     }

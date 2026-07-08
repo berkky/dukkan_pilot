@@ -7,7 +7,8 @@ Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 ### Public demo / plan talebi
 
 1. `/Sales/RequestDemo` veya `/Sales/RequestPlan?planId=`
-2. (Opsiyonel) `/RoiCalculator` ile tahmini değer senaryosu — **garanti değil**
+2. (Opsiyonel) `/DemoPacks` ile sektör demosu seçimi
+3. (Opsiyonel) `/RoiCalculator` ile tahmini değer senaryosu — **garanti değil**
 2. Form + Privacy/KVKK checkbox
 3. `SalesRequests` kaydı (`New`)
 4. Admin notification

@@ -9,7 +9,7 @@ Yardım içerikleri **static** (`HelpContentHelper`) + Razor view ile sunulur. D
 | Slug | Kategori | Bağlantılar |
 |------|----------|-------------|
 | nedir | Başlangıç | Landing, Features |
-| demo-nasil-denenir | Başlangıç | /Demo, /m/demo-kafe |
+| demo-nasil-denenir | Başlangıç | /DemoPacks, /Demo, /m/demo-kafe |
 | plan-talebi | Abonelik & Tahsilat | /Sales/RequestPlan |
 | guven-ve-gizlilik | Legal & Güven | /Trust, /Privacy |
 | qr-menu-nasil-calisir | QR Menü | Public menü |

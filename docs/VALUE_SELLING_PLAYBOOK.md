@@ -34,7 +34,7 @@
 2. **Önce temkinli senaryoyu** gösterin
 3. Varsayımları birlikte güncelleyin
 4. “Bu garanti değil; sizin operasyonunuza göre değişir” cümlesini söyleyin
-5. Demo akışını canlı gösterin (`/m/demo-kafe`)
+5. Lead sektörüne göre demo pack seçin (`/DemoPacks`) ve ilgili menüyü açın
 6. Plan talebi veya demo follow-up ile kapatın (`/Sales/RequestPlan`)
 
 ## Kaçınılacak dil

@@ -28,6 +28,7 @@ Bu katman:
 - Billing: admin invoice/payment operasyonu + business ledger (read-only)
 - Help Center: `/Help`, `/Business/HelpCenter`, `/Admin/HelpCenter` + contextual links
 - ROI Calculator: `/RoiCalculator` 200; `/Business/ValueCalculator` `/Admin/ValueCalculator` auth yok → 302; POST sonuç + disclaimer
+- Demo Packs: `/DemoPacks` 200; `/m/demo-*` 200; `check-public-demo-readiness.ps1` multi-slug
 - System: health, robots, sitemap, security headers
 - Deployment/backup: backup, verify, restore, migration status
 
@@ -36,7 +37,7 @@ Bu katman:
 - `scripts/run-smoke-tests.ps1`: HTTP 200/302 smoke + grup bazlı rapor
 - `scripts/check-security-headers.ps1`: nosniff / frame / referrer / permissions-policy
 - `scripts/check-seo-endpoints.ps1`: robots + sitemap (private URL yok)
-- `scripts/check-public-demo-readiness.ps1`: `/m/demo-kafe` read-only demo readiness
+- `scripts/check-public-demo-readiness.ps1`: demo slugs (tekil veya çoklu) read-only demo readiness
 - `scripts/release-quality-gate.ps1`: build + check-release + migration status + opsiyonel web checks
 
 ## Manuel kalan kritik testler

@@ -1,0 +1,93 @@
+﻿@model DukkanPilot.Web.Models.Demo.DemoPacksPageViewModel
+
+<section class="landing-page-hero py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-9">
+                <span class="landing-pill landing-pill-dark mb-3">Vertical Demo Packs</span>
+                <h1 class="display-6 fw-bold mb-3">@Model.PageTitle</h1>
+                <p class="text-muted mb-4">@Model.Intro</p>
+
+                <div class="landing-note p-3">
+                    <strong>Not:</strong>
+                    <span class="text-muted small">Demo içerikler seed verisidir. Gerçek işletme verisi değildir ve garanti iddia etmez.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        <div class="row g-4">
+            @foreach (var pack in Model.Packs)
+            {
+                <div class="col-md-6 col-xl-4">
+                    <div class="landing-section-card h-100 p-4">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <div class="landing-pill landing-pill-dark">@pack.VerticalName</div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(pack.BadgeText))
+                            {
+                                <span class="badge bg-primary">@pack.BadgeText</span>
+                            }
+                        </div>
+
+                        <h2 class="h5 mb-2">@pack.Title</h2>
+                        <p class="text-muted small mb-3">@pack.ShortDescription</p>
+
+                        <div class="small mb-2"><span class="text-muted">Best for:</span> <strong>@pack.BestFor</strong></div>
+                        <div class="small text-muted mb-3">@pack.ScenarioSummary</div>
+
+                        <div class="small mb-3">
+                            <div class="fw-semibold mb-1">Öne çıkan özellikler</div>
+                            <ul class="mb-0 ps-3">
+                                @foreach (var f in pack.KeyFeatures)
+                                {
+                                    <li>@f</li>
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="small mb-3">
+                            <div class="fw-semibold mb-1">Konuşma noktaları</div>
+                            <ul class="mb-0 ps-3">
+                                @foreach (var t in pack.DemoTalkingPoints)
+                                {
+                                    <li>@t</li>
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="row g-2 small mb-3">
+                            <div class="col-12">
+                                <div class="fw-semibold mb-1">Örnek kategori/akış</div>
+                                <div class="text-muted">@string.Join(" · ", pack.SampleCategories)</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="fw-semibold mb-1">Örnek kampanya/ödül</div>
+                                <div class="text-muted">@string.Join(" · ", pack.SampleCampaigns.Concat(pack.SampleRewards))</div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a href="@pack.PublicMenuUrl" class="btn btn-success" target="_blank" rel="noopener">Public demo menüyü aç</a>
+                            <a href="@pack.RoiCalculatorUrl" class="btn btn-outline-primary">ROI / Değerini hesapla</a>
+                            <a href="/Sales/RequestPlan?source=demo-pack&vertical=@pack.Slug" class="btn btn-outline-secondary">Plan talebi oluştur</a>
+                        </div>
+
+                        <p class="small text-muted mt-3 mb-0">Önerilen plan: <strong>@pack.SuggestedPlanName</strong> (tahmini; ihtiyaca göre değişir)</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="landing-band mt-5 p-4 text-center">
+            <h2 class="h5 fw-bold mb-2">Kısa karşılaştırma</h2>
+            <p class="text-muted mb-0 small">
+                Kafe: hızlı menü + sadakat · Tatlıcı: kampanya + vitrin · Burgerci: combo/sepet · Restoran: operasyon + mutfak · Lounge: premium deneyim
+            </p>
+        </div>
+    </div>
+</section>

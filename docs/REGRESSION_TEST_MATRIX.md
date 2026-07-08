@@ -37,6 +37,11 @@
 | ROI Calculator | `/RoiCalculator` | Anon | Aç + POST | 200, disclaimer | Med | Script |
 | ROI Calculator | `/Business/ValueCalculator` | Auth | Aç | 200 + prefill | Med | Manual |
 | ROI Calculator | `/Admin/ValueCalculator` | SuperAdmin | Aç | 200 | Med | Manual |
+| Demo Packs | `/DemoPacks` | Anon | Galeri aç | 200 + kartlar | Med | Script |
+| Public menu | `/m/demo-tatlici` | Anon | Menü aç | 200 + ürün/kategori görünür | High | Script |
+| Public menu | `/m/demo-burgerci` | Anon | Menü aç | 200 + ürün/kategori görünür | High | Script |
+| Public menu | `/m/demo-restoran` | Anon | Menü aç | 200 + ürün/kategori görünür | High | Script |
+| Public menu | `/m/demo-nargile` | Anon | Menü aç | 200 + ürün/kategori görünür | High | Script |
 | Admin Dashboard | `/Admin/Dashboard` | SuperAdmin | Aç | 200 + KPI | High | Manual |
 | Admin SalesRequests | `/Admin/SalesRequests` | SuperAdmin | Aç | 200 | High | Manual |
 | Admin Onboarding | `/Admin/Onboarding` | SuperAdmin | Aç | 200 | High | Manual |
