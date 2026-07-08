@@ -1,0 +1,69 @@
+@model DukkanPilot.Web.Models.Legal.LegalPageViewModel
+
+<section class="legal-page py-5">
+    <div class="container legal-page-inner">
+        <nav class="small mb-3" aria-label="breadcrumb">
+            <a href="/">Ana Sayfa</a> · <a href="/Trust">Güven Merkezi</a> · Veri İşleme
+        </nav>
+        <h1 class="h2 mb-2">@Model.Title</h1>
+        <p class="text-muted mb-4">@Model.Subtitle</p>
+        <partial name="_LegalPageHeader" model="Model" />
+
+        <article class="legal-content">
+            <h2 class="h5">1. SaaS rol modeli</h2>
+            <ul>
+                <li><strong>Platform (DukkanPilot):</strong> altyapı, paneller, güvenlik ve operasyon araçları.</li>
+                <li><strong>İşletme hesabı:</strong> menü, sipariş, kampanya, müşteri verisi yönetimi.</li>
+                <li><strong>İşletme müşterileri:</strong> public menü / sipariş formunu kullanan son kullanıcılar.</li>
+            </ul>
+            <p class="small text-muted">
+                Hukuki “veri sorumlusu / veri işleyen” rolleri sözleşme ve fiili kontrole göre belirlenir;
+                bu sayfa teknik yaklaşımı anlatır, nihai hukuki sınıflandırma yapmaz.
+            </p>
+
+            <h2 class="h5">2. Tenant izolasyonu</h2>
+            <p>
+                İşletme paneli işlemleri <code>BusinessId</code> claim’i ile filtrelenir.
+                Başka işletmenin verisine erişim, tasarım gereği engellenmeye çalışılır.
+            </p>
+
+            <h2 class="h5">3. Rol bazlı erişim</h2>
+            <ul>
+                <li><strong>SuperAdmin:</strong> platform yönetimi, Sales/Operations, işletmeler.</li>
+                <li><strong>BusinessOwner:</strong> kendi işletmesi, personel, faturalama ayarları.</li>
+                <li><strong>Staff:</strong> işletme operasyonları (personel yönetimi hariç).</li>
+            </ul>
+
+            <h2 class="h5">4. Audit ve bildirim</h2>
+            <p>
+                Kritik işlemler audit log’a yazılabilir. Bildirim metadata’sında parola, connection string ve
+                benzeri secret’ların tutulmaması hedeflenir.
+            </p>
+
+            <h2 class="h5">5. Yedekleme ve secret yönetimi</h2>
+            <ul>
+                <li>Release/migration öncesi FULL backup ve verify prosedürleri</li>
+                <li>Restore testlerinin production DB üzerine yazmadan çalıştırılması</li>
+                <li>Production secret’ların repoya yazılmaması; env / sunucu config</li>
+            </ul>
+
+            <h2 class="h5">6. Token ve DataProtection</h2>
+            <p>
+                Sipariş takip token’larının erişim loglarına yazılmaması önerilir.
+                Production’da DataProtection key persistence, cookie ve şifre sıfırlama token sürekliliği için planlanmalıdır.
+            </p>
+
+            <h2 class="h5">7. Sınırlar</h2>
+            <p class="mb-0">
+                Bu açıklama satış ve operasyon şeffaflığı içindir; ISO/SOC sertifikası veya “%100 KVKK uyumlu”
+                iddiası taşımaz. Canlı öncesi hukuki ve teknik review önerilir.
+            </p>
+        </article>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="/Privacy">Gizlilik</a>
+            <a class="btn btn-outline-secondary btn-sm" href="/Kvkk">KVKK</a>
+            <a class="btn btn-primary btn-sm" href="/Trust">Güven Merkezi</a>
+        </div>
+    </div>
+</section>

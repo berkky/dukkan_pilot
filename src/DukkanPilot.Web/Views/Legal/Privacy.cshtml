@@ -1,0 +1,85 @@
+@model DukkanPilot.Web.Models.Legal.LegalPageViewModel
+
+<section class="legal-page py-5">
+    <div class="container legal-page-inner">
+        <nav class="small mb-3" aria-label="breadcrumb">
+            <a href="/">Ana Sayfa</a> · <a href="/Trust">Güven Merkezi</a> · Gizlilik
+        </nav>
+        <h1 class="h2 mb-2">@Model.Title</h1>
+        <p class="text-muted mb-4">@Model.Subtitle</p>
+        <partial name="_LegalPageHeader" model="Model" />
+
+        <article class="legal-content">
+            <h2 class="h5">1. Kapsam</h2>
+            <p>
+                Bu metin, @Model.CompanyName (“DükkanPilot”) tarafından sunulan QR menü, WhatsApp sipariş yönlendirme,
+                sadakat, kampanya, CRM ve abonelik paneli hizmetleri kapsamında kişisel verilere ilişkin örnek bir bilgilendirmedir.
+                KVKK süreçlerine uygun yönetilebilir bir yapı hedeflenmiştir; bu sayfa tek başına hukuki uyumluluk belgesi değildir.
+            </p>
+
+            <h2 class="h5">2. Toplanabilen veri kategorileri</h2>
+            <ul>
+                <li><strong>Hesap bilgileri:</strong> ad-soyad, e-posta, telefon (opsiyonel), şifre özeti (ham şifre saklanmaz).</li>
+                <li><strong>İşletme bilgileri:</strong> işletme adı, slug, adres, logo URL, WhatsApp numarası, tema ayarları.</li>
+                <li><strong>Sipariş bilgileri:</strong> sipariş kalemleri, tutarlar, durum, iletişim alanları (public form).</li>
+                <li><strong>Müşteri CRM:</strong> işletmenin girdiği müşteri kayıtları ve sadakat hareketleri.</li>
+                <li><strong>Teknik loglar:</strong> uygulama/hata logları, sağlık kontrolleri, güvenlik amaçlı kayıtlar.</li>
+                <li><strong>Audit ve bildirim kayıtları:</strong> işlem geçmişi ve panel uyarıları (hassas secret içermemesi hedeflenir).</li>
+            </ul>
+
+            <h2 class="h5">3. İşleme amaçları</h2>
+            <ul>
+                <li>Hizmet sunumu ve hesap/panel yönetimi</li>
+                <li>Sipariş ve mutfak süreci</li>
+                <li>Güvenlik, kötüye kullanım önleme, erişim kontrolü</li>
+                <li>Raporlama ve işletme içi analitik (işletme paneli)</li>
+                <li>Destek ve olay müdahalesi</li>
+                <li>Yasal yükümlülüklerin yerine getirilmesi (geçerli olduğu ölçüde)</li>
+            </ul>
+
+            <h2 class="h5">4. Saklama yaklaşımı</h2>
+            <p>
+                Veriler, hizmetin sunulması ve yasal zorunluluklar için gerekli sürelerle sınırlı tutulmaya çalışılır.
+                Somut saklama süreleri canlı kurulumda tanımlanan politika ve hukuki görüş ile netleştirilmelidir.
+                Soft delete (pasifleştirme) uygulaması hard delete anlamına gelmez.
+            </p>
+
+            <h2 class="h5">5. Üçüncü taraflara aktarım</h2>
+            <ul>
+                <li>
+                    <strong>WhatsApp:</strong> Platform şu aşamada WhatsApp Business API entegrasyonu içermez;
+                    sipariş metni kullanıcının cihazı üzerinden <code>wa.me</code> bağlantısı ile yönlendirilebilir.
+                </li>
+                <li><strong>Altyapı:</strong> hosting, veritabanı ve benzeri hizmet sağlayıcıları sözleşme çerçevesinde kullanılabilir.</li>
+                <li><strong>Yetkili kurumlar:</strong> yasal zorunluluk halinde paylaşılabilir.</li>
+            </ul>
+
+            <h2 class="h5">6. Veri güvenliği</h2>
+            <p>
+                Cookie tabanlı oturum (<code>DukkanPilot.Auth</code>), rol/tenant izolasyonu, audit log, bildirim merkezi,
+                yedekleme/geri yükleme prosedürleri ve production secret yönetimi gibi teknik önlemler uygulanır veya önerilir.
+                Hiçbir sistem %100 riskten ari değildir; güvenlik sürekli iyileştirme gerektirir.
+            </p>
+
+            <h2 class="h5">7. Haklar ve iletişim</h2>
+            <p>
+                İlgili kişiler, yürürlükteki mevzuat kapsamındaki haklarını kullanmak için
+                <a href="mailto:@Model.SupportEmail">@Model.SupportEmail</a> adresine başvurabilir.
+                Başvuru süreçleri ve yanıt süreleri canlı öncesi hukuki olarak tanımlanmalıdır.
+            </p>
+
+            <h2 class="h5">8. Hukuki kontrol notu</h2>
+            <p class="mb-0">
+                Bu metin örnek taslaktır. Canlı satış veya canlı müşteri verisi işlemeye başlamadan önce
+                avukat / KVKK uzmanı kontrolü önerilir. Güncel iletişim: @Model.SupportEmail.
+            </p>
+        </article>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="/Kvkk">KVKK Aydınlatma</a>
+            <a class="btn btn-outline-secondary btn-sm" href="/Cookies">Çerezler</a>
+            <a class="btn btn-outline-secondary btn-sm" href="/Terms">Kullanım Şartları</a>
+            <a class="btn btn-primary btn-sm" href="/Trust">Güven Merkezi</a>
+        </div>
+    </div>
+</section>

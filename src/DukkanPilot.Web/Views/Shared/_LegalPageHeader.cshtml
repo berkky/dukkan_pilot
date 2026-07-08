@@ -1,0 +1,12 @@
+@using DukkanPilot.Web.Models.Legal
+@model LegalPageViewModel
+
+<div class="alert alert-warning legal-disclaimer border-0 shadow-sm" role="note">
+    <div class="fw-semibold mb-1">Taslak bilgilendirme metni</div>
+    <p class="small mb-2">@Model.Disclaimer</p>
+    <div class="d-flex flex-wrap gap-3 small text-muted">
+        <span>Son güncelleme: <strong>@Model.LastUpdatedDisplay</strong></span>
+        <span>İletişim: <a href="mailto:@Model.SupportEmail">@Model.SupportEmail</a></span>
+        <span>@Model.CompanyName</span>
+    </div>
+</div>

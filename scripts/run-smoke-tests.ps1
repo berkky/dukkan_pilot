@@ -99,6 +99,12 @@ Test-Url "/sitemap.xml" @(200)
 Test-Url "/m/demo-kafe" @(200) "Public menu"
 Test-Url "/Account/Login" @(200)
 Test-Url "/Account/Register" @(200)
+Test-Url "/Privacy" @(200) "Legal"
+Test-Url "/Terms" @(200) "Legal"
+Test-Url "/Kvkk" @(200) "Legal"
+Test-Url "/Cookies" @(200) "Legal"
+Test-Url "/DataProcessing" @(200) "Legal"
+Test-Url "/Trust" @(200) "Trust Center"
 
 Test-Url "/Business/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "/Admin/Dashboard" @(302, 301) "Auth redirect"

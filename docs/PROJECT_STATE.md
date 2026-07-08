@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 29B aşaması (Backup / Database Safety / Operational Recovery) tamamlandı.
+> Son güncelleme: 30A aşaması (Legal / KVKK / Privacy / Trust Center) tamamlandı.
 
 ---
 
@@ -572,6 +572,17 @@ DukkanPilot.sln
 - Migration yok; Entity/DbContext değişmedi; Program.cs dokunulmadı; Identity/SignalR/NuGet yok
 - Public/Business/Admin/Account/Audit/Notification/Demo/Deployment akışları bozulmadı
 
+### 30A aşaması — Legal / KVKK / Privacy / Trust Center
+- **Public:** `/Privacy`, `/Terms`, `/Kvkk`, `/Cookies`, `/DataProcessing`, `/Trust` (+ `/Legal/...` alias); taslak uyarıları; hukuki garanti iddiası yok
+- **Cookie notice:** `_CookieNotice` + `cookie-notice.js` (localStorage); analytics/tracking yok
+- **Landing/Account footer** legal linkleri; Register/Login yasal link metinleri (checkbox/POST yok)
+- **Business:** DemoCenter/GoLive yasal hazırlık kartı; Settings gizlilik help card
+- **Admin:** Operations legal readiness checklist; SalesCenter güven evrakları kartı
+- **SEO:** sitemap’e Trust/Legal URL’leri
+- **Docs:** `LEGAL_READINESS_CHECKLIST.md`, `PRIVACY_AND_DATA_MAP.md`, `COOKIE_AND_TRACKING_NOTES.md`, `TERMS_TEMPLATE_NOTES.md`
+- Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet yok; Program.cs dokunulmadı
+- Public/Business/Admin/Account/Audit/Notification/Demo/Deployment/Operations akışları bozulmadı
+
 ---
 
 ## 6. Veritabanı
@@ -638,6 +649,8 @@ Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 29A tamamlandı — Publish/check/smoke scripts; production example config; IIS/Kestrel/release/smoke/deployment docs.
 
 29B tamamlandı — DB backup/verify/restore-test scripts; idempotent migration SQL; Admin Operations Center; backup/migration/incident/ops security/first-release docs.
+
+30A tamamlandı — Legal/Trust pages; cookie notice; footer/account/business/admin legal polish; legal docs; sitemap.
 
 ---
 
@@ -777,3 +790,6 @@ Tarayıcı: `https://localhost:7136` veya `http://localhost:5139`
 | `docs/OPERATIONAL_SECURITY_CHECKLIST.md` | Ops güvenlik checklist |
 | `docs/FIRST_RELEASE_OPERATIONS.md` | İlk canlı kurulum |
 | `/Admin/Operations` | Salt okunur operasyon durumu |
+| `/Trust` | Güven Merkezi |
+| `/Privacy` · `/Terms` · `/Kvkk` · `/Cookies` · `/DataProcessing` | Legal taslak sayfalar |
+| `docs/LEGAL_READINESS_CHECKLIST.md` | Canlı öncesi legal checklist |

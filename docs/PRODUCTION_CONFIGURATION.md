@@ -25,11 +25,15 @@ Placeholder şablon: `src/DukkanPilot.Web/appsettings.Production.example.json`
 "App": {
   "PublicBaseUrl": "https://your-domain.com",
   "CompanyName": "DukkanPilot",
-  "SupportEmail": "support@your-domain.com"
+  "SupportEmail": "support@your-domain.com",
+  "LegalLastUpdated": "8 Temmuz 2026"
 }
 ```
 
-Not: Kod bu anahtarları henüz zorunlu okumuyorsa bile deploy dokümantasyonu ve ilerideki absolute URL ihtiyaçları için tanımlıdır.
+`SupportEmail` / `CompanyName` / `LegalLastUpdated` legal sayfalarda (`LegalController`) okunur.
+`PublicBaseUrl` production absolute URL ve SEO için tutulur.
+
+Production smoke: `/Trust`, `/Privacy`, `/Kvkk`, `/Cookies`, `/Terms`, `/DataProcessing`, cookie notice (landing/account/public).
 
 ## Secret yönetimi
 

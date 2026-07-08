@@ -1,0 +1,80 @@
+@model DukkanPilot.Web.Models.Legal.LegalPageViewModel
+
+<section class="legal-page py-5">
+    <div class="container legal-page-inner">
+        <nav class="small mb-3" aria-label="breadcrumb">
+            <a href="/">Ana Sayfa</a> · <a href="/Trust">Güven Merkezi</a> · KVKK
+        </nav>
+        <h1 class="h2 mb-2">@Model.Title</h1>
+        <p class="text-muted mb-4">@Model.Subtitle</p>
+        <partial name="_LegalPageHeader" model="Model" />
+
+        <article class="legal-content">
+            <h2 class="h5">1. Veri sorumlusu (placeholder)</h2>
+            <p>Canlı kullanımda aşağıdaki alanlar gerçek bilgilerle doldurulmalıdır:</p>
+            <ul>
+                <li><strong>Ünvan:</strong> [Şirket / İşletme Ünvanı]</li>
+                <li><strong>Adres:</strong> [Adres]</li>
+                <li><strong>E-posta:</strong> <a href="mailto:@Model.SupportEmail">@Model.SupportEmail</a> (veya KVKK başvuru adresi)</li>
+            </ul>
+            <p class="small text-muted">Bu sayfada uydurma VKN, adres veya yetkili kişi bilgisi yer almaz.</p>
+
+            <h2 class="h5">2. İşlenen kişisel veri kategorileri</h2>
+            <ul>
+                <li>Kimlik / iletişim (ad, e-posta, telefon)</li>
+                <li>İşletme ve hesap verileri</li>
+                <li>Sipariş ve işlem verileri</li>
+                <li>Müşteri CRM kayıtları (işletme tarafından girilen)</li>
+                <li>Teknik ve güvenlik logları, audit kayıtları</li>
+            </ul>
+
+            <h2 class="h5">3. İşleme amaçları</h2>
+            <p>
+                Hizmetin sunulması, hesap yönetimi, sipariş süreçleri, güvenlik, destek, raporlama ve
+                mevzuattan kaynaklanan yükümlülüklerin yerine getirilmesi.
+            </p>
+
+            <h2 class="h5">4. Hukuki sebepler (genel çerçeve)</h2>
+            <ul>
+                <li>Sözleşmenin kurulması veya ifası</li>
+                <li>Hukuki yükümlülüğün yerine getirilmesi</li>
+                <li>Meşru menfaat (güvenlik, hizmet iyileştirme — dengelenerek)</li>
+                <li>Açık rıza gerektiren hallerde ayrıca rıza alınması gerektiği notu: aydınlatmadan ayrı tutulmalıdır</li>
+            </ul>
+            <p class="small">Hangi kategorinin hangi hukuki sebebe dayandığı canlı öncesi hukuki review ile belirlenmelidir.</p>
+
+            <h2 class="h5">5. Toplama yöntemleri</h2>
+            <ul>
+                <li>Web formları (kayıt, ayarlar, CRM)</li>
+                <li>Public sipariş formu</li>
+                <li>Oturum / güvenlik çerezleri ve sistem logları</li>
+            </ul>
+
+            <h2 class="h5">6. Aktarım</h2>
+            <ul>
+                <li>Hosting / altyapı sağlayıcıları</li>
+                <li>İşletme sahibi ve yetkili personel (tenant kapsamında)</li>
+                <li>Yetkili kamu kurumları (yasal zorunluluk)</li>
+                <li>WhatsApp yönlendirmesi kullanıcı cihazı üzerinden olabilir (API entegrasyonu yoktur)</li>
+            </ul>
+
+            <h2 class="h5">7. İlgili kişi hakları ve başvuru</h2>
+            <p>
+                KVKK md. 11 kapsamındaki haklar için başvuru yöntemi canlı öncesi tanımlanmalıdır.
+                Taslak kanal: <a href="mailto:@Model.SupportEmail">@Model.SupportEmail</a>.
+            </p>
+
+            <h2 class="h5">8. Ayrı metinler</h2>
+            <p class="mb-0">
+                Açık rıza metinleri, işleme şartları ve gizlilik politikası birbirinin yerine geçmez.
+                Bu aydınlatma metni taslaktır; KVKK’ya “tam uyumludur” iddiası taşımaz. Canlı öncesi hukuki kontrol önerilir.
+            </p>
+        </article>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="/Privacy">Gizlilik</a>
+            <a class="btn btn-outline-secondary btn-sm" href="/DataProcessing">Veri İşleme</a>
+            <a class="btn btn-primary btn-sm" href="/Trust">Güven Merkezi</a>
+        </div>
+    </div>
+</section>

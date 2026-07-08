@@ -1,0 +1,106 @@
+@model DukkanPilot.Web.Models.Legal.TrustPageViewModel
+
+<section class="trust-hero py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <p class="text-uppercase small fw-semibold text-primary mb-2">Güven Merkezi</p>
+                <h1 class="display-6 fw-bold mb-3">@Model.Title</h1>
+                <p class="lead text-muted mb-4">@Model.Subtitle</p>
+                <p class="small text-muted">
+                    Bu sayfa satışa yardımcı bir özet sunar; sahip olunmayan sertifika (SOC2/ISO vb.) iddiası yoktur.
+                    Hukuki metinler taslak niteliğindedir.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    @if (Model.AuthCta.IsAuthenticated)
+                    {
+                        <a class="btn btn-primary" href="@Model.AuthCta.PrimaryUrl">@Model.AuthCta.PrimaryText</a>
+                        <a class="btn btn-outline-secondary" href="@Model.AuthCta.SecondaryUrl">@Model.AuthCta.SecondaryText</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary" href="/Demo">Demo’yu Gör</a>
+                        <a class="btn btn-outline-primary" href="/Account/Register">Ücretsiz Başla</a>
+                        <a class="btn btn-outline-secondary" href="mailto:@Model.SupportEmail">Destek</a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="trust-highlight card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="fw-semibold mb-2">Kısa özet</div>
+                        <ul class="small mb-0">
+                            <li>Rol ve tenant izolasyonu</li>
+                            <li>Audit log + bildirim merkezi</li>
+                            <li>Backup / restore / incident runbook’ları</li>
+                            <li>Legal &amp; Privacy taslak sayfaları</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <partial name="_LegalPageHeader" model="(DukkanPilot.Web.Models.Legal.LegalPageViewModel)Model" />
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 trust-card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Güvenlik yaklaşımı</h2>
+                        <ul class="small">
+                            <li>Production’da HTTPS önerisi / HSTS</li>
+                            <li>Secure cookie (Production)</li>
+                            <li>SuperAdmin / Owner / Staff rolleri</li>
+                            <li><code>BusinessId</code> tenant filtresi</li>
+                            <li>Audit log ve notification merkezi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 trust-card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Operasyon güvenliği</h2>
+                        <ul class="small">
+                            <li>Release + smoke checklist</li>
+                            <li>Database backup / verify / restore-test scriptleri</li>
+                            <li>Idempotent migration SQL üretimi</li>
+                            <li>Incident response runbook</li>
+                            <li>Admin Operasyon Merkezi (salt okunur)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 trust-card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Veri minimizasyonu ve şeffaflık</h2>
+                        <ul class="small mb-0">
+                            <li>Public demo sayfalarında panel şifresi paylaşılmaz</li>
+                            <li>Bildirim/audit’te secret minimizasyonu hedeflenir</li>
+                            <li>Legal sayfalar ve veri haritası dokümanları erişilebilir</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 trust-card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Yasal dokümanlar</h2>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-sm btn-outline-dark" href="/Privacy">Gizlilik</a>
+                            <a class="btn btn-sm btn-outline-dark" href="/Kvkk">KVKK</a>
+                            <a class="btn btn-sm btn-outline-dark" href="/Terms">Şartlar</a>
+                            <a class="btn btn-sm btn-outline-dark" href="/Cookies">Çerezler</a>
+                            <a class="btn btn-sm btn-outline-dark" href="/DataProcessing">Veri İşleme</a>
+                        </div>
+                        <p class="small text-muted mt-3 mb-0">Taslak metinler — canlı öncesi hukuki kontrol önerilir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

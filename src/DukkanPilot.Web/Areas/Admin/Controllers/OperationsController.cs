@@ -50,6 +50,15 @@ public class OperationsController : AdminBaseController
             HasIncidentRunbook = FileExists("docs", "INCIDENT_RESPONSE_RUNBOOK.md"),
             HasOperationalSecurityChecklist = FileExists("docs", "OPERATIONAL_SECURITY_CHECKLIST.md"),
             HasFirstReleaseOpsDocs = FileExists("docs", "FIRST_RELEASE_OPERATIONS.md"),
+            HasLegalReadinessDocs = FileExists("docs", "LEGAL_READINESS_CHECKLIST.md"),
+            HasPrivacyDataMapDocs = FileExists("docs", "PRIVACY_AND_DATA_MAP.md"),
+            HasCookieDocs = FileExists("docs", "COOKIE_AND_TRACKING_NOTES.md"),
+            HasTermsNotesDocs = FileExists("docs", "TERMS_TEMPLATE_NOTES.md"),
+            HasLegalPrivacyView = FileExists("src", "DukkanPilot.Web", "Views", "Legal", "Privacy.cshtml"),
+            HasTrustView = FileExists("src", "DukkanPilot.Web", "Views", "Legal", "Trust.cshtml"),
+            HasCookieNoticeAssets = FileExists("src", "DukkanPilot.Web", "wwwroot", "js", "cookie-notice.js")
+                && FileExists("src", "DukkanPilot.Web", "Views", "Shared", "_CookieNotice.cshtml"),
+            HasSupportEmailPlaceholder = FileExists("src", "DukkanPilot.Web", "appsettings.Production.example.json"),
             DocLinks =
             [
                 new OpsDocLinkViewModel { Title = "Deployment checklist", Path = "docs/DEPLOYMENT_CHECKLIST.md" },
@@ -59,7 +68,9 @@ public class OperationsController : AdminBaseController
                 new OpsDocLinkViewModel { Title = "Migration runbook", Path = "docs/MIGRATION_RUNBOOK.md" },
                 new OpsDocLinkViewModel { Title = "Incident response", Path = "docs/INCIDENT_RESPONSE_RUNBOOK.md" },
                 new OpsDocLinkViewModel { Title = "Operational security", Path = "docs/OPERATIONAL_SECURITY_CHECKLIST.md" },
-                new OpsDocLinkViewModel { Title = "First release operations", Path = "docs/FIRST_RELEASE_OPERATIONS.md" }
+                new OpsDocLinkViewModel { Title = "First release operations", Path = "docs/FIRST_RELEASE_OPERATIONS.md" },
+                new OpsDocLinkViewModel { Title = "Legal readiness", Path = "docs/LEGAL_READINESS_CHECKLIST.md" },
+                new OpsDocLinkViewModel { Title = "Privacy & data map", Path = "docs/PRIVACY_AND_DATA_MAP.md" }
             ],
             ScriptHints =
             [
@@ -129,6 +140,47 @@ public class OperationsController : AdminBaseController
                 Title = "Rollback plani hazir mi?",
                 Description = "Onceki publish yedegi + DB backup; EF down migration riskli.",
                 IsReadyHint = model.HasIncidentRunbook && model.HasBackupDocs
+            }
+        ];
+
+        model.LegalReadinessChecklist =
+        [
+            new OpsChecklistItemViewModel
+            {
+                Title = "Legal pages available",
+                Description = "/Privacy /Kvkk /Terms /Cookies /DataProcessing /Trust",
+                IsReadyHint = model.HasLegalPrivacyView && model.HasTrustView
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Production SupportEmail placeholder",
+                Description = "appsettings.Production.example.json App.SupportEmail mevcut (secret yok).",
+                IsReadyHint = model.HasSupportEmailPlaceholder
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Legal docs",
+                Description = "LEGAL_READINESS / PRIVACY_AND_DATA_MAP / COOKIE / TERMS notes.",
+                IsReadyHint = model.HasLegalReadinessDocs && model.HasPrivacyDataMapDocs
+                    && model.HasCookieDocs && model.HasTermsNotesDocs
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Cookie notice assets",
+                Description = "_CookieNotice + cookie-notice.js (localStorage, tracking yok).",
+                IsReadyHint = model.HasCookieNoticeAssets
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "No public demo passwords",
+                Description = "Landing /Demo sifre gostermemeli; Login'deki demo hesaplar ayrik.",
+                IsReadyHint = true
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Backup & ops security docs",
+                Description = "Backup/recovery + operational security checklist.",
+                IsReadyHint = model.HasBackupDocs && model.HasOperationalSecurityChecklist
             }
         ];
 

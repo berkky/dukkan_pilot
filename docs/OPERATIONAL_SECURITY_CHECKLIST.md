@@ -23,6 +23,13 @@ Release ve ilk müşteri öncesi kontrol listesi. Gerçek secret değerleri bura
 - [ ] Cookie auth + PasswordHelper bozulmadı
 - [ ] HTTPS production’da zorunlu; cookie SecurePolicy=Always
 
+## Legal / Trust
+
+- [ ] `/Privacy`, `/Terms`, `/Kvkk`, `/Cookies`, `/DataProcessing`, `/Trust` açılıyor
+- [ ] Cookie notice görünür; harici tracking yok
+- [ ] Legal docs: `LEGAL_READINESS_CHECKLIST.md` gözden geçirildi
+- [ ] Metinler taslak; hukuki kesin uyumluluk iddiası yok
+
 ## DataProtection & tokens
 
 - [ ] Production’da DataProtection key persistence planlandı (cookie/reset token sürekliliği)

@@ -23,8 +23,17 @@ public class AdminOperationsViewModel
     public bool HasIncidentRunbook { get; set; }
     public bool HasOperationalSecurityChecklist { get; set; }
     public bool HasFirstReleaseOpsDocs { get; set; }
+    public bool HasLegalReadinessDocs { get; set; }
+    public bool HasPrivacyDataMapDocs { get; set; }
+    public bool HasCookieDocs { get; set; }
+    public bool HasTermsNotesDocs { get; set; }
+    public bool HasLegalPrivacyView { get; set; }
+    public bool HasTrustView { get; set; }
+    public bool HasCookieNoticeAssets { get; set; }
+    public bool HasSupportEmailPlaceholder { get; set; }
 
     public List<OpsChecklistItemViewModel> OperationalChecklist { get; set; } = new();
+    public List<OpsChecklistItemViewModel> LegalReadinessChecklist { get; set; } = new();
     public List<OpsDocLinkViewModel> DocLinks { get; set; } = new();
     public List<string> ScriptHints { get; set; } = new();
 }

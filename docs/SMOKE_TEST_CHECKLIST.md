@@ -14,10 +14,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Pricing` | Anon | 200 | Plan kartları |
 | `/Features` | Anon | 200 | |
 | `/Demo` | Anon | 200 | Şifre yok; `/m/demo-kafe` CTA |
-| `/m/demo-kafe` | Anon | 200 | Menü + sepet |
+| `/Trust` | Anon | 200 | Güven Merkezi; taslak uyarısı |
+| `/Privacy` | Anon | 200 | Gizlilik taslağı |
+| `/Terms` | Anon | 200 | Kullanım şartları taslağı |
+| `/Kvkk` | Anon | 200 | KVKK aydınlatma taslağı |
+| `/Cookies` | Anon | 200 | Çerez politikası |
+| `/DataProcessing` | Anon | 200 | Veri işleme yaklaşımı |
+| `/m/demo-kafe` | Anon | 200 | Menü + sepet; cookie notice |
 | `/health` | Anon | 200 JSON | DB fail → 503 |
-| `/robots.txt` | Anon | 200 | |
-| `/sitemap.xml` | Anon | 200 | |
+| `/robots.txt` | Anon | 200 | Legal allow |
+| `/sitemap.xml` | Anon | 200 | Trust/Legal URL’ler dahil |
 | Yok URL | Anon | Profesyonel 404 | |
 
 ## Account

@@ -1076,3 +1076,15 @@ body:has(#cartOffcanvas.show) #cart-bar {
     border-color: #86efac;
     color: #166534;
 }
+
+/* cookie notice (shared) */
+.dp-cookie-notice {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1080;
+  padding: 0.75rem; background: rgba(15, 23, 42, 0.96); color: #e2e8f0;
+}
+.dp-cookie-notice[hidden] { display: none !important; }
+.dp-cookie-notice-inner {
+  max-width: 960px; margin: 0 auto; display: flex; gap: 1rem;
+  align-items: center; justify-content: space-between; flex-wrap: wrap;
+}
+.dp-cookie-notice a { color: #93c5fd; }

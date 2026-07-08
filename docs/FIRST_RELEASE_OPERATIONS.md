@@ -9,7 +9,11 @@
 
 2. **Production appsettings**  
    `appsettings.Production.example.json` → sunucuda `appsettings.Production.json`  
-   `PublicBaseUrl`, `AllowedHosts`, connection string (veya env).
+   `PublicBaseUrl`, `AllowedHosts`, `SupportEmail`, `CompanyName`, connection string (veya env).
+
+2b. **Legal readiness**  
+   `docs/LEGAL_READINESS_CHECKLIST.md` · Trust `/Trust` · Privacy/KVKK/Cookies/Terms  
+   Placeholder şirket bilgilerini doldurun; avukat kontrolü önerilir.
 
 3. **SQL Database oluştur**  
    Production SQL Server’da boş DB (örn. `DukkanPilotDb`). LocalDB production için önerilmez.

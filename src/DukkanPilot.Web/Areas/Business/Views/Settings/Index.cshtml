@@ -27,6 +27,15 @@
     </div>
 </div>
 
+@await Html.PartialAsync("_HelpCard", new HelpCardViewModel
+{
+    Title = "Gizlilik hatırlatması",
+    Description = "İşletme adı, telefon ve WhatsApp bilgileri public menü ve iletişim süreçlerinde kullanılabilir. Canlı öncesi KVKK/Gizlilik metinlerini kontrol edin.",
+    ActionText = "Güven Merkezi",
+    ActionUrl = "/Trust",
+    Variant = "info"
+})
+
 <div class="panel-card">
     <div class="panel-card-body">
         <form asp-action="Index" method="post">

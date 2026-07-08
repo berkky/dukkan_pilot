@@ -67,13 +67,22 @@ $required = @(
     "docs\INCIDENT_RESPONSE_RUNBOOK.md",
     "docs\OPERATIONAL_SECURITY_CHECKLIST.md",
     "docs\FIRST_RELEASE_OPERATIONS.md",
+    "docs\LEGAL_READINESS_CHECKLIST.md",
+    "docs\PRIVACY_AND_DATA_MAP.md",
+    "docs\COOKIE_AND_TRACKING_NOTES.md",
+    "docs\TERMS_TEMPLATE_NOTES.md",
     "scripts\publish-release.ps1",
     "scripts\run-smoke-tests.ps1",
     "scripts\db-backup.ps1",
     "scripts\db-verify-backup.ps1",
     "scripts\db-restore-test.ps1",
     "scripts\db-generate-migration-script.ps1",
-    "scripts\db-migration-status.ps1"
+    "scripts\db-migration-status.ps1",
+    "src\DukkanPilot.Web\Controllers\LegalController.cs",
+    "src\DukkanPilot.Web\Views\Legal\Privacy.cshtml",
+    "src\DukkanPilot.Web\Views\Legal\Trust.cshtml",
+    "src\DukkanPilot.Web\Views\Shared\_CookieNotice.cshtml",
+    "src\DukkanPilot.Web\wwwroot\js\cookie-notice.js"
 )
 
 foreach ($rel in $required) {

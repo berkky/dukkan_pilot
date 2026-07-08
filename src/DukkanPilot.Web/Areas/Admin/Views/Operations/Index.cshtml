@@ -93,6 +93,12 @@
                     <li class="mb-1">@(Model.HasIncidentRunbook ? "✅" : "❌") INCIDENT_RESPONSE_RUNBOOK.md</li>
                     <li class="mb-1">@(Model.HasOperationalSecurityChecklist ? "✅" : "❌") OPERATIONAL_SECURITY_CHECKLIST.md</li>
                     <li>@(Model.HasFirstReleaseOpsDocs ? "✅" : "❌") FIRST_RELEASE_OPERATIONS.md</li>
+                    <li>@(Model.HasLegalReadinessDocs ? "✅" : "❌") LEGAL_READINESS_CHECKLIST.md</li>
+                    <li>@(Model.HasPrivacyDataMapDocs ? "✅" : "❌") PRIVACY_AND_DATA_MAP.md</li>
+                    <li>@(Model.HasCookieDocs ? "✅" : "❌") COOKIE_AND_TRACKING_NOTES.md</li>
+                    <li>@(Model.HasTermsNotesDocs ? "✅" : "❌") TERMS_TEMPLATE_NOTES.md</li>
+                    <li>@(Model.HasLegalPrivacyView && Model.HasTrustView ? "✅" : "❌") Legal / Trust views</li>
+                    <li>@(Model.HasCookieNoticeAssets ? "✅" : "❌") Cookie notice assets</li>
                 </ul>
             </div>
         </div>
@@ -114,6 +120,29 @@
             }
         </div>
         <p class="small text-muted mb-0 mt-3">İşaretler otomatik “tamamlandı” sayılmaz; operatör checklist’i manuel doğrular.</p>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Legal readiness checklist</h3></div>
+    <div class="panel-card-body">
+        <div class="row g-3">
+            @foreach (var item in Model.LegalReadinessChecklist)
+            {
+                <div class="col-md-6 col-xl-4">
+                    <div class="border rounded p-3 h-100">
+                        <div class="fw-semibold small mb-1">@(item.IsReadyHint ? "✅" : "⚠️") @item.Title</div>
+                        <p class="small text-muted mb-0">@item.Description</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="/Trust" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">/Trust</a>
+            <a href="/Privacy" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener">/Privacy</a>
+            <a href="/Kvkk" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener">/Kvkk</a>
+        </div>
+        <p class="small text-muted mb-0 mt-3">Hukuki uyumluluk iddiası yoktur; canlı öncesi uzman kontrolü önerilir.</p>
     </div>
 </div>
 

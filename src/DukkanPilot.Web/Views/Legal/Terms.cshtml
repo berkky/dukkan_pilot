@@ -1,0 +1,89 @@
+@model DukkanPilot.Web.Models.Legal.LegalPageViewModel
+
+<section class="legal-page py-5">
+    <div class="container legal-page-inner">
+        <nav class="small mb-3" aria-label="breadcrumb">
+            <a href="/">Ana Sayfa</a> · <a href="/Trust">Güven Merkezi</a> · Şartlar
+        </nav>
+        <h1 class="h2 mb-2">@Model.Title</h1>
+        <p class="text-muted mb-4">@Model.Subtitle</p>
+        <partial name="_LegalPageHeader" model="Model" />
+
+        <article class="legal-content">
+            <h2 class="h5">1. Hizmet tanımı</h2>
+            <p>
+                DükkanPilot; QR menü, WhatsApp üzerinden sipariş yönlendirme, mutfak/operasyon paneli,
+                kampanya, sadakat, CRM, raporlama ve abonelik yönetimi sağlayan bir SaaS MVP’dir.
+                Bu aşamada online ödeme entegrasyonu yoktur.
+            </p>
+
+            <h2 class="h5">2. Hesap oluşturma</h2>
+            <p>
+                Kayıt olan kullanıcı doğru bilgi vermeyi, erişim bilgilerini korumayı ve
+                kendi hesabı altındaki işlemlerden sorumlu olmayı kabul eder (taslak madde).
+            </p>
+
+            <h2 class="h5">3. İşletme paneli</h2>
+            <p>
+                İşletme sahipleri menü, fiyat, kampanya, ödül ve müşteri kayıtlarını doğru yönetmekle yükümlüdür.
+                Personel erişimi işletme tarafından atanır; yetkisiz paylaşım yasaktır.
+            </p>
+
+            <h2 class="h5">4. Public QR menü ve sipariş</h2>
+            <p>
+                Son kullanıcı menüyü açabilir, sepete ekleyebilir ve siparişi WhatsApp’a yönlendirebilir.
+                Platform, WhatsApp mesajlaşmasının üçüncü taraf uygulamasında gerçekleştiğini belirtir;
+                mesaj içeriğinin WhatsApp tarafındaki işlenmesi bu taslağın dışında değerlendirilmelidir.
+            </p>
+
+            <h2 class="h5">5. Kampanya ve sadakat</h2>
+            <p>
+                Kampanya koşulları ve sadakat puan kuralları işletmenin sorumluluğundadır.
+                Hatalı yapılandırma kaynaklı müşteri şikayetlerinde işletme paneli ayarları önceliklidir.
+            </p>
+
+            <h2 class="h5">6. Yasaklı kullanımlar</h2>
+            <ul>
+                <li>Yetkisiz erişim, tersine mühendislik veya hizmeti bozma girişimleri</li>
+                <li>Yasadışı içerik veya dolandırıcılık amaçlı kullanım</li>
+                <li>Başkasına ait kişisel veriyi izinsiz işleme</li>
+            </ul>
+
+            <h2 class="h5">7. Süreklilik ve bakım</h2>
+            <p>
+                Planlı bakım, arıza veya güvenlik müdahaleleri nedeniyle kesintiler olabilir.
+                Kesin uptime garantisi bu taslakta verilmez; SLA canlı pakette ayrıca tanımlanmalıdır.
+            </p>
+
+            <h2 class="h5">8. Plan / abonelik</h2>
+            <p>
+                Plan limitleri ürün içi abonelik alanları üzerinden yönetilir.
+                Online ödeme entegrasyonu eklendiğinde bu bölüm güncellenmelidir.
+            </p>
+
+            <h2 class="h5">9. Veri ve güvenlik sorumlulukları</h2>
+            <p>
+                Platform teknik önlemler uygular; işletme, kendi müşteri verisi ve public menüde topladığı bilgiler için
+                aydınlatma/rıza ihtiyaçlarını değerlendirmekle yükümlüdür (hukuki görüş ile netleştirilir).
+            </p>
+
+            <h2 class="h5">10. Askıya alma / fesih / sorumluluk</h2>
+            <p>
+                Kötüye kullanımda hesap askıya alınabilir. Sorumluluk sınırları, uygulanacak hukuk ve yetkili mahkeme
+                maddeleri canlı öncesi avukat tarafından yazılmalıdır. Bu sayfada kesin tazminat limiti iddiası yoktur.
+            </p>
+
+            <h2 class="h5">11. Değişiklikler</h2>
+            <p class="mb-0">
+                Şartlar güncellenebilir; önemli değişikliklerde makul bildirim hedeflenir.
+                Bu metin örnek taslaktır; canlı kullanım öncesi hukuki kontrol önerilir.
+            </p>
+        </article>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="/Privacy">Gizlilik</a>
+            <a class="btn btn-outline-secondary btn-sm" href="/Kvkk">KVKK</a>
+            <a class="btn btn-primary btn-sm" href="/Account/Register">Ücretsiz Başla</a>
+        </div>
+    </div>
+</section>

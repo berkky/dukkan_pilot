@@ -1,0 +1,83 @@
+@model DukkanPilot.Web.Models.Legal.LegalPageViewModel
+
+<section class="legal-page py-5">
+    <div class="container legal-page-inner">
+        <nav class="small mb-3" aria-label="breadcrumb">
+            <a href="/">Ana Sayfa</a> · <a href="/Trust">Güven Merkezi</a> · Çerezler
+        </nav>
+        <h1 class="h2 mb-2">@Model.Title</h1>
+        <p class="text-muted mb-4">@Model.Subtitle</p>
+        <partial name="_LegalPageHeader" model="Model" />
+
+        <article class="legal-content">
+            <h2 class="h5">1. Çerez nedir?</h2>
+            <p>
+                Çerezler, tarayıcıya yerleştirilen küçük metin dosyalarıdır. Oturum, güvenlik ve tercih amaçlı kullanılabilir.
+            </p>
+
+            <h2 class="h5">2. DukkanPilot’ta durum</h2>
+            <ul>
+                <li>
+                    <strong>Zorunlu oturum çerezi:</strong> kimlik doğrulama için
+                    <code>DukkanPilot.Auth</code> (ASP.NET Core cookie authentication).
+                </li>
+                <li><strong>Güvenlik / antiforgery:</strong> form koruması için çerçeve çerezleri kullanılabilir (ortama göre değişebilir).</li>
+                <li>
+                    <strong>Çerez bildirimi:</strong> “Anladım” tercihi tarayıcı <code>localStorage</code>
+                    anahtarı <code>dp_cookie_notice_dismissed</code> ile saklanır; bu bir üçüncü taraf izleme değildir.
+                </li>
+            </ul>
+            <p>
+                Şu an harici analytics / reklam / tracking çerezi kullanılmamaktadır.
+                İleride eklenirse bu politika ve bildirim güncellenmelidir.
+            </p>
+
+            <h2 class="h5">3. Örnek tablo</h2>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ad</th>
+                            <th>Amaç</th>
+                            <th>Tür</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DukkanPilot.Auth</code></td>
+                            <td>Oturum / kimlik doğrulama</td>
+                            <td>Zorunlu</td>
+                        </tr>
+                        <tr>
+                            <td>Antiforgery (çerçeve, ad değişebilir)</td>
+                            <td>CSRF koruması</td>
+                            <td>Zorunlu</td>
+                        </tr>
+                        <tr>
+                            <td><code>dp_cookie_notice_dismissed</code> (localStorage)</td>
+                            <td>Bildirimin kapatıldığını hatırlama</td>
+                            <td>Tercih (çerez değil)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 class="h5">4. Yönetim</h2>
+            <p>
+                Tarayıcı ayarlarından çerezler silinebilir veya engellenebilir; zorunlu oturum çerezleri engellenirse
+                panele giriş çalışmayabilir. Bu sayfa bir consent-management iddiası taşımaz.
+            </p>
+
+            <h2 class="h5">5. Hukuki kontrol</h2>
+            <p class="mb-0">
+                Metin örnek taslaktır. Canlı kullanım ve olası çerez kategorisi genişlemesi öncesi hukuki kontrol önerilir.
+                İletişim: <a href="mailto:@Model.SupportEmail">@Model.SupportEmail</a>.
+            </p>
+        </article>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="/Privacy">Gizlilik</a>
+            <a class="btn btn-primary btn-sm" href="/Trust">Güven Merkezi</a>
+        </div>
+    </div>
+</section>

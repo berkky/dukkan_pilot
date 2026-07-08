@@ -323,3 +323,41 @@
 .landing-demo-card .btn-lg {
     font-weight: 600;
 }
+
+/* 30A Legal / Trust / Cookie notice */
+.legal-page-inner { max-width: 820px; }
+.legal-content h2 { margin-top: 1.75rem; }
+.legal-content p, .legal-content li { color: #334155; line-height: 1.65; }
+.legal-disclaimer { background: #fff7ed; color: #7c2d12; }
+.trust-hero { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); }
+.trust-highlight { background: #0f172a; color: #e2e8f0; }
+.trust-highlight ul { padding-left: 1.1rem; }
+.trust-card h2 { margin-bottom: 0.75rem; }
+
+.dp-cookie-notice {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1080;
+  padding: 0.75rem;
+  background: rgba(15, 23, 42, 0.96);
+  color: #e2e8f0;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.2);
+}
+.dp-cookie-notice[hidden] { display: none !important; }
+.dp-cookie-notice-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.dp-cookie-notice a { color: #93c5fd; }
+.dp-cookie-notice p { flex: 1 1 240px; }
+@media (max-width: 575.98px) {
+  .dp-cookie-notice-inner { flex-direction: column; align-items: stretch; }
+  .dp-cookie-notice .btn { width: 100%; }
+}

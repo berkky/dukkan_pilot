@@ -17,9 +17,12 @@
 - [ ] `appsettings.Production.example.json` güncel; gerçek secret yok
 - [ ] `appsettings.Production.json` / `.env` / connection string **commitlenmemiş**
 - [ ] Demo/Owner/Admin şifreleri public landing/demo sayfasında yok
+- [ ] Legal pages smoke: `/Privacy` `/Terms` `/Kvkk` `/Cookies` `/DataProcessing` `/Trust`
+- [ ] Cookie notice kontrol edildi (tracking yok)
+- [ ] Legal docs reviewed (`LEGAL_READINESS_CHECKLIST.md`) — taslak; garanti iddiası yok
 - [ ] `docs/PROJECT_STATE.md` checkpoint güncel
 - [ ] Değişen özellikler için smoke maddeleri biliniyor
-- [ ] `/Admin/Operations` release safety dosyaları yeşil (SuperAdmin)
+- [ ] `/Admin/Operations` release + legal readiness checklist (SuperAdmin)
 
 ## Release üretimi
 
