@@ -60,6 +60,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`
+- [ ] Public menu mobile polish (`MOBILE_WEB_POLISH_CHECKLIST.md`)
 
 ## Rollback
 

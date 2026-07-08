@@ -108,3 +108,4 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | Security headers | nosniff, frame, referrer, permissions |
 | HSTS | Production |
 | `/robots.txt` | Admin/Business disallow mantığı |
+| Public menu polish | `MOBILE_WEB_POLISH_CHECKLIST.md` |

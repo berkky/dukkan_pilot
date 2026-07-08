@@ -79,6 +79,7 @@ public class QualityController : AdminBaseController
             new QualityChecklistItemViewModel { Title = "Auth redirect geçti mi?", Description = "Business/Admin protected routes 302 dönmeli" },
             new QualityChecklistItemViewModel { Title = "Security headers kontrol edildi mi?", Description = "nosniff / frame / referrer / permissions policy" },
             new QualityChecklistItemViewModel { Title = "SEO endpoints kontrol edildi mi?", Description = "robots + sitemap; private URL yok" },
+            new QualityChecklistItemViewModel { Title = "Public menu mobile polish gözden geçirildi mi?", Description = "/m/demo-kafe: hero, kategori scroll, sepet bar, form, confirmation, tracking" },
             new QualityChecklistItemViewModel { Title = "Sales form manuel test edildi mi?", Description = "RequestDemo/RequestPlan + Privacy/KVKK" },
             new QualityChecklistItemViewModel { Title = "Public order manuel test edildi mi?", Description = "Public menu → WhatsApp order → confirmation/tracking" },
             new QualityChecklistItemViewModel { Title = "Admin dashboard kontrol edildi mi?", Description = "SalesCenter/Onboarding/CustomerSuccess/Operations" },

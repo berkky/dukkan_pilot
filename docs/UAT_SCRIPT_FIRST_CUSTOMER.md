@@ -19,6 +19,7 @@
 - `/m/demo-kafe` açılır
 - Sepete ürün eklenir (JS)
 - Kampanya banner/indirimi görsel olarak doğrulanır (varsa)
+- Mobil polish hızlı kontrol: hero + kategori nav + sepet bar
 
 ### 2) Sipariş zinciri (8 dk)
 

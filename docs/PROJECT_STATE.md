@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 32A (QA / Regression / UAT / Release Quality Gate) tamamlandı.
+> Son güncelleme: 32B (Public Menü + Mobil Web Final Polish) tamamlandı.
 
 ---
 
@@ -618,6 +618,14 @@ DukkanPilot.sln
 - Admin: `/Admin/Quality` (read-only) kalite merkezi; script çalıştırmaz, secret göstermez
 - Docs: QA_TEST_PLAN, REGRESSION_TEST_MATRIX, UAT_SCRIPT_FIRST_CUSTOMER, BUG_REPORT_TEMPLATE, RELEASE_QUALITY_GATE
 - Migration yok; Entity/DbContext değişmedi; test project/NuGet yok
+
+### 32B — Public Menü + Mobil Web Final Polish
+- `/m/{slug}` hero + kategori sticky nav + aktif kategori state + premium kart/CTA polish
+- Sepet bar/drawer + order form + pricing notları (read-only UI polish; pricing engine bozulmaz)
+- Confirmation/Tracking ekranlarında polling mesajları ve mobil UX polish
+- Demo readiness script: daha zengin HTML sinyalleri + PASS/WARN/FAIL
+- Docs: PUBLIC_MENU_UX_GUIDE, MOBILE_WEB_POLISH_CHECKLIST, PUBLIC_ORDER_UAT_SCRIPT
+- Migration yok; Entity/DbContext değişmedi; NuGet yok; public order güvenliği/price validation korunur
 
 ---
 

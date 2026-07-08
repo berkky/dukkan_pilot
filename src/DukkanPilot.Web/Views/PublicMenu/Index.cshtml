@@ -19,14 +19,29 @@
                      alt="@Model.BusinessName"
                      class="public-menu-logo"
                      onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />
-                <div class="public-menu-logo-placeholder" hidden aria-hidden="true">☕</div>
+                <div class="public-menu-logo-placeholder" hidden aria-hidden="true">
+                    @(string.IsNullOrWhiteSpace(Model.BusinessName) ? "☕" : Model.BusinessName.Trim().Substring(0, 1).ToUpperInvariant())
+                </div>
             }
             else
             {
-                <div class="public-menu-logo-placeholder" aria-hidden="true">☕</div>
+                <div class="public-menu-logo-placeholder" aria-hidden="true">
+                    @(string.IsNullOrWhiteSpace(Model.BusinessName) ? "☕" : Model.BusinessName.Trim().Substring(0, 1).ToUpperInvariant())
+                </div>
             }
             <div class="flex-grow-1 min-w-0">
                 <h1 class="h4 mb-1 fw-bold">@Model.BusinessName</h1>
+                <div class="public-menu-badges">
+                    <span class="badge public-menu-hero-badge">QR Menü Aktif</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.WhatsAppNumber))
+                    {
+                        <span class="badge public-menu-hero-badge public-menu-hero-badge-success">WhatsApp ile sipariş</span>
+                    }
+                    else
+                    {
+                        <span class="badge public-menu-hero-badge">Online sipariş kapalı</span>
+                    }
+                </div>
                 @if (!string.IsNullOrWhiteSpace(Model.Description))
                 {
                     <p class="public-menu-header-desc mb-0">@Model.Description</p>
@@ -149,7 +164,9 @@
             <div class="category-nav">
                 @foreach (var category in Model.Categories)
                 {
-                    <a class="category-nav-link" href="#category-@category.Id">@category.Name</a>
+                    <a class="category-nav-link"
+                       data-category-link="category-@category.Id"
+                       href="#category-@category.Id">@category.Name</a>
                 }
             </div>
         </nav>
@@ -226,7 +243,7 @@
             data-bs-toggle="offcanvas"
             data-bs-target="#cartOffcanvas"
             aria-controls="cartOffcanvas">
-        <span class="cart-bar-label">Sepetim</span>
+        <span class="cart-bar-label">Sepeti Gör</span>
         <span class="cart-bar-meta">
             <span id="cart-item-count">0</span> ürün · <span id="cart-total">@Model.FormatPrice(0)</span>
         </span>
@@ -275,6 +292,13 @@
                 <label for="order-notes" class="form-label small mb-1">Sipariş notu (opsiyonel)</label>
                 <textarea class="form-control form-control-sm" id="order-notes" rows="2" maxlength="1000" placeholder="Örn. şekersiz olsun"></textarea>
             </div>
+            <div class="public-order-privacy-note small text-muted">
+                Bilgileriniz sipariş için işletmeyle paylaşılır.
+                <a href="/Privacy" class="public-order-privacy-link" target="_blank" rel="noopener">Gizlilik Politikası</a>
+            </div>
+            <div class="public-order-flow-note small text-muted">
+                Sipariş oluşturulduktan sonra WhatsApp mesajı hazır açılır.
+            </div>
         </div>
 
         <div id="whatsapp-warning" class="alert alert-warning py-2 small mb-2" hidden>
@@ -288,6 +312,9 @@
                 <span class="fw-semibold">Toplam</span>
                 <span class="fw-bold fs-5" id="cart-summary-total" style="color: var(--menu-theme);">@Model.FormatPrice(0)</span>
             </div>
+            <div class="small text-muted mb-2">
+                Fiyatlar işletme panelindeki güncel fiyatlarla hesaplanır.
+            </div>
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-outline-secondary flex-shrink-0" id="cart-clear-btn">Temizle</button>
                 <button type="button" class="btn flex-grow-1 text-white" id="cart-place-order-btn" style="background: var(--menu-theme); border-color: var(--menu-theme);">
@@ -299,5 +326,6 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/public-menu-nav.js" asp-append-version="true"></script>
     <script src="~/js/public-menu-cart.js" asp-append-version="true"></script>
 }

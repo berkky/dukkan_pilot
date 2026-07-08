@@ -135,7 +135,7 @@
             }
 
             if (!response.ok) {
-                showPollingError('Durum güncellenemedi. Bağlantınızı kontrol edin.');
+                showPollingError('Durum güncellenemedi, birazdan tekrar denenecek.');
                 return;
             }
 
@@ -150,7 +150,7 @@
 
             scheduleNextPoll();
         } catch {
-            showPollingError('Durum güncellenemedi. Bağlantınızı kontrol edin.');
+            showPollingError('Durum güncellenemedi, birazdan tekrar denenecek.');
         }
     }
 

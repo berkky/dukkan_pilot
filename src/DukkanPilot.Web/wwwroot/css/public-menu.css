@@ -54,6 +54,25 @@
     overflow: hidden;
 }
 
+.public-menu-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.public-menu-hero-badge {
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #fff;
+    font-weight: 600;
+}
+
+.public-menu-hero-badge-success {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
 .public-menu-info {
     margin: 0.875rem 1rem 0;
     padding: 0.875rem 1rem;
@@ -152,6 +171,17 @@
     background: var(--menu-theme, #2563eb);
     border-color: var(--menu-theme, #2563eb);
     color: #fff;
+}
+
+.category-nav-link.is-active {
+    background: var(--menu-theme, #2563eb);
+    border-color: var(--menu-theme, #2563eb);
+    color: #fff;
+}
+
+.category-nav-link:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--menu-theme, #2563eb) 55%, #fff);
+    outline-offset: 2px;
 }
 
 .menu-category-section {
@@ -271,7 +301,19 @@
     white-space: nowrap;
     font-weight: 600;
     border-radius: 0.5rem;
-    padding: 0.35rem 0.75rem;
+    padding: 0.5rem 0.85rem;
+}
+
+.public-order-privacy-note a,
+.public-order-flow-note a {
+    color: var(--menu-theme, var(--dp-theme-color, #2563eb));
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.public-order-privacy-note a:hover,
+.public-order-privacy-note a:focus {
+    text-decoration: underline;
 }
 
 .cart-bar {
@@ -305,6 +347,11 @@ body:has(#cartOffcanvas.show) #cart-bar {
     color: #fff;
     font-weight: 600;
     box-shadow: 0 4px 14px color-mix(in srgb, var(--menu-theme, #2563eb) 35%, transparent);
+}
+
+.cart-bar-button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--menu-theme, #2563eb) 60%, #fff);
+    outline-offset: 3px;
 }
 
 .cart-bar-label {

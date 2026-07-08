@@ -19,9 +19,29 @@ Write-Host "Repo: $RepoRoot"
 Write-Host ""
 
 Write-Host "==> dotnet build"
-dotnet build (Join-Path $RepoRoot "src\DukkanPilot.Web\DukkanPilot.Web.csproj") -c Release
-if ($LASTEXITCODE -ne 0) {
-    Write-Fail "dotnet build exited $LASTEXITCODE"
+$buildOk = $false
+for ($i = 1; $i -le 3; $i++) {
+    $out = & dotnet build (Join-Path $RepoRoot "src\DukkanPilot.Web\DukkanPilot.Web.csproj") -c Release 2>&1
+    $code = $LASTEXITCODE
+    Write-Host ($out | Out-String)
+
+    if ($code -eq 0) {
+        $buildOk = $true
+        break
+    }
+
+    $text = ($out | Out-String)
+    if ($text -match "CS2012" -or $text -match "being used by another process" -or $text -match "VBCSCompiler" -or $text -match "Microsoft Defender") {
+        Write-WarnMsg "dotnet build failed due to file lock (attempt $i/3). Retrying..."
+        Start-Sleep -Seconds 2
+        continue
+    }
+
+    break
+}
+
+if (-not $buildOk) {
+    Write-Fail "dotnet build failed"
 } else {
     Write-Ok "dotnet build"
 }

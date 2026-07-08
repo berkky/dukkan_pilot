@@ -21,7 +21,7 @@ Bu katman:
 - Public: landing/pricing/features/demo/trust
 - Legal: privacy/kvkk/terms/cookies/data processing
 - Sales: request demo/plan
-- Public menu: `/m/{slug}` (demo-kafe)
+- Public menu: `/m/{slug}` (demo-kafe) + mobile polish checklist
 - Order flow: cart → WhatsApp order → confirmation/tracking → kitchen
 - Business: dashboard, onboarding, success, golive, demos
 - Admin: dashboard, salescenter, onboarding, customersuccess, operations, quality
@@ -41,6 +41,7 @@ Bu katman:
 - Public order POST (doğrulama + WhatsApp metni)
 - Kitchen status ilerletme (Pending → Preparing → Completed)
 - Tracking/confirmation sayfaları
+- Mobile polish: hero/nav/cart bar/drawer/form/tracking (bkz. `MOBILE_WEB_POLISH_CHECKLIST.md`)
 - Sales request form legal checkbox’ları
 
 ## Kritik risk alanları
