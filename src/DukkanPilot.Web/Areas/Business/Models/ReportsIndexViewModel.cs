@@ -21,6 +21,8 @@ public class ReportsIndexViewModel
     public DashboardStatusDistributionViewModel StatusDistribution { get; set; } = new();
 
     public List<SalesReportOrderRowViewModel> RecentOrders { get; set; } = [];
+
+    public ReportCampaignImpactViewModel CampaignImpact { get; set; } = new();
 }
 
 public class ReportKpiViewModel

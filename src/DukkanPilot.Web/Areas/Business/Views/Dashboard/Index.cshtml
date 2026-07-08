@@ -272,6 +272,23 @@
         </div>
 
         <div class="panel-card mb-4">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Kampanya Etkisi (Bu Ay)</h3>
+                <a href="/Business/Reports/Campaigns?period=thismonth" class="btn btn-sm btn-outline-primary">Rapor</a>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-7">Kampanyalı sipariş</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.CampaignSummary.MonthCampaignOrderCount</dd>
+                    <dt class="col-7">Toplam indirim</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.CampaignSummary.MonthTotalDiscount.ToString("N2", culture) ₺</dd>
+                    <dt class="col-7">En çok kullanılan</dt>
+                    <dd class="col-5 text-end fw-semibold">@(Model.CampaignSummary.TopCampaignNameThisMonth ?? "-")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="panel-card mb-4">
             <div class="panel-card-header">
                 <h3 class="h6 mb-0">Hızlı Aksiyonlar</h3>
             </div>

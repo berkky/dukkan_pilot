@@ -200,6 +200,9 @@ public class AppDbContext : DbContext
         {
             entity.Property(e => e.OrderNumber).HasMaxLength(50).IsRequired();
             entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            entity.Property(e => e.SubtotalAmount).HasPrecision(18, 2);
+            entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.AppliedCampaignName).HasMaxLength(200);
             entity.Property(e => e.Notes).HasMaxLength(1000);
             entity.Property(e => e.CustomerName).HasMaxLength(200);
             entity.Property(e => e.CustomerPhone).HasMaxLength(20);

@@ -1,6 +1,7 @@
 @model CampaignDetailsViewModel
 @using System.Globalization
 @using DukkanPilot.Web.Helpers
+@using DukkanPilot.Web.Areas.Business.Models
 @{
     ViewData["Title"] = "Kampanya Detayı";
     ViewData["Subtitle"] = Model.Title;
@@ -76,5 +77,88 @@
             <dt class="col-sm-3">Güncellenme</dt>
             <dd class="col-sm-9">@(Model.UpdatedAt.HasValue ? Model.UpdatedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture) : "-")</dd>
         </dl>
+    </div>
+</div>
+
+@{
+    var perf = Model.Performance;
+}
+<div class="panel-card mt-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Kampanya Performansı</h3>
+    </div>
+    <div class="panel-card-body">
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Sipariş</div>
+                    <div class="stat-value">@perf.OrderCount</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Toplam İndirim</div>
+                    <div class="stat-value fs-5">@perf.TotalDiscount.ToString("N2", culture) ₺</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Net Ciro</div>
+                    <div class="stat-value fs-5">@perf.NetRevenue.ToString("N2", culture) ₺</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Ort. Sepet</div>
+                    <div class="stat-value fs-5">@perf.AverageBasket.ToString("N2", culture) ₺</div>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted small mb-3">
+            Son kullanım: @(perf.LastUsedAt.HasValue ? perf.LastUsedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture) : "Henüz kullanılmadı")
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sipariş No</th>
+                        <th>Müşteri</th>
+                        <th class="text-end">Ara Toplam</th>
+                        <th class="text-end">İndirim</th>
+                        <th class="text-end">Toplam</th>
+                        <th>Durum</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (perf.RecentOrders.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">Bu kampanyaya bağlı sipariş yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var order in perf.RecentOrders)
+                    {
+                        <tr>
+                            <td><a href="/Business/Orders/Details/@order.OrderId">@order.OrderNumber</a></td>
+                            <td>@(order.CustomerName ?? "-")</td>
+                            <td class="text-end">@order.SubtotalAmount.ToString("N2", culture) ₺</td>
+                            <td class="text-end text-success">@order.DiscountAmount.ToString("N2", culture) ₺</td>
+                            <td class="text-end">@order.TotalAmount.ToString("N2", culture) ₺</td>
+                            <td>
+                                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(order.Status)">
+                                    @OrderDisplayHelper.GetStatusLabel(order.Status)
+                                </span>
+                            </td>
+                            <td>@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

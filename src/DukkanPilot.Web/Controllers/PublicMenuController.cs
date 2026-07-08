@@ -235,6 +235,10 @@ public class PublicMenuController : Controller
             CustomerId = null,
             OrderNumber = orderNumber,
             TotalAmount = pricing.Total,
+            SubtotalAmount = pricing.Subtotal,
+            DiscountAmount = pricing.DiscountAmount,
+            AppliedCampaignId = pricing.AppliedCampaignId,
+            AppliedCampaignName = TrimToMax(pricing.AppliedCampaignName, 200),
             Status = OrderStatus.Pending,
             Source = OrderSource.WhatsApp,
             Notes = BuildOrderNotes(request.Notes, pricing),
@@ -395,8 +399,10 @@ public class PublicMenuController : Controller
             .ToList();
 
         var rewardRequestText = ExtractRewardRequest(order.Notes);
-        var campaignInfoText = ExtractCampaignInfo(order.Notes);
         var customerNote = ExtractCustomerNote(order.Notes);
+        var campaignInfoText = !string.IsNullOrWhiteSpace(order.AppliedCampaignName)
+            ? order.AppliedCampaignName
+            : ExtractCampaignInfo(order.Notes);
 
         var loyaltyRule = await _pricingHelper.GetActiveLoyaltyRuleAsync(business.Id);
         int? earnedPointsPreview = null;
@@ -425,8 +431,12 @@ public class PublicMenuController : Controller
             }
         }
 
-        var subtotal = messageLines.Sum(i => i.Quantity * i.UnitPrice);
-        var discountAmount = subtotal > order.TotalAmount ? subtotal - order.TotalAmount : 0m;
+        var subtotal = order.SubtotalAmount > 0
+            ? order.SubtotalAmount
+            : messageLines.Sum(i => i.Quantity * i.UnitPrice);
+        var discountAmount = order.DiscountAmount > 0
+            ? order.DiscountAmount
+            : (subtotal > order.TotalAmount ? subtotal - order.TotalAmount : 0m);
 
         string? whatsAppUrl = null;
         if (whatsAppNumber is not null)

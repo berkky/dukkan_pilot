@@ -77,6 +77,18 @@ public class DashboardController : BusinessBaseController
             .Take(5)
             .ToListAsync();
 
+        var monthCampaignOrders = ordersQuery
+            .Where(o => o.CreatedAt >= monthStartUtc
+                && o.CreatedAt < monthEndUtc
+                && o.Status != OrderStatus.Cancelled
+                && o.DiscountAmount > 0);
+
+        var topCampaignThisMonth = await monthCampaignOrders
+            .GroupBy(o => o.AppliedCampaignName ?? "Bilinmeyen Kampanya")
+            .Select(g => new { Name = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count)
+            .FirstOrDefaultAsync();
+
         var model = new BusinessDashboardViewModel
         {
             BusinessName = business.Name,
@@ -150,7 +162,10 @@ public class DashboardController : BusinessBaseController
                     c.StartDate <= now &&
                     (c.EndDate == null || c.EndDate >= now)),
                 NearestEndingCampaignTitle = nearestEnding?.Title,
-                NearestEndingCampaignEndDate = nearestEnding?.EndDate
+                NearestEndingCampaignEndDate = nearestEnding?.EndDate,
+                MonthCampaignOrderCount = await monthCampaignOrders.CountAsync(),
+                MonthTotalDiscount = await monthCampaignOrders.SumAsync(o => (decimal?)o.DiscountAmount) ?? 0m,
+                TopCampaignNameThisMonth = topCampaignThisMonth?.Name
             },
             Subscription = await _subscriptionStatusHelper.GetStatusAsync(businessId),
             PlanUsage = await _planLimitHelper.GetUsageAsync(businessId),

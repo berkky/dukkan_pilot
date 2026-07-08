@@ -9,6 +9,10 @@ public class Order : BaseEntity
     public int? CustomerId { get; set; }
     public string OrderNumber { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
+    public decimal SubtotalAmount { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public int? AppliedCampaignId { get; set; }
+    public string? AppliedCampaignName { get; set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public OrderSource Source { get; set; } = OrderSource.WhatsApp;
     public string? Notes { get; set; }

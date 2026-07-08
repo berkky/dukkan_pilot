@@ -300,3 +300,90 @@
         </div>
     </div>
 </div>
+
+@{
+    var impact = Model.CampaignImpact;
+}
+<div class="panel-card mb-4">
+    <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h3 class="h6 mb-0">Kampanya Etkisi</h3>
+        <a href="/Business/Reports/Campaigns?period=@Uri.EscapeDataString(Model.Period)&startDate=@Model.StartDateLocal.ToString("yyyy-MM-dd")&endDate=@Model.EndDateLocal.ToString("yyyy-MM-dd")" class="btn btn-sm btn-outline-primary">Detaylı Kampanya Raporu</a>
+    </div>
+    <div class="panel-card-body">
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-lg-4">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Kampanyalı Sipariş</div>
+                    <div class="stat-value">@impact.OrdersWithCampaign</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Kampanyasız Sipariş</div>
+                    <div class="stat-value">@impact.OrdersWithoutCampaign</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Toplam İndirim</div>
+                    <div class="stat-value fs-5">@impact.TotalDiscount.ToString("N2", culture) ₺</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Kampanyalı Ciro</div>
+                    <div class="stat-value fs-5">@impact.CampaignOrderRevenue.ToString("N2", culture) ₺</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="stat-card h-100">
+                    <div class="stat-label">Ort. Kampanyalı Sepet</div>
+                    <div class="stat-value fs-5">@impact.AverageCampaignBasket.ToString("N2", culture) ₺</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="stat-card h-100">
+                    <div class="stat-label">İndirim Oranı</div>
+                    <div class="stat-value">%@impact.DiscountRatePercent.ToString("N2", culture)</div>
+                </div>
+            </div>
+        </div>
+
+        @if (impact.TopCampaigns.Count == 0)
+        {
+            <p class="text-muted mb-0">Seçili dönemde kampanyalı sipariş yok.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Kampanya</th>
+                            <th class="text-end">Sipariş</th>
+                            <th class="text-end">Ara Toplam</th>
+                            <th class="text-end">İndirim</th>
+                            <th class="text-end">Net Ciro</th>
+                            <th class="text-end">Ort. Sepet</th>
+                            <th class="text-end">Son Kullanım</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in impact.TopCampaigns)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@row.CampaignName</td>
+                            <td class="text-end">@row.OrderCount</td>
+                            <td class="text-end">@row.TotalSubtotal.ToString("N2", culture) ₺</td>
+                            <td class="text-end text-success">@row.TotalDiscount.ToString("N2", culture) ₺</td>
+                            <td class="text-end">@row.NetRevenue.ToString("N2", culture) ₺</td>
+                            <td class="text-end">@row.AverageBasket.ToString("N2", culture) ₺</td>
+                            <td class="text-end">@(row.LastUsedAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture) ?? "-")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

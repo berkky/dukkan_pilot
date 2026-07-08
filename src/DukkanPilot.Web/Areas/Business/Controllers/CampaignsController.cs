@@ -313,6 +313,31 @@ public class CampaignsController : BusinessBaseController
             return null;
         }
 
+        var campaignOrders = _context.Orders.AsNoTracking()
+            .Where(o => o.BusinessId == businessId
+                && o.AppliedCampaignId == campaign.Id
+                && o.Status != OrderStatus.Cancelled);
+
+        var orderCount = await campaignOrders.CountAsync();
+        var totalDiscount = await campaignOrders.SumAsync(o => (decimal?)o.DiscountAmount) ?? 0m;
+        var netRevenue = await campaignOrders.SumAsync(o => (decimal?)o.TotalAmount) ?? 0m;
+        var lastUsedAt = await campaignOrders.MaxAsync(o => (DateTime?)o.CreatedAt);
+        var recentOrders = await campaignOrders
+            .OrderByDescending(o => o.CreatedAt)
+            .Take(10)
+            .Select(o => new CampaignPerformanceOrderRowViewModel
+            {
+                OrderId = o.Id,
+                OrderNumber = o.OrderNumber,
+                CreatedAt = o.CreatedAt,
+                CustomerName = o.CustomerName,
+                SubtotalAmount = o.SubtotalAmount,
+                DiscountAmount = o.DiscountAmount,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status
+            })
+            .ToListAsync();
+
         return new CampaignDetailsViewModel
         {
             Id = campaign.Id,
@@ -330,7 +355,16 @@ public class CampaignsController : BusinessBaseController
             MaximumDiscountAmount = campaign.MaximumDiscountAmount,
             IsPublicVisible = campaign.IsPublicVisible,
             IsAutoApply = campaign.IsAutoApply,
-            Priority = campaign.Priority
+            Priority = campaign.Priority,
+            Performance = new CampaignPerformanceSummaryViewModel
+            {
+                OrderCount = orderCount,
+                TotalDiscount = totalDiscount,
+                NetRevenue = netRevenue,
+                AverageBasket = orderCount > 0 ? netRevenue / orderCount : 0m,
+                LastUsedAt = lastUsedAt,
+                RecentOrders = recentOrders
+            }
         };
     }
 

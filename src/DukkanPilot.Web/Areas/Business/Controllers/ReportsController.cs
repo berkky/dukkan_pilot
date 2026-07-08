@@ -346,7 +346,155 @@ public class ReportsController : BusinessBaseController
                 CompletedCount = kpis.CompletedOrders,
                 CancelledCount = kpis.CancelledOrders
             },
-            RecentOrders = recentOrders
+            RecentOrders = recentOrders,
+            CampaignImpact = await BuildCampaignImpactAsync(businessId, range.StartUtc, range.EndUtc)
+        };
+    }
+
+    [HttpGet("Campaigns")]
+    public async Task<IActionResult> Campaigns(string? period, DateTime? startDate, DateTime? endDate)
+    {
+        ViewData["ActiveMenu"] = "reports-campaigns";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var range = ReportPeriodHelper.Resolve(period, startDate, endDate);
+        var impact = await BuildCampaignImpactAsync(businessId, range.StartUtc, range.EndUtc);
+
+        var recentCampaignOrders = await _context.Orders
+            .AsNoTracking()
+            .Where(o => o.BusinessId == businessId
+                && o.CreatedAt >= range.StartUtc
+                && o.CreatedAt < range.EndUtc
+                && o.Status != OrderStatus.Cancelled
+                && o.DiscountAmount > 0)
+            .OrderByDescending(o => o.CreatedAt)
+            .Take(20)
+            .Select(o => new SalesReportOrderRowViewModel
+            {
+                OrderId = o.Id,
+                OrderNumber = o.OrderNumber,
+                CreatedAt = o.CreatedAt,
+                CustomerName = o.CustomerName,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status
+            })
+            .ToListAsync();
+
+        var model = new CampaignReportIndexViewModel
+        {
+            Period = range.Period,
+            PeriodLabel = range.PeriodLabel,
+            StartDateLocal = range.StartLocal,
+            EndDateLocal = range.EndLocal,
+            WasDateRangeAdjusted = range.WasDateRangeAdjusted,
+            Impact = impact,
+            RecentCampaignOrders = recentCampaignOrders
+        };
+
+        return View(model);
+    }
+
+    [HttpGet("CampaignsExportCsv")]
+    public async Task<IActionResult> CampaignsExportCsv(string? period, DateTime? startDate, DateTime? endDate)
+    {
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var range = ReportPeriodHelper.Resolve(period, startDate, endDate);
+        var impact = await BuildCampaignImpactAsync(businessId, range.StartUtc, range.EndUtc);
+        var culture = CultureInfo.GetCultureInfo("tr-TR");
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Kampanya,Sipariş Sayısı,Ara Toplam,Toplam İndirim,Net Ciro,Ortalama Sepet,Son Kullanım");
+
+        foreach (var row in impact.TopCampaigns)
+        {
+            sb.Append(CsvEscape(row.CampaignName));
+            sb.Append(',');
+            sb.Append(row.OrderCount);
+            sb.Append(',');
+            sb.Append(CsvEscape(row.TotalSubtotal.ToString("N2", culture)));
+            sb.Append(',');
+            sb.Append(CsvEscape(row.TotalDiscount.ToString("N2", culture)));
+            sb.Append(',');
+            sb.Append(CsvEscape(row.NetRevenue.ToString("N2", culture)));
+            sb.Append(',');
+            sb.Append(CsvEscape(row.AverageBasket.ToString("N2", culture)));
+            sb.Append(',');
+            sb.Append(CsvEscape(row.LastUsedAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)));
+            sb.AppendLine();
+        }
+
+        var bytes = Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+        var fileName = $"dukkanpilot-kampanya-rapor-{DateTime.Now:yyyyMMdd}.csv";
+        return File(bytes, "text/csv; charset=utf-8", fileName);
+    }
+
+    private async Task<ReportCampaignImpactViewModel> BuildCampaignImpactAsync(
+        int businessId,
+        DateTime startUtc,
+        DateTime endUtc)
+    {
+        var revenueOrders = _context.Orders.AsNoTracking()
+            .Where(o => o.BusinessId == businessId
+                && o.CreatedAt >= startUtc
+                && o.CreatedAt < endUtc
+                && o.Status != OrderStatus.Cancelled);
+
+        var withCampaign = revenueOrders.Where(o => o.DiscountAmount > 0);
+        var withoutCampaign = revenueOrders.Where(o => o.DiscountAmount <= 0);
+
+        var ordersWithCampaign = await withCampaign.CountAsync();
+        var ordersWithoutCampaign = await withoutCampaign.CountAsync();
+        var totalDiscount = await withCampaign.SumAsync(o => (decimal?)o.DiscountAmount) ?? 0m;
+        var campaignOrderRevenue = await withCampaign.SumAsync(o => (decimal?)o.TotalAmount) ?? 0m;
+        var campaignOrderSubtotal = await withCampaign.SumAsync(o => (decimal?)o.SubtotalAmount) ?? 0m;
+        var averageCampaignBasket = ordersWithCampaign > 0 ? campaignOrderRevenue / ordersWithCampaign : 0m;
+        var discountRatePercent = campaignOrderSubtotal > 0
+            ? Math.Round(totalDiscount * 100m / campaignOrderSubtotal, 2)
+            : 0m;
+
+        var topCampaigns = await withCampaign
+            .GroupBy(o => new
+            {
+                o.AppliedCampaignId,
+                Name = o.AppliedCampaignName ?? "Bilinmeyen Kampanya"
+            })
+            .Select(g => new ReportCampaignPerformanceRowViewModel
+            {
+                CampaignId = g.Key.AppliedCampaignId,
+                CampaignName = g.Key.Name,
+                OrderCount = g.Count(),
+                TotalSubtotal = g.Sum(o => o.SubtotalAmount),
+                TotalDiscount = g.Sum(o => o.DiscountAmount),
+                NetRevenue = g.Sum(o => o.TotalAmount),
+                AverageBasket = g.Average(o => o.TotalAmount),
+                AverageDiscount = g.Average(o => o.DiscountAmount),
+                LastUsedAt = g.Max(o => (DateTime?)o.CreatedAt)
+            })
+            .OrderByDescending(c => c.TotalDiscount)
+            .ThenByDescending(c => c.OrderCount)
+            .Take(10)
+            .ToListAsync();
+
+        return new ReportCampaignImpactViewModel
+        {
+            OrdersWithCampaign = ordersWithCampaign,
+            OrdersWithoutCampaign = ordersWithoutCampaign,
+            TotalDiscount = totalDiscount,
+            CampaignOrderRevenue = campaignOrderRevenue,
+            CampaignOrderSubtotal = campaignOrderSubtotal,
+            AverageCampaignBasket = averageCampaignBasket,
+            DiscountRatePercent = discountRatePercent,
+            TopCampaigns = topCampaigns
         };
     }
 

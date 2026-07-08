@@ -20,4 +20,6 @@ public class CampaignDetailsViewModel
     public bool IsPublicVisible { get; set; }
     public bool IsAutoApply { get; set; }
     public int Priority { get; set; }
+
+    public CampaignPerformanceSummaryViewModel Performance { get; set; } = new();
 }

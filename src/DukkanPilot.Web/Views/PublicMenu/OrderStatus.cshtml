@@ -99,7 +99,7 @@
             </div>
         }
 
-        @if (Model.IsConfirmationPage && Model.ShowDiscountBreakdown)
+        @if (Model.ShowDiscountBreakdown)
         {
             <div class="public-order-info-box">
                 <div class="public-order-info-label">Sipariş Özeti</div>
@@ -109,17 +109,10 @@
             </div>
         }
 
-        @if (Model.IsConfirmationPage && !string.IsNullOrWhiteSpace(Model.CampaignInfoText))
+        @if (!string.IsNullOrWhiteSpace(Model.CampaignInfoText))
         {
             <div class="public-order-info-box">
                 <div class="public-order-info-label">Kampanya</div>
-                <div>@Model.CampaignInfoText</div>
-            </div>
-        }
-        else if (!Model.IsConfirmationPage && !string.IsNullOrWhiteSpace(Model.CampaignInfoText))
-        {
-            <div class="public-order-info-box">
-                <div class="public-order-info-label">Kampanya Bilgisi</div>
                 <div>@Model.CampaignInfoText</div>
             </div>
         }

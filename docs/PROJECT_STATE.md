@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 25B aşaması (Gerçek Kampanya Motoru / Kontrollü Migration) tamamlandı.
+> Son güncelleme: 25C aşaması (Kampanya Performans Analitiği / Gerçek İndirim Raporları) tamamlandı.
 
 ---
 
@@ -467,6 +467,19 @@ DukkanPilot.sln
 - Identity yok; SignalR yok; yeni NuGet dependency yok
 - **25B-FIX:** `DiscountType` için `HasDefaultValue` Fluent API kaldırıldı (entity default `Percentage`); `CampaignDiscountType.None = 0` sentinel eklendi; model/snapshot uyumu sağlandı, `PendingModelChanges` giderildi
 
+### 25C aşaması — Kampanya Performans Analitiği / Gerçek İndirim Raporları
+- **Order entity kontrollü genişletildi:** `SubtotalAmount`, `DiscountAmount`, `AppliedCampaignId`, `AppliedCampaignName` (FK yok; cascade riski yok)
+- **Migration:** `AddOrderCampaignReportingFields` (`20260708120000`) — yalnızca `Orders` tablosu
+- **Existing data backfill:** `SubtotalAmount = TotalAmount`, `DiscountAmount = 0`, kampanya alanları null
+- **Public order POST:** pricing helper sonucundan Subtotal/Discount/Campaign alanları saklanır
+- **Confirmation/tracking:** gerçek Order alanlarından indirim özeti (notes parse birincil değil)
+- **`/Business/Reports`:** Kampanya Etkisi KPI + top kampanyalar tablosu
+- **`/Business/Reports/Campaigns`:** kampanya performans ekranı + CSV export
+- **Campaign Details:** sipariş/indirim/ciro kartları + son 10 sipariş
+- **Dashboard:** bu ay kampanya indirimi / kampanyalı sipariş / en çok kullanılan kampanya
+- Client fiyat/indirim verisine güvenilmiyor; 9C sadakat puanı kazanımı bozulmadı
+- Identity yok; SignalR yok; yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -475,7 +488,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate` (`20260706150101_InitialCreate`), `AddCampaignDiscountFields` (`20260707235034_AddCampaignDiscountFields`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`) |
 
 ### Seed verisi
 
@@ -528,7 +541,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-25B tamamlandı — gerçek kampanya indirim motoru, kontrollü Campaign migration ve server-side fiyat/indirim doğrulaması eklendi.
+25C tamamlandı — Order kampanya raporlama alanları, gerçek indirim raporları ve kampanya performans ekranı eklendi.
 
 ---
 
