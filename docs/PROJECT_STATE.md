@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 31A (Customer Onboarding & Implementation Center) tamamlandı.
+> Son güncelleme: 31B (Customer Success / Retention / Business Health Score) tamamlandı.
 
 ---
 
@@ -604,6 +604,13 @@ DukkanPilot.sln
 - Admin: `/Admin/Onboarding` + `/Admin/Onboarding/Details/{businessId}` + Dashboard/SalesCenter/Operations/SalesRequests handoff
 - Docs: CUSTOMER_ONBOARDING_RUNBOOK, KICKOFF_MEETING_SCRIPT, IMPLEMENTATION_HANDOFF_CHECKLIST, CUSTOMER_SUCCESS_PLAYBOOK
 - Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet/ödeme yok; Notification/Audit gürültüsü yok (read-only)
+
+### 31B — Customer Success / Retention / Business Health Score
+- `CustomerSuccessHealthHelper` — mevcut Business/Order/Customer/Campaign/Reward/Notification/Audit/Subscription/SalesRequest verilerinden 0–100 health score + churn risk + expansion potential hesaplar
+- Business: `/Business/Success` + Dashboard/Onboarding/GoLive/DemoCenter/sidebar entegrasyonu
+- Admin: `/Admin/CustomerSuccess` + `/Admin/CustomerSuccess/Details/{businessId}` + Dashboard/SalesCenter/Operations/BusinessDetails/SalesRequests entegrasyonu
+- Docs: CUSTOMER_SUCCESS_HEALTH_SCORE, RETENTION_PLAYBOOK, UPGRADE_OPPORTUNITY_PLAYBOOK, CHURN_RISK_RUNBOOK
+- Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet/ödeme yok; Success ekranları read-only, audit üretmez, notification spam yaratmaz
 
 ---
 

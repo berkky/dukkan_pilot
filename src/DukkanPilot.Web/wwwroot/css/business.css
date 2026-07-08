@@ -396,3 +396,68 @@
         font-size: 1.25rem;
     }
 }
+
+/* 31B — Customer Success */
+.success-score-card,
+.success-dashboard-card {
+    border-width: 1px;
+}
+
+.success-score-ring {
+    width: 5.5rem;
+    height: 5.5rem;
+    margin-inline: auto;
+    border-radius: 50%;
+    border: 4px solid #111827;
+    display: grid;
+    place-items: center;
+    background: #f8fafc;
+}
+
+.success-score-ring-sm {
+    width: 4.25rem;
+    height: 4.25rem;
+}
+
+.success-score-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.success-score-ring-sm .success-score-value {
+    font-size: 1.2rem;
+}
+
+.success-progress {
+    height: 10px;
+}
+
+.success-signal-list,
+.success-recommendation-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.success-signal-card,
+.success-recommendation-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    background: #fff;
+}
+
+.success-signal-card.is-critical {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.success-signal-card.is-warning {
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.success-signal-card.is-positive {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}

@@ -25,6 +25,10 @@ public class AdminDashboardViewModel
     public int OnboardingAtRiskCount { get; set; }
 
     public int OnboardingLiveCount { get; set; }
+
+    public int CustomerSuccessAtRiskCount { get; set; }
+
+    public int CustomerSuccessHealthyCount { get; set; }
 }
 
 public class AdminPlatformKpiViewModel

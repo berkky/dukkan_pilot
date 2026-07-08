@@ -1,0 +1,225 @@
+@model DukkanPilot.Web.Areas.Business.Models.BusinessSuccessViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Models.Shared
+@{
+    ViewData["Title"] = "İşletme Sağlığı";
+    ViewData["Subtitle"] = Model.Snapshot.BusinessName;
+    var s = Model.Snapshot;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string Money(decimal amount) => amount.ToString("N2", culture) + " ₺";
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">İşletme Sağlığı</h2>
+        <p class="text-muted mb-0">Kullanım, sipariş, menü, müşteri ve abonelik sinyallerinize göre işletmenizin DukkanPilot sağlığı.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/Onboarding" class="btn btn-outline-primary btn-sm">Onboarding</a>
+        <a href="/Business/GoLive" class="btn btn-outline-success btn-sm">Go-Live</a>
+        <a href="/Business/Reports" class="btn btn-outline-secondary btn-sm">Raporlar</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu skor neyi gösterir?",
+    Description = "Bu ekran read-only çalışır; veri yazmaz, audit veya yeni bildirim oluşturmaz. Amaç churn riski, kullanım sağlığı ve büyüme fırsatlarını önceliklendirmektir.",
+    Variant = "info"
+})
+
+<div class="panel-card mb-4 success-score-card @s.CardVariantClass">
+    <div class="panel-card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col-sm-3 col-md-2 text-center">
+                <div class="success-score-ring" aria-label="Health score @s.Score">
+                    <span class="success-score-value">@s.Score</span>
+                </div>
+                <div class="small text-muted mt-1">Health score</div>
+            </div>
+            <div class="col-sm-9 col-md-7">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    <span class="badge @s.StatusBadgeClass">@s.StatusLabel</span>
+                    <span class="badge @s.ChurnRiskBadgeClass">Churn: @s.ChurnRiskLabel</span>
+                    <span class="badge @s.ExpansionPotentialBadgeClass">Expansion: @s.ExpansionPotentialLabel</span>
+                </div>
+                <div class="progress success-progress mb-2">
+                    <div class="progress-bar @(s.IsHealthyOrBetter ? "bg-success" : (s.IsAtRisk ? "bg-warning" : "bg-primary"))" style="width:@s.Score%"></div>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(s.TopRiskLabel))
+                {
+                    <p class="small text-muted mb-0">En kritik sinyal: <strong>@s.TopRiskLabel</strong></p>
+                }
+            </div>
+            <div class="col-md-3">
+                @if (!string.IsNullOrWhiteSpace(s.NextRecommendedActionUrl))
+                {
+                    <div class="onboarding-next-action">
+                        <div class="small text-muted mb-1">Önerilen aksiyon</div>
+                        <div class="fw-semibold small mb-2">@s.NextRecommendedActionTitle</div>
+                        <a href="@s.NextRecommendedActionUrl" class="btn btn-sm btn-primary w-100">@(s.NextRecommendedActionText ?? "Git")</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-2"><div class="stat-card h-100"><div class="stat-label">Sipariş (30 gün)</div><div class="stat-value fs-4">@s.Kpis.OrdersLast30Days</div></div></div>
+    <div class="col-sm-6 col-xl-2"><div class="stat-card h-100"><div class="stat-label">Tamamlanan</div><div class="stat-value fs-4">@s.Kpis.CompletedOrdersLast30Days</div></div></div>
+    <div class="col-sm-6 col-xl-2"><div class="stat-card h-100"><div class="stat-label">Ciro</div><div class="stat-value fs-6">@Money(s.Kpis.RevenueLast30Days)</div></div></div>
+    <div class="col-sm-6 col-xl-2"><div class="stat-card h-100"><div class="stat-label">Ort. Sepet</div><div class="stat-value fs-6">@Money(s.Kpis.AverageBasketLast30Days)</div></div></div>
+    <div class="col-sm-6 col-xl-2"><div class="stat-card h-100"><div class="stat-label">Yeni Müşteri</div><div class="stat-value fs-4">@s.Kpis.NewCustomersLast30Days</div></div></div>
+    <div class="col-sm-6 col-xl-2"><div class="stat-card h-100"><div class="stat-label">Tekrar Eden</div><div class="stat-value fs-4">@s.Kpis.RepeatCustomers</div></div></div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Risk sinyalleri</h3></div>
+            <div class="panel-card-body">
+                @if (s.RiskSignals.Count == 0)
+                {
+                    <span class="badge bg-success">Kritik risk görünmüyor</span>
+                }
+                else
+                {
+                    <div class="success-signal-list">
+                        @foreach (var signal in s.RiskSignals)
+                        {
+                            <div class="success-signal-card is-@signal.Severity">
+                                <div class="d-flex justify-content-between gap-2">
+                                    <strong class="small">@signal.Label</strong>
+                                    <span class="badge @(signal.Severity == "critical" ? "bg-danger" : "bg-warning text-dark")">@signal.Value</span>
+                                </div>
+                                <div class="small text-muted mt-1">@signal.Description</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Growth fırsatları</h3></div>
+            <div class="panel-card-body">
+                @if (s.GrowthSignals.Count == 0)
+                {
+                    <p class="text-muted small mb-0">Şu an belirgin upgrade / expansion sinyali yok.</p>
+                }
+                else
+                {
+                    <div class="success-signal-list">
+                        @foreach (var signal in s.GrowthSignals)
+                        {
+                            <div class="success-signal-card is-positive">
+                                <div class="d-flex justify-content-between gap-2">
+                                    <strong class="small">@signal.Label</strong>
+                                    <span class="badge bg-success">@signal.Value</span>
+                                </div>
+                                <div class="small text-muted mt-1">@signal.Description</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Öneriler</h3></div>
+            <div class="panel-card-body">
+                @if (s.Recommendations.Count == 0)
+                {
+                    <span class="badge bg-success">Şu an kritik aksiyon gerekmiyor</span>
+                }
+                else
+                {
+                    <div class="success-recommendation-list">
+                        @foreach (var rec in s.Recommendations)
+                        {
+                            <div class="success-recommendation-card">
+                                <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                                    <div>
+                                        <div class="fw-semibold small">@rec.Title</div>
+                                        <div class="small text-muted">@rec.Description</div>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(rec.ActionUrl))
+                                    {
+                                        <a href="@rec.ActionUrl" class="btn btn-sm @(rec.IsCritical ? "btn-warning" : "btn-outline-primary")">@rec.ActionText</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Health breakdown</h3></div>
+            <div class="panel-card-body">
+                @foreach (var item in s.Breakdown)
+                {
+                    var percent = item.MaxScore > 0 ? (int)Math.Round(item.Score * 100.0 / item.MaxScore) : 0;
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>@item.Label</span>
+                            <strong>@item.Score / @item.MaxScore</strong>
+                        </div>
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar" style="width:@percent%"></div>
+                        </div>
+                        <div class="small text-muted mt-1">@item.Description</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Abonelik ve limitler</h3></div>
+            <div class="panel-card-body">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge @s.Subscription.StatusCssClass">@s.Subscription.StatusText</span>
+                    @if (s.Subscription.DaysRemaining.HasValue)
+                    {
+                        <span class="badge bg-light text-dark border">@s.Subscription.DaysRemaining gün kaldı</span>
+                    }
+                </div>
+                @foreach (var metric in s.PlanUsage.AllMetrics)
+                {
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small">
+                            <span>@metric.Name</span>
+                            <span class="@metric.StatusCssClass">@metric.UsageDisplay</span>
+                        </div>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar @metric.ProgressBarClass" style="width:@metric.UsagePercent%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Hızlı bağlantılar</h3></div>
+            <div class="panel-card-body d-flex flex-wrap gap-2">
+                @foreach (var link in s.QuickLinks)
+                {
+                    <a href="@link.Url" class="btn btn-sm btn-outline-secondary">@link.Title</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

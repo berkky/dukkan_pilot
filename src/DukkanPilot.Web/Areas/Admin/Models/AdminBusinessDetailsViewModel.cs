@@ -39,6 +39,8 @@ public class AdminBusinessDetailsViewModel
 
     public AdminBusinessOrderSummaryViewModel OrderSummary { get; set; } = new();
 
+    public DukkanPilot.Web.Models.Success.CustomerSuccessSnapshot? CustomerSuccess { get; set; }
+
     public List<AdminBusinessRecentOrderViewModel> RecentOrders { get; set; } = [];
 
     public List<AdminBusinessTopProductViewModel> TopProducts { get; set; } = [];

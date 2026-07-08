@@ -3,6 +3,7 @@
 ## İlk gün
 
 - Owner girişi + Kurulum Sihirbazı
+- Owner girişi + `Business/Success` health ekranı
 - WhatsApp + menü + public link
 - Bir test sipariş + kitchen demo
 
@@ -19,6 +20,7 @@
 - Rapor + CRM inceleme görüşmesi
 - Plan kullanımını (limit) kontrol et
 - Yenileme / upgrade sinyallerini izle (SalesRequests + Billing)
+- `CustomerSuccessHealthHelper` skoru ve risk listesiyle müdahale önceliği çıkar
 
 ## Başarı metrikleri
 
@@ -33,6 +35,7 @@
 2. Sipariş yok → birlikte test sipariş
 3. Owner girmiyor → kickoff yenile / Sales handoff
 4. Abonelik riski → Billing + SalesRequests
+5. `Admin/CustomerSuccess` üzerinden top risk / next action ile sırala
 
 ## Kampanya önerileri
 
@@ -51,3 +54,4 @@
 - Limitlere yaklaşma (ürün / kampanya)
 - Aktif kullanım + düşük plan
 - Won sonrası sürekli Live skor
+- Health `Healthy` / `GrowthReady` + expansion `GoodFit` / `StrongFit`

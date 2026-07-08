@@ -32,6 +32,7 @@
         <p class="text-muted mb-0">İşletme performans özeti</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/Success" class="btn btn-outline-dark">İşletme Sağlığı</a>
         <a href="/Business/Onboarding" class="btn btn-primary">Kurulum Sihirbazı</a>
         <a href="/Business/GoLive" class="btn btn-success">Go-Live Merkezi</a>
         <a href="/Business/Orders/Kitchen" class="btn btn-outline-secondary">Mutfak Modu</a>
@@ -39,6 +40,52 @@
         <a href="/Business/Reports" class="btn btn-outline-primary">Raporlar</a>
     </div>
 </div>
+
+@if (Model.SuccessStatus is not null)
+{
+    <div class="panel-card mb-4 success-dashboard-card @Model.SuccessStatus.CardVariantClass">
+        <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h3 class="h6 mb-0">Customer Success / İşletme Sağlığı</h3>
+            <span class="badge @Model.SuccessStatus.StatusBadgeClass">@Model.SuccessStatus.StatusLabel</span>
+        </div>
+        <div class="panel-card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-sm-3 col-md-2">
+                    <div class="success-score-ring success-score-ring-sm" aria-label="Success skoru @Model.SuccessStatus.Score">
+                        <span class="success-score-value">@Model.SuccessStatus.Score</span>
+                    </div>
+                </div>
+                <div class="col-sm-9 col-md-7">
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <span class="badge @Model.SuccessStatus.ChurnRiskBadgeClass">Churn: @Model.SuccessStatus.ChurnRiskLabel</span>
+                    </div>
+                    @if (Model.SuccessStatus.IsHealthyOrBetter)
+                    {
+                        <p class="small text-success mb-0">Kullanım sağlığı iyi görünüyor.</p>
+                    }
+                    else if (Model.SuccessStatus.IsCriticalOrAtRisk)
+                    {
+                        <p class="small text-warning mb-0">
+                            En kritik risk: <strong>@(Model.SuccessStatus.TopRiskLabel ?? "Customer success takibi")</strong>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-0">
+                            @if (!string.IsNullOrWhiteSpace(Model.SuccessStatus.NextActionTitle))
+                            {
+                                <span>Önerilen aksiyon: <strong>@Model.SuccessStatus.NextActionTitle</strong></span>
+                            }
+                        </p>
+                    }
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <a href="/Business/Success" class="btn btn-sm @(Model.SuccessStatus.IsCriticalOrAtRisk ? "btn-warning" : "btn-dark")">İşletme Sağlığını Gör</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @if (Model.OnboardingStatus is not null)
 {

@@ -11,11 +11,16 @@ public class DemoCenterController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly CustomerOnboardingHelper _onboardingHelper;
+    private readonly CustomerSuccessHealthHelper _successHelper;
 
-    public DemoCenterController(AppDbContext context, CustomerOnboardingHelper onboardingHelper)
+    public DemoCenterController(
+        AppDbContext context,
+        CustomerOnboardingHelper onboardingHelper,
+        CustomerSuccessHealthHelper successHelper)
     {
         _context = context;
         _onboardingHelper = onboardingHelper;
+        _successHelper = successHelper;
     }
 
     [HttpGet("")]
@@ -176,6 +181,14 @@ public class DemoCenterController : BusinessBaseController
             model.OnboardingScore = onboardingCard.Score;
             model.OnboardingStatusLabel = onboardingCard.StatusLabel;
             model.OnboardingBadgeClass = onboardingCard.StatusBadgeClass;
+        }
+
+        var successCard = await _successHelper.BuildDashboardCardAsync(businessId);
+        if (successCard is not null)
+        {
+            model.SuccessScore = successCard.Score;
+            model.SuccessStatusLabel = successCard.StatusLabel;
+            model.SuccessBadgeClass = successCard.StatusBadgeClass;
         }
 
         return View(model);

@@ -49,6 +49,22 @@
             </div>
         </a>
     </div>
+    <div class="col-md-6 col-xl-4">
+        <a href="/Admin/CustomerSuccess" class="text-decoration-none">
+            <div class="panel-card h-100 border-danger mb-0">
+                <div class="panel-card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small mb-1">Customer Success riski</div>
+                            <div class="h4 mb-1 text-danger">@Model.CustomerSuccessAtRiskCount işletme</div>
+                            <div class="small text-muted">@Model.CustomerSuccessHealthyCount sağlıklı · Retention takibi</div>
+                        </div>
+                        <span class="fs-4">💚</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>
 
 @if (Model.CriticalNotifications.Count > 0)

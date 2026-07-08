@@ -62,6 +62,14 @@ public class AdminSalesRequestDetailViewModel
 
     public string? OnboardingNextAction { get; set; }
 
+    public int? CustomerSuccessScore { get; set; }
+
+    public string? CustomerSuccessStatusLabel { get; set; }
+
+    public string? CustomerSuccessBadgeClass { get; set; }
+
+    public string? CustomerSuccessTopRisk { get; set; }
+
     public AdminSalesRequestUpdateViewModel Update { get; set; } = new();
 }
 

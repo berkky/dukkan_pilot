@@ -1,0 +1,123 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminCustomerSuccessDetailsViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Customer Success Detay";
+    var s = Model.Snapshot;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string Money(decimal amount) => amount.ToString("N2", culture) + " ₺";
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <nav class="small mb-1"><a href="/Admin/CustomerSuccess">Customer Success</a> · Detay</nav>
+        <h2 class="h4 mb-1">@s.BusinessName</h2>
+        <p class="text-muted mb-0">@s.BusinessSlug · @s.Subscription.PlanName · @s.Subscription.StatusText</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Admin/Businesses/Details/@s.BusinessId" class="btn btn-sm btn-outline-secondary">Business Details</a>
+        <a href="/Admin/Onboarding/Details/@s.BusinessId" class="btn btn-sm btn-outline-primary">Onboarding</a>
+        <a href="@s.PublicMenuUrl" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success">Public Menü</a>
+    </div>
+</div>
+
+<div class="panel-card mb-4 @s.CardVariantClass">
+    <div class="panel-card-body">
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+            <span class="display-6 fw-semibold">@s.Score</span>
+            <span class="badge @s.StatusBadgeClass">@s.StatusLabel</span>
+            <span class="badge @s.ChurnRiskBadgeClass">Churn: @s.ChurnRiskLabel</span>
+            <span class="badge @s.ExpansionPotentialBadgeClass">Expansion: @s.ExpansionPotentialLabel</span>
+        </div>
+        <div class="progress mb-2" style="height:8px;"><div class="progress-bar" style="width:@s.Score%"></div></div>
+        <p class="small text-muted mb-0">Top risk: <strong>@(s.TopRiskLabel ?? "-")</strong></p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Risk sinyalleri</h3></div>
+            <div class="panel-card-body">
+                @foreach (var signal in s.RiskSignals)
+                {
+                    <div class="mb-2 small"><strong>@signal.Label:</strong> @signal.Value <span class="text-muted">· @signal.Description</span></div>
+                }
+            </div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Öneriler</h3></div>
+            <div class="panel-card-body">
+                @foreach (var rec in s.Recommendations)
+                {
+                    <div class="mb-3">
+                        <div class="fw-semibold small">@rec.Title</div>
+                        <div class="text-muted small">@rec.Description</div>
+                        @if (!string.IsNullOrWhiteSpace(rec.ActionUrl))
+                        {
+                            <a href="@rec.ActionUrl" class="btn btn-sm btn-outline-primary mt-2">@rec.ActionText</a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Usage KPI</h3></div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-7">Orders 7 / 30 gün</dt><dd class="col-5">@s.Kpis.OrdersLast7Days / @s.Kpis.OrdersLast30Days</dd>
+                    <dt class="col-7">Completed / Cancelled</dt><dd class="col-5">@s.Kpis.CompletedOrdersLast30Days / @s.Kpis.CancelledOrdersLast30Days</dd>
+                    <dt class="col-7">Revenue 30 gün</dt><dd class="col-5">@Money(s.Kpis.RevenueLast30Days)</dd>
+                    <dt class="col-7">Customer / Repeat</dt><dd class="col-5">@s.Kpis.ActiveCustomerCount / @s.Kpis.RepeatCustomers</dd>
+                    <dt class="col-7">Campaign / Reward</dt><dd class="col-5">@s.Kpis.CampaignCount / @s.Kpis.RewardCount</dd>
+                    <dt class="col-7">Active products</dt><dd class="col-5">@s.Kpis.ActiveProductCount</dd>
+                    <dt class="col-7">Staff</dt><dd class="col-5">@s.Kpis.StaffCount</dd>
+                    <dt class="col-7">Critical notifications</dt><dd class="col-5">@s.Kpis.CriticalNotificationCount</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Subscription summary</h3></div>
+            <div class="panel-card-body">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                    <span class="badge @s.Subscription.StatusCssClass">@s.Subscription.StatusText</span>
+                    @if (s.Subscription.DaysRemaining.HasValue)
+                    {
+                        <span class="badge bg-light text-dark border">@s.Subscription.DaysRemaining gün</span>
+                    }
+                </div>
+                @foreach (var metric in s.PlanUsage.AllMetrics)
+                {
+                    <div class="d-flex justify-content-between small"><span>@metric.Name</span><span class="@metric.StatusCssClass">@metric.UsageDisplay</span></div>
+                }
+            </div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">İlgili kayıtlar</h3></div>
+            <div class="panel-card-body">
+                <div class="small text-muted mb-2">SalesRequests</div>
+                <ul class="small">
+                    @foreach (var r in Model.RelatedSalesRequests)
+                    {
+                        <li><a href="/Admin/SalesRequests/Details/@r.Id">#@r.Id</a> · @r.Status · @r.RequestType</li>
+                    }
+                </ul>
+                <div class="small text-muted mb-2">Recent audit</div>
+                <ul class="small">
+                    @foreach (var a in Model.RecentAudits.Take(5))
+                    {
+                        <li>@a.Title · @a.AtUtc.ToLocalTime().ToString("g")</li>
+                    }
+                </ul>
+                <div class="small text-muted mb-2">Recent notifications</div>
+                <ul class="small mb-0">
+                    @foreach (var n in Model.RecentNotifications.Take(5))
+                    {
+                        <li>@n.Title · @n.AtUtc.ToLocalTime().ToString("g")</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

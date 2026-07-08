@@ -13,15 +13,18 @@ public class SalesRequestsController : AdminBaseController
     private readonly AppDbContext _context;
     private readonly ISalesRequestService _salesRequests;
     private readonly CustomerOnboardingHelper _onboardingHelper;
+    private readonly CustomerSuccessHealthHelper _successHelper;
 
     public SalesRequestsController(
         AppDbContext context,
         ISalesRequestService salesRequests,
-        CustomerOnboardingHelper onboardingHelper)
+        CustomerOnboardingHelper onboardingHelper,
+        CustomerSuccessHealthHelper successHelper)
     {
         _context = context;
         _salesRequests = salesRequests;
         _onboardingHelper = onboardingHelper;
+        _successHelper = successHelper;
     }
 
     [HttpGet("")]
@@ -134,6 +137,15 @@ public class SalesRequestsController : AdminBaseController
                 model.OnboardingStatusLabel = snap.StatusLabel;
                 model.OnboardingBadgeClass = snap.StatusBadgeClass;
                 model.OnboardingNextAction = snap.NextBestActionTitle;
+            }
+
+            var success = await _successHelper.BuildAsync(businessId, string.Empty, isBusinessOwner: true, cancellationToken);
+            if (success is not null)
+            {
+                model.CustomerSuccessScore = success.Score;
+                model.CustomerSuccessStatusLabel = success.StatusLabel;
+                model.CustomerSuccessBadgeClass = success.StatusBadgeClass;
+                model.CustomerSuccessTopRisk = success.TopRiskLabel;
             }
         }
 

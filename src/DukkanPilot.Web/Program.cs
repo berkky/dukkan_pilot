@@ -38,6 +38,7 @@ builder.Services.AddScoped<BusinessSubscriptionStatusHelper>();
 builder.Services.AddScoped<BusinessPlanLimitHelper>();
 builder.Services.AddScoped<GoLiveHelper>();
 builder.Services.AddScoped<CustomerOnboardingHelper>();
+builder.Services.AddScoped<CustomerSuccessHealthHelper>();
 builder.Services.AddScoped<PublicOrderPricingHelper>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

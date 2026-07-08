@@ -12,11 +12,16 @@ public class SalesCenterController : AdminBaseController
 {
     private readonly AppDbContext _context;
     private readonly CustomerOnboardingHelper _onboardingHelper;
+    private readonly CustomerSuccessHealthHelper _successHelper;
 
-    public SalesCenterController(AppDbContext context, CustomerOnboardingHelper onboardingHelper)
+    public SalesCenterController(
+        AppDbContext context,
+        CustomerOnboardingHelper onboardingHelper,
+        CustomerSuccessHealthHelper successHelper)
     {
         _context = context;
         _onboardingHelper = onboardingHelper;
+        _successHelper = successHelper;
     }
 
     [HttpGet("")]
@@ -149,6 +154,8 @@ public class SalesCenterController : AdminBaseController
 
         var onboardingSnaps = await _onboardingHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
         var onboardingById = onboardingSnaps.ToDictionary(s => s.BusinessId);
+        var successSnaps = await _successHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
+        var successById = successSnaps.ToDictionary(s => s.BusinessId);
         var onboardingReady = onboardingSnaps
             .Where(s => s.Status is OnboardingStatus.ReadyToLaunch or OnboardingStatus.Live)
             .OrderByDescending(s => s.Score)
@@ -169,6 +176,39 @@ public class SalesCenterController : AdminBaseController
             })
             .ToList();
 
+        foreach (var row in rows)
+        {
+            if (successById.TryGetValue(row.BusinessId, out var snap))
+            {
+                row.SuccessScore = snap.Score;
+                row.SuccessLabel = snap.StatusLabel;
+                row.SuccessBadgeClass = snap.StatusBadgeClass;
+            }
+        }
+
+        var healthyList = successSnaps
+            .Where(s => s.IsHealthyOrBetter)
+            .OrderByDescending(s => s.Score)
+            .Take(15)
+            .Select(s => new SalesCenterBusinessRowViewModel
+            {
+                BusinessId = s.BusinessId,
+                BusinessName = s.BusinessName,
+                Slug = s.BusinessSlug,
+                PublicMenuUrl = s.PublicMenuUrl,
+                HealthScore = s.Score,
+                HealthLabel = s.StatusLabel,
+                HealthBadgeClass = s.StatusBadgeClass,
+                OrderCount = s.Kpis.OrdersLast30Days,
+                ActiveProductCount = s.Kpis.ActiveProductCount,
+                CampaignCount = s.Kpis.CampaignCount,
+                SuccessScore = s.Score,
+                SuccessLabel = s.StatusLabel,
+                SuccessBadgeClass = s.StatusBadgeClass,
+                IsDemoReady = true
+            })
+            .ToList();
+
         var wonRequests = await _context.SalesRequests.AsNoTracking()
             .Where(r => r.Status == "Won")
             .OrderByDescending(r => r.ClosedAtUtc ?? r.UpdatedAtUtc ?? r.CreatedAtUtc)
@@ -178,9 +218,11 @@ public class SalesCenterController : AdminBaseController
         var wonHandoffs = wonRequests.Select(r =>
         {
             CustomerOnboardingSnapshot? snap = null;
+            DukkanPilot.Web.Models.Success.CustomerSuccessSnapshot? successSnap = null;
             if (r.BusinessId is int bid)
             {
                 onboardingById.TryGetValue(bid, out snap);
+                successById.TryGetValue(bid, out successSnap);
             }
 
             return new SalesCenterWonHandoffViewModel
@@ -191,7 +233,10 @@ public class SalesCenterController : AdminBaseController
                 BusinessId = r.BusinessId,
                 OnboardingScore = snap?.Score,
                 OnboardingStatusLabel = snap?.StatusLabel,
-                OnboardingBadgeClass = snap?.StatusBadgeClass
+                OnboardingBadgeClass = snap?.StatusBadgeClass,
+                SuccessScore = successSnap?.Score,
+                SuccessStatusLabel = successSnap?.StatusLabel,
+                SuccessBadgeClass = successSnap?.StatusBadgeClass
             };
         }).ToList();
 
@@ -203,12 +248,15 @@ public class SalesCenterController : AdminBaseController
             ExpiringSoonBusinesses = expiring,
             DemoReadyBusinesses = rows.Count(r => r.IsDemoReady),
             OnboardingReadyBusinesses = onboardingReady.Count,
+            HealthyBusinesses = successSnaps.Count(s => s.IsHealthyOrBetter),
+            UpgradeOpportunityCount = successSnaps.Count(s => s.ExpansionPotentialLabel is "GoodFit" or "StrongFit"),
             DemoReadyList = rows.Where(r => r.IsDemoReady)
                 .OrderByDescending(r => r.HealthScore)
                 .ThenByDescending(r => r.OrderCount)
                 .Take(15)
                 .ToList(),
             OnboardingReadyList = onboardingReady,
+            HealthyList = healthyList,
             NeedsAttentionList = rows.Where(r => !string.IsNullOrWhiteSpace(r.AttentionReason))
                 .OrderBy(r => r.HealthScore)
                 .ThenBy(r => r.BusinessName)

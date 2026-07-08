@@ -74,7 +74,11 @@ public class OperationsController : AdminBaseController
                 new OpsDocLinkViewModel { Title = "Customer onboarding", Path = "docs/CUSTOMER_ONBOARDING_RUNBOOK.md" },
                 new OpsDocLinkViewModel { Title = "Kickoff script", Path = "docs/KICKOFF_MEETING_SCRIPT.md" },
                 new OpsDocLinkViewModel { Title = "Implementation handoff", Path = "docs/IMPLEMENTATION_HANDOFF_CHECKLIST.md" },
-                new OpsDocLinkViewModel { Title = "Customer success", Path = "docs/CUSTOMER_SUCCESS_PLAYBOOK.md" }
+                new OpsDocLinkViewModel { Title = "Customer success", Path = "docs/CUSTOMER_SUCCESS_PLAYBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Health score", Path = "docs/CUSTOMER_SUCCESS_HEALTH_SCORE.md" },
+                new OpsDocLinkViewModel { Title = "Retention playbook", Path = "docs/RETENTION_PLAYBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Upgrade opportunity", Path = "docs/UPGRADE_OPPORTUNITY_PLAYBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Churn risk runbook", Path = "docs/CHURN_RISK_RUNBOOK.md" }
             ],
             ScriptHints =
             [
@@ -151,6 +155,13 @@ public class OperationsController : AdminBaseController
                 Description = "/Admin/Onboarding + docs/CUSTOMER_ONBOARDING_RUNBOOK.md",
                 IsReadyHint = FileExists("docs", "CUSTOMER_ONBOARDING_RUNBOOK.md")
                     && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "OnboardingController.cs")
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Customer Success board available",
+                Description = "/Admin/CustomerSuccess + docs/CUSTOMER_SUCCESS_HEALTH_SCORE.md",
+                IsReadyHint = FileExists("docs", "CUSTOMER_SUCCESS_HEALTH_SCORE.md")
+                    && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "CustomerSuccessController.cs")
             }
         ];
 

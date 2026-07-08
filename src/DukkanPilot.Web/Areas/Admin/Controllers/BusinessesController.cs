@@ -19,12 +19,18 @@ public class BusinessesController : AdminBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly CustomerSuccessHealthHelper _successHelper;
     private readonly IAuditLogService _auditLog;
 
-    public BusinessesController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
+    public BusinessesController(
+        AppDbContext context,
+        BusinessPlanLimitHelper planLimitHelper,
+        CustomerSuccessHealthHelper successHelper,
+        IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _successHelper = successHelper;
         _auditLog = auditLog;
     }
 
@@ -945,6 +951,7 @@ public class BusinessesController : AdminBaseController
 
         var revenueOrderCount = revenueOrders.Count;
         var averageBasket = revenueOrderCount > 0 ? totalRevenue / revenueOrderCount : 0m;
+        var customerSuccess = await _successHelper.BuildAsync(id, $"/m/{business.Slug}", isBusinessOwner: true);
 
         return new AdminBusinessDetailsViewModel
         {
@@ -976,6 +983,7 @@ public class BusinessesController : AdminBaseController
                 IsValid = isValid
             },
             PlanUsage = planUsage,
+            CustomerSuccess = customerSuccess,
             Menu = new AdminBusinessMenuReadinessViewModel
             {
                 TotalCategories = totalCategories,

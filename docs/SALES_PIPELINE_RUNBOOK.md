@@ -41,6 +41,7 @@ Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 5. Kickoff: `docs/KICKOFF_MEETING_SCRIPT.md`
 6. Handoff: `docs/IMPLEMENTATION_HANDOFF_CHECKLIST.md`
 7. Müşteriye `/Business/Onboarding` göster
+8. Go-live sonrası `/Admin/CustomerSuccess` ile health monitoring başlat
 
 ## Checklist (müşteri dönüşü)
 
@@ -49,7 +50,8 @@ Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 - [ ] Legal/KVKK hatırlatma
 - [ ] Abonelik manuel set
 - [ ] Onboarding handoff (`/Admin/Onboarding`)
-- [ ] Smoke: login + billing + onboarding
+- [ ] Health monitoring (`/Admin/CustomerSuccess` + `/Business/Success`)
+- [ ] Smoke: login + billing + onboarding + success
 
 ## Spam / duplicate
 

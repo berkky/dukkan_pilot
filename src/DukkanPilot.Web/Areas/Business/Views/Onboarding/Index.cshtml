@@ -131,6 +131,23 @@ else
 <div class="row g-4 mb-4">
     <div class="col-lg-6">
         <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Sonraki aşama: İşletme Sağlığı</h3></div>
+            <div class="panel-card-body">
+                @if (s.IsReadyToLaunch || s.IsLive)
+                {
+                    <p class="small text-muted">Kurulum tamamlandıktan sonra kullanım, churn riski ve growth sinyallerini <strong>İşletme Sağlığı</strong> ekranından takip edin.</p>
+                    <a href="/Business/Success" class="btn btn-sm btn-dark">İşletme Sağlığına Git</a>
+                }
+                else
+                {
+                    <p class="small text-muted">Success Center erişilebilir; ancak en doğru retention sinyalleri için önce kurulum adımlarını tamamlamanız önerilir.</p>
+                    <a href="/Business/Success" class="btn btn-sm btn-outline-dark">Yine de Aç</a>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
             <div class="panel-card-header"><h3 class="h6 mb-0">Launch checklist</h3></div>
             <div class="panel-card-body">
                 <ul class="onboarding-launch-list mb-0">

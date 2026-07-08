@@ -45,7 +45,7 @@
     <div class="col-lg-4">
         <div class="panel-card h-100">
             <div class="panel-card-header">
-                <h3 class="h6 mb-0">İşletme Sağlık Skoru</h3>
+                <h3 class="h6 mb-0">Operasyon Sağlığı</h3>
             </div>
             <div class="panel-card-body text-center">
                 <div class="display-4 fw-bold mb-2">@Model.Health.Score</div>
@@ -59,7 +59,7 @@
     <div class="col-lg-8">
         <div class="panel-card h-100">
             <div class="panel-card-header">
-                <h3 class="h6 mb-0">Risk Nedenleri</h3>
+                <h3 class="h6 mb-0">Operasyon Riskleri</h3>
             </div>
             <div class="panel-card-body">
                 @if (!Model.Health.Risks.Any())
@@ -79,6 +79,25 @@
         </div>
     </div>
 </div>
+
+@if (Model.CustomerSuccess is not null)
+{
+    <div class="panel-card mb-4 @Model.CustomerSuccess.CardVariantClass">
+        <div class="panel-card-header d-flex justify-content-between align-items-center">
+            <h3 class="h6 mb-0">Müşteri Başarı Sağlığı</h3>
+            <a href="/Admin/CustomerSuccess/Details/@Model.Id" class="btn btn-sm btn-outline-dark">Customer Success Details</a>
+        </div>
+        <div class="panel-card-body">
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                <span class="h4 mb-0">@Model.CustomerSuccess.Score</span>
+                <span class="badge @Model.CustomerSuccess.StatusBadgeClass">@Model.CustomerSuccess.StatusLabel</span>
+                <span class="badge @Model.CustomerSuccess.ChurnRiskBadgeClass">Churn: @Model.CustomerSuccess.ChurnRiskLabel</span>
+                <span class="badge @Model.CustomerSuccess.ExpansionPotentialBadgeClass">Expansion: @Model.CustomerSuccess.ExpansionPotentialLabel</span>
+            </div>
+            <p class="small text-muted mb-0">Operasyon Sağlığı yukarıdaki karttır; bu kart ise kullanım/retention sağlığını gösterir.</p>
+        </div>
+    </div>
+}
 
 <div class="row g-4 mb-4">
     <div class="col-lg-6">

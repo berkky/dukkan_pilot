@@ -1,0 +1,133 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminCustomerSuccessViewModel
+@using DukkanPilot.Web.Models.Shared
+@{
+    ViewData["Title"] = "Customer Success Merkezi";
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Customer Success Merkezi</h2>
+        <p class="text-muted mb-0">İşletmelerin kullanım sağlığı, churn riski ve büyüme fırsatlarını takip edin.</p>
+    </div>
+    <a href="/Admin/SalesCenter" class="btn btn-sm btn-outline-primary">SalesCenter</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl"><div class="stat-card h-100"><div class="stat-label">Aktif işletme</div><div class="stat-value">@Model.TotalActiveBusinesses</div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat-card h-100"><div class="stat-label">Healthy / GrowthReady</div><div class="stat-value text-success">@Model.HealthyOrGrowthReadyCount</div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat-card h-100"><div class="stat-label">AtRisk / Critical</div><div class="stat-value text-warning">@Model.AtRiskOrCriticalCount</div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat-card h-100"><div class="stat-label">30 gün sipariş yok</div><div class="stat-value">@Model.NoOrdersLast30DaysCount</div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat-card h-100"><div class="stat-label">7 gün içinde bitiyor</div><div class="stat-value">@Model.ExpiringIn7DaysCount</div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat-card h-100"><div class="stat-label">Upgrade fırsatı</div><div class="stat-value text-primary">@Model.UpgradeOpportunityCount</div></div></div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Filtreler</h3></div>
+    <div class="panel-card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2"><label class="form-label small">Health</label><input class="form-control form-control-sm" name="status" value="@Model.StatusFilter" placeholder="Critical / Healthy" /></div>
+            <div class="col-md-2"><label class="form-label small">Churn</label><input class="form-control form-control-sm" name="churnRisk" value="@Model.ChurnRiskFilter" placeholder="Low / High" /></div>
+            <div class="col-md-2"><label class="form-label small">Expansion</label><input class="form-control form-control-sm" name="expansion" value="@Model.ExpansionFilter" placeholder="Watch / StrongFit" /></div>
+            <div class="col-md-2"><label class="form-label small">Subscription</label><input class="form-control form-control-sm" name="subscriptionStatus" value="@Model.SubscriptionFilter" placeholder="Trial / Active" /></div>
+            <div class="col-md-2"><label class="form-label small">Ara</label><input class="form-control form-control-sm" name="search" value="@Model.Search" placeholder="İşletme / slug" /></div>
+            <div class="col-md-2 d-flex gap-2">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="noOrdersLast30Days" value="true" id="fNoOrders" @(Model.NoOrdersLast30Days == true ? "checked" : null) />
+                    <label class="form-check-label small" for="fNoOrders">30 gün sipariş yok</label>
+                </div>
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="hasUpgradeRequest" value="true" id="fUpgrade" @(Model.HasUpgradeRequest == true ? "checked" : null) />
+                    <label class="form-check-label small" for="fUpgrade">Upgrade talebi</label>
+                </div>
+            </div>
+            <div class="col-12"><button type="submit" class="btn btn-sm btn-primary">Filtrele</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Today's attention list</h3></div>
+    <div class="panel-card-body">
+        @if (Model.AttentionList.Count == 0)
+        {
+            <span class="badge bg-success">Bugün kritik müdahale listesi boş</span>
+        }
+        else
+        {
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var item in Model.AttentionList)
+                {
+                    <a href="/Admin/CustomerSuccess/Details/@item.BusinessId" class="text-decoration-none">
+                        <span class="badge @item.SeverityBadgeClass">@item.BusinessName · @item.Reason</span>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">İşletmeler</h3>
+        <span class="small text-muted">@Model.Rows.Count kayıt</span>
+    </div>
+    <div class="panel-card-body p-0">
+        @if (Model.Rows.Count == 0)
+        {
+            <div class="p-4">
+                @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+                {
+                    Title = "Gösterilecek customer success kaydı yok.",
+                    Description = "Filtreleri temizleyin veya aktif işletmeleri kontrol edin.",
+                    PrimaryActionText = "İşletmeler",
+                    PrimaryActionUrl = "/Admin/Businesses"
+                })
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0 customer-success-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>İşletme</th>
+                            <th>Plan</th>
+                            <th>Health</th>
+                            <th>Churn</th>
+                            <th>Expansion</th>
+                            <th>Son sipariş</th>
+                            <th>Son aktivite</th>
+                            <th>30g sipariş</th>
+                            <th>30g ciro</th>
+                            <th>Risk</th>
+                            <th>Next action</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr class="@((row.StatusLabel == "Kritik" || row.StatusLabel == "Riskli") ? "table-warning" : null)">
+                            <td><div class="fw-semibold">@row.BusinessName</div><div class="small text-muted">@row.Slug</div></td>
+                            <td class="small"><span class="badge @row.SubscriptionStatusBadgeClass">@row.SubscriptionStatusText</span><div class="text-muted">@(row.PlanName ?? "-")</div></td>
+                            <td><span class="badge @row.StatusBadgeClass">@row.Score · @row.StatusLabel</span></td>
+                            <td><span class="badge @row.ChurnRiskBadgeClass">@row.ChurnRiskLabel</span></td>
+                            <td><span class="badge @row.ExpansionBadgeClass">@row.ExpansionLabel</span></td>
+                            <td class="small text-muted">@(row.LastOrderAtUtc?.ToLocalTime().ToString("g") ?? "-")</td>
+                            <td class="small text-muted">@(row.LastActivityAtUtc?.ToLocalTime().ToString("g") ?? "-")</td>
+                            <td>@row.OrdersLast30Days</td>
+                            <td>@row.RevenueLast30Days.ToString("N2") ₺</td>
+                            <td class="small">@(row.TopRisk ?? "-")</td>
+                            <td class="small">@(row.NextRecommendedAction ?? "-")</td>
+                            <td class="text-nowrap">
+                                <a href="/Admin/CustomerSuccess/Details/@row.BusinessId" class="btn btn-sm btn-outline-primary">Detay</a>
+                                <a href="/Admin/Businesses/Details/@row.BusinessId" class="btn btn-sm btn-outline-secondary">İşletme</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

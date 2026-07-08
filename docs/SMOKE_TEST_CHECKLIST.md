@@ -60,6 +60,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Admin/SalesCenter` | SuperAdmin | 200 | |
 | `/Admin/Onboarding` | SuperAdmin | 200 | Auth yok → 302 |
 | `/Admin/Onboarding/Details/{id}` | SuperAdmin | 200 | |
+| `/Admin/CustomerSuccess` | SuperAdmin | 200 | Auth yok → 302 |
+| `/Admin/CustomerSuccess/Details/{id}` | SuperAdmin | 200 | |
 | `/Admin/Businesses` | SuperAdmin | 200 | |
 | `/Admin/AuditLogs` | SuperAdmin | 200 | |
 | `/Admin/Notifications` | SuperAdmin | 200 | |
@@ -84,16 +86,20 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | Admin list | Platform geneli |
 | Hassas veri | Token/şifre metadata’da yok |
 
-## Demo / Sales / Onboarding
+## Demo / Sales / Onboarding / Success
 
 | URL | Beklenen |
 |-----|----------|
 | `/Demo` | Satış akışı |
 | `/Business/DemoCenter` | Skor / CTA + onboarding kart |
 | `/Business/Onboarding` | Kurulum skoru + checklist (auth yok → 302) |
+| `/Business/Success` | Health score + churn/expansion + recommendations (auth yok → 302) |
 | `/Admin/SalesCenter` | Demo-ready + onboarding-ready list |
 | `/Admin/Onboarding` | Board + Sales handoff |
+| `/Admin/CustomerSuccess` | KPI + risk/growth board |
+| `/Admin/CustomerSuccess/Details/{id}` | Risk / recommendation / usage / subscription |
 | `/Admin/SalesRequests/Details/{id}` | BusinessId varsa onboarding mini kart |
+| `/Admin/SalesRequests/Details/{id}` | BusinessId varsa customer success mini kart |
 
 ## Security / SEO
 

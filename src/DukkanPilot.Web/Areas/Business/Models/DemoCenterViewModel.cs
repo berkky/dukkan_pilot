@@ -13,6 +13,9 @@ public class DemoCenterViewModel
     public int? OnboardingScore { get; set; }
     public string? OnboardingStatusLabel { get; set; }
     public string? OnboardingBadgeClass { get; set; }
+    public int? SuccessScore { get; set; }
+    public string? SuccessStatusLabel { get; set; }
+    public string? SuccessBadgeClass { get; set; }
 }
 
 public class DemoCenterCheckViewModel

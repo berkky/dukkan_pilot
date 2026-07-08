@@ -18,6 +18,7 @@ Satış talebi **Won** olduktan sonra müşteriyi kuruluma alma ve ilk değeri g
 3. Go-live tarihini netleştirin.
 4. BusinessOwner’a `/Business/Onboarding` gösterin.
 5. Public menü + QR afiş + test sipariş “aha moment”ini birlikte yapın.
+6. Go-live sonrası `Business/Success` ve `Admin/CustomerSuccess` ile health takibine geçin.
 
 ## İşletme bilgileri
 
@@ -57,6 +58,7 @@ Satış talebi **Won** olduktan sonra müşteriyi kuruluma alma ve ilk değeri g
 
 - Admin Onboarding Board: düşük skor / ürün yok / sipariş yok filtreleri.
 - Customer success: `docs/CUSTOMER_SUCCESS_PLAYBOOK.md`.
+- Kullanım başladıktan sonra health score, churn risk ve expansion sinyallerini izleyin.
 
 ## Aha moment
 

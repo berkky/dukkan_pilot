@@ -100,3 +100,9 @@
     align-items: center;
     gap: 0.35rem;
 }
+
+/* 31B — Customer Success */
+.customer-success-table th {
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
