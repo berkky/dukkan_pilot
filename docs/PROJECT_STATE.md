@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 32B (Public Menü + Mobil Web Final Polish) tamamlandı.
+> Son güncelleme: 33A (Manual Payment / Invoice / Subscription Operations) tamamlandı.
 
 ---
 
@@ -627,6 +627,16 @@ DukkanPilot.sln
 - Docs: PUBLIC_MENU_UX_GUIDE, MOBILE_WEB_POLISH_CHECKLIST, PUBLIC_ORDER_UAT_SCRIPT
 - Migration yok; Entity/DbContext değişmedi; NuGet yok; public order güvenliği/price validation korunur
 
+### 33A — Manual Payment / Invoice / Subscription Operations
+- Yeni tablolar: `BillingInvoices`, `BillingPayments` (manuel tahsilat takibi; resmi belge değildir)
+- Admin: `/Admin/Billing` (Index/KPI), CreateInvoice, Details, RecordPayment, Payments, Cancel
+- Business (Owner-only, read-only): `/Business/Billing/Invoices`, `/Business/Billing/Payments`
+- Audit: `Billing.InvoiceCreated`, `Billing.PaymentRecorded`, `Billing.InvoiceCancelled`
+- Notification: `BillingInvoiceCreated`, `BillingPaymentRecorded`, `BillingInvoicePaid`
+- SalesRequests Won entegrasyonu: Details ekranında tahsilat CTA
+- SalesCenter + Admin Dashboard + Operations + Quality + CustomerSuccess: billing snapshot/risk sinyalleri
+- Migration: `AddManualBillingOperations` (yalnızca iki yeni tablo)
+
 ---
 
 ## 6. Veritabanı
@@ -635,7 +645,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`), `AddManualBillingOperations` (`20260708170630`) |
 
 ### Seed verisi
 

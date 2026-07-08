@@ -1,0 +1,123 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminBillingRecordPaymentViewModel
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = "Ödeme Kaydı";
+    ViewData["Subtitle"] = "Manuel tahsilat";
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Ödeme Kaydı</h2>
+        <p class="text-muted mb-0">Manuel ödeme kaydı (resmi belge değildir).</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Admin/Billing" class="btn btn-outline-secondary btn-sm">Billing</a>
+        @if (Model.BillingInvoiceId.HasValue)
+        {
+            <a href="/Admin/Billing/Details/@Model.BillingInvoiceId" class="btn btn-outline-primary btn-sm">Invoice detay</a>
+        }
+    </div>
+</div>
+
+<div class="alert alert-light border small mb-4">
+    Ödeme kaydı <strong>aboneliği otomatik uzatmaz</strong>. Gerekirse abonelik ekranından ayrıca güncelleyin.
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <form method="post" action="/Admin/Billing/RecordPayment">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="BillingInvoiceId" value="@(Model.BillingInvoiceId?.ToString() ?? "")" />
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">İşletme</label>
+                    @if (Model.BillingInvoiceId.HasValue)
+                    {
+                        <select class="form-select" name="BusinessId" asp-for="BusinessId" disabled="disabled">
+                            <option value="0">Seçin...</option>
+                            @foreach (var b in Model.Businesses)
+                            {
+                                <option value="@b.Id" selected="@(Model.BusinessId == b.Id)">@b.Name</option>
+                            }
+                        </select>
+                        <input type="hidden" name="BusinessId" value="@Model.BusinessId" />
+                    }
+                    else
+                    {
+                        <select class="form-select" name="BusinessId" asp-for="BusinessId">
+                            <option value="0">Seçin...</option>
+                            @foreach (var b in Model.Businesses)
+                            {
+                                <option value="@b.Id" selected="@(Model.BusinessId == b.Id)">@b.Name</option>
+                            }
+                        </select>
+                    }
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.BusinessId)</span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Invoice</label>
+                    <input class="form-control" value="@(Model.InvoiceNumber ?? "-")" readonly />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tutar</label>
+                    <input class="form-control" asp-for="Amount" name="Amount" />
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.Amount)</span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Currency</label>
+                    <input class="form-control" asp-for="Currency" name="Currency" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ödeme tarihi</label>
+                    <input type="date" class="form-control" asp-for="PaymentDate" name="PaymentDate" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Method</label>
+                    <select class="form-select" asp-for="Method" name="Method">
+                        <option value="BankTransfer">Havale/EFT</option>
+                        <option value="Cash">Nakit</option>
+                        <option value="Manual">Manuel</option>
+                        <option value="Other">Diğer</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" asp-for="Status" name="Status">
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Failed">Failed</option>
+                        <option value="Refunded">Refunded</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Reference (opsiyonel)</label>
+                    <input class="form-control" asp-for="ReferenceNumber" name="ReferenceNumber" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">PayerName (opsiyonel)</label>
+                    <input class="form-control" asp-for="PayerName" name="PayerName" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Business görünür not (opsiyonel)</label>
+                    <textarea class="form-control" asp-for="BusinessVisibleNote" name="BusinessVisibleNote" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Admin notu (opsiyonel)</label>
+                    <textarea class="form-control" asp-for="AdminNotes" name="AdminNotes" rows="2"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a href="/Admin/Billing" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+

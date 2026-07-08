@@ -1,0 +1,102 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminBillingCreateInvoiceViewModel
+@{
+    ViewData["Title"] = "Yeni Tahsilat Kaydı";
+    ViewData["Subtitle"] = "Resmi fatura değildir";
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Yeni Tahsilat Kaydı</h2>
+        <p class="text-muted mb-0">Bu kayıt resmi e-Fatura/e-Arşiv/e-Belge yerine geçmez.</p>
+    </div>
+    <a href="/Admin/Billing" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+</div>
+
+<div class="alert alert-light border small mb-4">
+    <strong>Hukuki/Mali not:</strong> Bu ekran iç tahsilat takibi içindir. Resmi fatura/e-Belge süreçleri muhasebe/mali müşavir kanalından yürütülmelidir.
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body">
+        <form method="post" action="/Admin/Billing/CreateInvoice">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">İşletme</label>
+                    <select class="form-select" name="BusinessId" asp-for="BusinessId">
+                        <option value="0">Seçin...</option>
+                        @foreach (var b in Model.Businesses)
+                        {
+                            <option value="@b.Id" selected="@(Model.BusinessId == b.Id)">@b.Name</option>
+                        }
+                    </select>
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.BusinessId)</span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Related SalesRequestId (opsiyonel)</label>
+                    <input class="form-control" asp-for="RelatedSalesRequestId" name="RelatedSalesRequestId" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Başlık</label>
+                    <input class="form-control" asp-for="Title" name="Title" />
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.Title)</span>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Açıklama (opsiyonel)</label>
+                    <textarea class="form-control" asp-for="Description" name="Description" rows="2"></textarea>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tutar (KDV hariç)</label>
+                    <input class="form-control" asp-for="Amount" name="Amount" />
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.Amount)</span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Vergi/KDV (opsiyonel)</label>
+                    <input class="form-control" asp-for="TaxAmount" name="TaxAmount" />
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.TaxAmount)</span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Currency</label>
+                    <input class="form-control" asp-for="Currency" name="Currency" />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Kesim tarihi</label>
+                    <input type="date" class="form-control" asp-for="IssueDate" name="IssueDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Vade tarihi</label>
+                    <input type="date" class="form-control" asp-for="DueDate" name="DueDate" />
+                    <span class="text-danger small">@Html.ValidationMessageFor(m => m.DueDate)</span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Dönem başlangıç (opsiyonel)</label>
+                    <input type="date" class="form-control" asp-for="PeriodStart" name="PeriodStart" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dönem bitiş (opsiyonel)</label>
+                    <input type="date" class="form-control" asp-for="PeriodEnd" name="PeriodEnd" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Business görünür not (opsiyonel)</label>
+                    <textarea class="form-control" asp-for="BusinessVisibleNote" name="BusinessVisibleNote" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Admin notu (opsiyonel)</label>
+                    <textarea class="form-control" asp-for="AdminNotes" name="AdminNotes" rows="2"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a href="/Admin/Billing" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+

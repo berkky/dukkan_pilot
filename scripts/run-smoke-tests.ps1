@@ -160,11 +160,15 @@ Test-Url "AuthRedirects" "/Business/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/Onboarding" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/Success" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/Billing/Requests" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Business/Billing/Invoices" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Business/Billing/Payments" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/SalesRequests" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Onboarding" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/CustomerSuccess" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Operations" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Admin/Billing" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Admin/Billing/Payments" @(302, 301) "Auth redirect"
 
 $results | Sort-Object Group, Path | Format-Table -AutoSize Group, Path, Expected, Actual, Status, Note
 

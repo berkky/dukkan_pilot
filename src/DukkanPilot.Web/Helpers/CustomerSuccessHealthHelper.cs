@@ -127,6 +127,17 @@ public class CustomerSuccessHealthHelper
         var criticalNotificationCount = await _context.Notifications
             .CountAsync(n => n.BusinessId == businessId && !n.IsRead && n.Severity == "Critical", cancellationToken);
 
+        var billingInvoices = await _context.BillingInvoices
+            .AsNoTracking()
+            .Where(i => i.BusinessId == businessId && i.Status != "Cancelled")
+            .Select(i => new { i.Status, i.PaymentStatus, i.TotalAmount })
+            .ToListAsync(cancellationToken);
+
+        var overdueInvoiceCount = billingInvoices.Count(i => i.Status == "Overdue");
+        var openInvoiceAmount = billingInvoices
+            .Where(i => i.PaymentStatus != "Paid" && i.PaymentStatus != "Cancelled")
+            .Sum(i => i.TotalAmount);
+
         DateTime? lastActivityAt = lastOrderAt;
         if (lastAuditAt.HasValue && (!lastActivityAt.HasValue || lastAuditAt > lastActivityAt))
         {
@@ -221,6 +232,8 @@ public class CustomerSuccessHealthHelper
         if (criticalNotificationCount > 0) riskPenalty += 5;
         if (!hasAudit) riskPenalty += 3;
         if (!publicMenuReady) riskPenalty += 8;
+        if (overdueInvoiceCount > 0) riskPenalty += 10;
+        else if (openInvoiceAmount > 0) riskPenalty += 4;
 
         var rawScore = usageScore + menuScore + engagementScore + revenueScore + subscriptionScore + adoptionScore + growthBonus - riskPenalty;
         var score = Math.Clamp(rawScore, 0, 100);
@@ -271,6 +284,16 @@ public class CustomerSuccessHealthHelper
         if (!publicMenuReady)
         {
             riskSignals.Add(CreateSignal("menu-not-ready", "Public menü", "Eksik", false, "warning", "Slug, kategori veya ürün eksik."));
+        }
+        if (overdueInvoiceCount > 0)
+        {
+            riskSignals.Add(CreateSignal("billing-overdue", "Tahsilat riski", $"{overdueInvoiceCount} gecikmiş", false, "critical", "Gecikmiş tahsilat kaydı var. Ödeme durumunu kontrol edin."));
+            recommendations.Add(CreateRecommendation("Ödeme durumunu kontrol edin", "Gecikmiş tahsilat kaydı bulunuyor. Ödeme ve abonelik durumunu netleştirin.", "danger", "/Business/Billing/Invoices", "Tahsilat Kayıtları", "billing", true));
+        }
+        else if (openInvoiceAmount > 0)
+        {
+            riskSignals.Add(CreateSignal("billing-open", "Açık tahsilat", openInvoiceAmount.ToString("N2"), false, "warning", "Ödenmemiş/kısmi tahsilat kaydı mevcut."));
+            recommendations.Add(CreateRecommendation("Tahsilat kayıtlarını kontrol edin", "Ödenmemiş veya kısmi tahsilat kayıtlarınız var. Vade ve ödeme durumunu kontrol edin.", "warning", "/Business/Billing/Invoices", "Tahsilat Kayıtları", "billing", false));
         }
         if (!engagementRecent)
         {

@@ -1,0 +1,114 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminBillingPaymentsViewModel
+@using DukkanPilot.Web.Helpers
+@using System.Globalization
+@{
+    ViewData["Title"] = "Ödemeler";
+    ViewData["Subtitle"] = "Manuel tahsilat kayıtları";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Ödemeler</h2>
+        <p class="text-muted mb-0">Bu ekran iç tahsilat takibi içindir (resmi belge değildir).</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Admin/Billing" class="btn btn-outline-secondary btn-sm">Billing</a>
+        <a href="/Admin/Billing/RecordPayment" class="btn btn-primary btn-sm">Yeni ödeme</a>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h3 class="h6 mb-0">Filtreler</h3>
+        <a class="btn btn-sm btn-outline-secondary" href="/Admin/Billing/Payments">Sıfırla</a>
+    </div>
+    <div class="panel-card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">İşletme</label>
+                <select class="form-select form-select-sm" name="businessId">
+                    <option value="">Tümü</option>
+                    @foreach (var b in Model.Businesses)
+                    {
+                        <option value="@b.Id" selected="@(Model.BusinessId == b.Id)">@b.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Method</label>
+                <input class="form-control form-control-sm" name="method" value="@Model.Method" placeholder="BankTransfer/Cash..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Status</label>
+                <input class="form-control form-control-sm" name="status" value="@Model.Status" placeholder="Confirmed/Pending..." />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">From</label>
+                <input type="date" class="form-control form-control-sm" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">To</label>
+                <input type="date" class="form-control form-control-sm" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-sm btn-primary w-100">Uygula</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Payment listesi</h3>
+        <span class="badge bg-light text-dark border">@Model.Payments.Count kayıt</span>
+    </div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Tarih</th>
+                    <th>BusinessId</th>
+                    <th>InvoiceId</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th class="text-end">Tutar</th>
+                    <th>Ref</th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Payments.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Kayıt yok.</td></tr>
+                }
+                else
+                {
+                    foreach (var p in Model.Payments)
+                    {
+                        <tr>
+                            <td class="small">@p.PaymentDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</td>
+                            <td class="small">#@p.BusinessId</td>
+                            <td class="small">
+                                @if (p.BillingInvoiceId.HasValue)
+                                {
+                                    <a href="/Admin/Billing/Details/@p.BillingInvoiceId.Value">#@p.BillingInvoiceId</a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="small">@BillingDisplayHelper.GetPaymentMethodLabel(p.Method)</td>
+                            <td class="small"><span class="badge bg-light text-dark border">@p.Status</span></td>
+                            <td class="text-end fw-semibold">@BillingDisplayHelper.FormatMoney(p.Amount, p.Currency)</td>
+                            <td class="small text-muted">@(!string.IsNullOrWhiteSpace(p.ReferenceNumber) ? p.ReferenceNumber : "-")</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

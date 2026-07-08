@@ -1,0 +1,62 @@
+@model DukkanPilot.Web.Areas.Business.Models.BusinessBillingLedgerViewModel
+@using DukkanPilot.Web.Helpers
+@using System.Globalization
+@{
+    ViewData["Title"] = "Ödeme Kayıtlarım";
+    ViewData["Subtitle"] = "İç tahsilat takibi";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Ödeme Kayıtlarım</h2>
+        <p class="text-muted mb-0">Ödeme/tahsilat takip kayıtları (resmi belge değildir).</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Business/Billing/Invoices" class="btn btn-outline-primary btn-sm">Invoices</a>
+        <a href="/Business/Billing" class="btn btn-outline-secondary btn-sm">Abonelik</a>
+    </div>
+</div>
+
+<div class="alert alert-light border small mb-4">@Model.DisclaimerText</div>
+
+<div class="panel-card">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Payments</h3></div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Tarih</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th class="text-end">Tutar</th>
+                    <th>Ref</th>
+                    <th>Not</th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Payments.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Kayıt yok.</td></tr>
+                }
+                else
+                {
+                    foreach (var p in Model.Payments)
+                    {
+                        <tr>
+                            <td class="small">@p.PaymentDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</td>
+                            <td class="small">@BillingDisplayHelper.GetPaymentMethodLabel(p.Method)</td>
+                            <td class="small"><span class="badge bg-light text-dark border">@p.Status</span></td>
+                            <td class="text-end fw-semibold">@BillingDisplayHelper.FormatMoney(p.Amount, p.Currency)</td>
+                            <td class="small text-muted">@(!string.IsNullOrWhiteSpace(p.ReferenceNumber) ? p.ReferenceNumber : "-")</td>
+                            <td class="small text-muted">@(!string.IsNullOrWhiteSpace(p.BusinessVisibleNote) ? p.BusinessVisibleNote : "-")</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

@@ -102,6 +102,9 @@ $required = @(
     "docs\RETENTION_PLAYBOOK.md",
     "docs\UPGRADE_OPPORTUNITY_PLAYBOOK.md",
     "docs\CHURN_RISK_RUNBOOK.md",
+    "docs\MANUAL_BILLING_RUNBOOK.md",
+    "docs\BILLING_OPERATIONS_DATA_MAP.md",
+    "docs\MANUAL_PAYMENT_UAT_SCRIPT.md",
     "src\DukkanPilot.Web\Helpers\CustomerOnboardingHelper.cs",
     "src\DukkanPilot.Web\Helpers\CustomerSuccessHealthHelper.cs",
     "src\DukkanPilot.Web\Areas\Business\Controllers\OnboardingController.cs",
@@ -135,7 +138,20 @@ $required = @(
     "src\DukkanPilot.Core\Entities\SalesRequest.cs",
     "src\DukkanPilot.Web\Controllers\SalesRequestController.cs",
     "src\DukkanPilot.Web\Services\SalesRequestService.cs",
-    "src\DukkanPilot.Web\Areas\Admin\Controllers\SalesRequestsController.cs"
+    "src\DukkanPilot.Web\Areas\Admin\Controllers\SalesRequestsController.cs",
+    "src\DukkanPilot.Core\Entities\BillingInvoice.cs",
+    "src\DukkanPilot.Core\Entities\BillingPayment.cs",
+    "src\DukkanPilot.Web\Services\BillingOperationsService.cs",
+    "src\DukkanPilot.Web\Helpers\BillingDisplayHelper.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Controllers\BillingController.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Models\AdminBillingViewModel.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Billing\Index.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Billing\CreateInvoice.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Billing\Details.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Billing\RecordPayment.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Billing\Payments.cshtml",
+    "src\DukkanPilot.Web\Areas\Business\Views\Billing\Invoices.cshtml",
+    "src\DukkanPilot.Web\Areas\Business\Views\Billing\Payments.cshtml"
 )
 
 foreach ($rel in $required) {

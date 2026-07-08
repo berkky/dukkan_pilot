@@ -178,5 +178,59 @@
                 </div>
             </div>
         }
+        else if (string.Equals(Model.Status, "Won", StringComparison.OrdinalIgnoreCase) && Model.BusinessId.HasValue)
+        {
+            <div class="panel-card mt-4 border-warning">
+                <div class="panel-card-header"><h3 class="h6 mb-0">Tahsilat operasyonu</h3></div>
+                <div class="panel-card-body">
+                    <p class="small text-muted mb-2">
+                        Bu talep kazanıldı. Manuel tahsilat kaydı oluşturabilirsiniz (resmi fatura değildir).
+                    </p>
+                    <a class="btn btn-sm btn-warning"
+                       href="/Admin/Billing/CreateInvoice?businessId=@Model.BusinessId&salesRequestId=@Model.Id">
+                        Bu talep için tahsilat kaydı oluştur
+                    </a>
+                </div>
+            </div>
+        }
+
+        @if (Model.RelatedBillingInvoices.Count > 0)
+        {
+            <div class="panel-card mt-4">
+                <div class="panel-card-header"><h3 class="h6 mb-0">İlişkili tahsilat kayıtları</h3></div>
+                <div class="panel-card-body p-0">
+                    <p class="small text-muted px-3 pt-3 mb-2">İç operasyon kayıtlarıdır; resmi e-Fatura/e-Arşiv belgesi değildir.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kayıt No</th>
+                                    <th>Başlık</th>
+                                    <th>Toplam</th>
+                                    <th>Vade</th>
+                                    <th>Durum</th>
+                                    <th>Ödeme</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var inv in Model.RelatedBillingInvoices)
+                                {
+                                    <tr>
+                                        <td><code>@inv.InvoiceNumber</code></td>
+                                        <td>@inv.Title</td>
+                                        <td>@BillingDisplayHelper.FormatMoney(inv.TotalAmount, inv.Currency)</td>
+                                        <td>@inv.DueDate.ToString("dd.MM.yyyy")</td>
+                                        <td><span class="badge @BillingDisplayHelper.GetInvoiceStatusBadgeClass(inv.Status)">@BillingDisplayHelper.GetInvoiceStatusLabel(inv.Status)</span></td>
+                                        <td><span class="badge @BillingDisplayHelper.GetPaymentStatusBadgeClass(inv.PaymentStatus)">@BillingDisplayHelper.GetPaymentStatusLabel(inv.PaymentStatus)</span></td>
+                                        <td><a href="/Admin/Billing/Details/@inv.Id" class="btn btn-sm btn-outline-primary">Detay</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>

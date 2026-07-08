@@ -19,6 +19,9 @@
 - [ ] Plan/talep ihtiyacı varsa `/Business/Billing` veya public `/Sales/RequestPlan`
 - [ ] Admin satış taleplerini `/Admin/SalesRequests` ile takip
 - [ ] Admin Kurulum Takibi (`/Admin/Onboarding`) — skor / risk / Won handoff
+- [ ] Won talep sonrası Admin Billing (`/Admin/Billing`) — iç tahsilat kaydı oluştur (resmi fatura değil)
+- [ ] Manuel ödeme kaydı gir (`/Admin/Billing/RecordPayment`) — abonelik otomatik uzamaz; gerekirse `/Admin/Businesses` abonelik düzenle
+- [ ] İşletme sahibi tahsilat geçmişini `/Business/Billing/Invoices` üzerinden görebilir (Owner-only)
 
 ## Müşteriye eğitim (30 dk)
 1. Public menü + sepet
@@ -36,5 +39,6 @@
 - [ ] Admin Onboarding Board’da skor yükseldi mi?
 
 ## Not
-Hukuki/KVKK metinleri bu checklist’te yok (30A). Ödeme entegrasyonu yok.
-Onboarding runbook: `docs/CUSTOMER_ONBOARDING_RUNBOOK.md`.
+Hukuki/KVKK metinleri bu checklist’te yok (30A). Gerçek ödeme sağlayıcısı / kart tahsilatı yok (33A).
+DukkanPilot iç tahsilat kayıtları resmi e-Fatura/e-Arşiv değildir; muhasebe süreci ayrı yürütülmelidir.
+Onboarding runbook: `docs/CUSTOMER_ONBOARDING_RUNBOOK.md`. Tahsilat runbook: `docs/MANUAL_BILLING_RUNBOOK.md`.

@@ -66,6 +66,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Admin/AuditLogs` | SuperAdmin | 200 | |
 | `/Admin/Notifications` | SuperAdmin | 200 | |
 | SalesCenter | Owner | AccessDenied | |
+| `/Admin/Billing` | SuperAdmin | 200 | Auth yok → 302 |
+| `/Admin/Billing/Payments` | SuperAdmin | 200 | Auth yok → 302 |
+
+## Billing (BusinessOwner)
+
+| URL | Rol | Beklenen | Not |
+|-----|-----|----------|-----|
+| `/Business/Billing/Invoices` | Owner | 200 | Auth yok → 302; read-only; resmi belge değildir uyarısı |
+| `/Business/Billing/Payments` | Owner | 200 | Auth yok → 302; read-only |
 
 ## Sipariş / kampanya
 

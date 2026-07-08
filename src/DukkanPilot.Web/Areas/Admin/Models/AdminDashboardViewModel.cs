@@ -29,6 +29,10 @@ public class AdminDashboardViewModel
     public int CustomerSuccessAtRiskCount { get; set; }
 
     public int CustomerSuccessHealthyCount { get; set; }
+
+    public decimal BillingOpenAmount { get; set; }
+    public int BillingOverdueCount { get; set; }
+    public decimal BillingPaidThisMonth { get; set; }
 }
 
 public class AdminPlatformKpiViewModel

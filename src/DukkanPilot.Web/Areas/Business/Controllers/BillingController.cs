@@ -96,6 +96,102 @@ public class BillingController : BusinessBaseController
         return View(model);
     }
 
+    [HttpGet("Invoices")]
+    [Authorize(Roles = nameof(UserRole.BusinessOwner))]
+    public async Task<IActionResult> Invoices(CancellationToken cancellationToken)
+    {
+        ViewData["ActiveMenu"] = "billing-invoices";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var invoices = await _context.BillingInvoices
+            .AsNoTracking()
+            .Where(i => i.BusinessId == businessId && i.Status != "Cancelled")
+            .OrderByDescending(i => i.CreatedAtUtc)
+            .Take(200)
+            .ToListAsync(cancellationToken);
+
+        var payments = await _context.BillingPayments
+            .AsNoTracking()
+            .Where(p => p.BusinessId == businessId && p.Status == "Confirmed")
+            .OrderByDescending(p => p.PaymentDate)
+            .Take(200)
+            .ToListAsync(cancellationToken);
+
+        var summary = await _context.BillingInvoices
+            .AsNoTracking()
+            .Where(i => i.BusinessId == businessId && i.Status != "Cancelled")
+            .Select(i => new { i.TotalAmount, i.Status, i.PaymentStatus, i.DueDate })
+            .ToListAsync(cancellationToken);
+
+        var openAmount = summary.Where(i => i.PaymentStatus != "Paid" && i.PaymentStatus != "Cancelled").Sum(i => i.TotalAmount);
+        var overdueAmount = summary.Where(i => i.Status == "Overdue").Sum(i => i.TotalAmount);
+        var nextDue = summary
+            .Where(i => i.PaymentStatus != "Paid" && i.PaymentStatus != "Cancelled")
+            .OrderBy(i => i.DueDate)
+            .Select(i => (DateTime?)i.DueDate)
+            .FirstOrDefault();
+
+        return View(new Areas.Business.Models.BusinessBillingLedgerViewModel
+        {
+            OpenAmount = openAmount,
+            OverdueAmount = overdueAmount,
+            PaidThisMonth = payments.Where(p => p.PaymentDate >= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1)).Sum(p => p.Amount),
+            NextDueDateUtc = nextDue,
+            Invoices = invoices,
+            Payments = payments
+        });
+    }
+
+    [HttpGet("Payments")]
+    [Authorize(Roles = nameof(UserRole.BusinessOwner))]
+    public async Task<IActionResult> Payments(CancellationToken cancellationToken)
+    {
+        ViewData["ActiveMenu"] = "billing-payments";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var invoices = await _context.BillingInvoices
+            .AsNoTracking()
+            .Where(i => i.BusinessId == businessId && i.Status != "Cancelled")
+            .OrderByDescending(i => i.CreatedAtUtc)
+            .Take(50)
+            .ToListAsync(cancellationToken);
+
+        var payments = await _context.BillingPayments
+            .AsNoTracking()
+            .Where(p => p.BusinessId == businessId && p.Status == "Confirmed")
+            .OrderByDescending(p => p.PaymentDate)
+            .Take(200)
+            .ToListAsync(cancellationToken);
+
+        var openAmount = invoices.Where(i => i.PaymentStatus != "Paid" && i.PaymentStatus != "Cancelled").Sum(i => i.TotalAmount);
+        var overdueAmount = invoices.Where(i => i.Status == "Overdue").Sum(i => i.TotalAmount);
+        var nextDue = invoices
+            .Where(i => i.PaymentStatus != "Paid" && i.PaymentStatus != "Cancelled")
+            .OrderBy(i => i.DueDate)
+            .Select(i => (DateTime?)i.DueDate)
+            .FirstOrDefault();
+
+        return View(new Areas.Business.Models.BusinessBillingLedgerViewModel
+        {
+            OpenAmount = openAmount,
+            OverdueAmount = overdueAmount,
+            PaidThisMonth = payments.Where(p => p.PaymentDate >= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1)).Sum(p => p.Amount),
+            NextDueDateUtc = nextDue,
+            Invoices = invoices,
+            Payments = payments
+        });
+    }
+
     [HttpGet("RequestUpgrade/{planId:int}")]
     [Authorize(Roles = nameof(UserRole.BusinessOwner))]
     public async Task<IActionResult> RequestUpgrade(int planId)

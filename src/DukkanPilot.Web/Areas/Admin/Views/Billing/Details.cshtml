@@ -1,0 +1,145 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminBillingDetailsViewModel
+@using DukkanPilot.Web.Helpers
+@using System.Globalization
+@{
+    ViewData["Title"] = $"Invoice {Model.Invoice.InvoiceNumber}";
+    ViewData["Subtitle"] = Model.BusinessName;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@Model.Invoice.InvoiceNumber</h2>
+        <p class="text-muted mb-0">@Model.BusinessName · İç tahsilat kaydı (resmi belge değildir)</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="/Admin/Billing">Liste</a>
+        <a class="btn btn-primary btn-sm" href="/Admin/Billing/RecordPayment?invoiceId=@Model.Invoice.Id">Ödeme kaydı</a>
+        <form method="post" action="/Admin/Billing/CancelInvoice/@Model.Invoice.Id" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tahsilat kaydı iptal edilsin mi?')">İptal</button>
+        </form>
+        <a class="btn btn-outline-dark btn-sm" href="/Admin/Businesses/Details/@Model.Invoice.BusinessId">İşletme</a>
+    </div>
+</div>
+
+<div class="alert alert-light border small mb-4">@Model.DisclaimerText</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h3 class="h6 mb-0">Invoice detay</h3>
+                <div class="d-flex gap-2">
+                    <span class="badge @BillingDisplayHelper.GetInvoiceStatusBadgeClass(Model.Invoice.Status)">@BillingDisplayHelper.GetInvoiceStatusLabel(Model.Invoice.Status)</span>
+                    <span class="badge @BillingDisplayHelper.GetPaymentStatusBadgeClass(Model.Invoice.PaymentStatus)">@BillingDisplayHelper.GetPaymentStatusLabel(Model.Invoice.PaymentStatus)</span>
+                </div>
+            </div>
+            <div class="panel-card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Başlık</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.Invoice.Title</dd>
+
+                    <dt class="col-sm-4">Kesim / Vade</dt>
+                    <dd class="col-sm-8">
+                        @Model.Invoice.IssueDate.ToLocalTime().ToString("dd.MM.yyyy", culture)
+                        ·
+                        @Model.Invoice.DueDate.ToLocalTime().ToString("dd.MM.yyyy", culture)
+                        <span class="text-muted small ms-2">(@BillingDisplayHelper.GetDueStatusText(Model.Invoice.DueDate))</span>
+                    </dd>
+
+                    <dt class="col-sm-4">Tutar</dt>
+                    <dd class="col-sm-8">
+                        <div>Ara: @BillingDisplayHelper.FormatMoney(Model.Invoice.Amount, Model.Invoice.Currency)</div>
+                        @if (Model.Invoice.TaxAmount.HasValue && Model.Invoice.TaxAmount.Value > 0)
+                        {
+                            <div>Vergi: @BillingDisplayHelper.FormatMoney(Model.Invoice.TaxAmount.Value, Model.Invoice.Currency)</div>
+                        }
+                        <div class="fw-semibold">Toplam: @BillingDisplayHelper.FormatMoney(Model.Invoice.TotalAmount, Model.Invoice.Currency)</div>
+                    </dd>
+
+                    <dt class="col-sm-4">Ödenen / Kalan</dt>
+                    <dd class="col-sm-8">
+                        <div>Ödenen: @BillingDisplayHelper.FormatMoney(Model.PaidAmount, Model.Invoice.Currency)</div>
+                        <div>Kalan: @BillingDisplayHelper.FormatMoney(Model.RemainingAmount, Model.Invoice.Currency)</div>
+                    </dd>
+
+                    <dt class="col-sm-4">Business notu</dt>
+                    <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Invoice.BusinessVisibleNote) ? Model.Invoice.BusinessVisibleNote : "-")</dd>
+
+                    <dt class="col-sm-4">Admin notu</dt>
+                    <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Invoice.AdminNotes) ? Model.Invoice.AdminNotes : "-")</dd>
+
+                    <dt class="col-sm-4">Kaynak</dt>
+                    <dd class="col-sm-8 small text-muted">@Model.Invoice.Source</dd>
+
+                    <dt class="col-sm-4">SalesRequest</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Invoice.RelatedSalesRequestId.HasValue)
+                        {
+                            <a href="/Admin/SalesRequests/Details/@Model.Invoice.RelatedSalesRequestId.Value">#@Model.Invoice.RelatedSalesRequestId</a>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Ödemeler</h3>
+                <a class="btn btn-sm btn-outline-primary" href="/Admin/Billing/RecordPayment?invoiceId=@Model.Invoice.Id">Ödeme ekle</a>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th class="text-end">Tutar</th>
+                            <th>Ref</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.Payments.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-4">Ödeme kaydı yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var p in Model.Payments)
+                            {
+                                <tr>
+                                    <td class="small">@p.PaymentDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</td>
+                                    <td class="small">@BillingDisplayHelper.GetPaymentMethodLabel(p.Method)</td>
+                                    <td class="small"><span class="badge bg-light text-dark border">@p.Status</span></td>
+                                    <td class="text-end fw-semibold">@BillingDisplayHelper.FormatMoney(p.Amount, p.Currency)</td>
+                                    <td class="small text-muted">@(!string.IsNullOrWhiteSpace(p.ReferenceNumber) ? p.ReferenceNumber : "-")</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Operasyon notu</h3></div>
+            <div class="panel-card-body small">
+                Ödeme kaydı <strong>aboneliği otomatik uzatmaz</strong>.
+                Gerekirse abonelik ekranından ayrıca güncelleyin:
+                <div class="mt-2">
+                    <a class="btn btn-sm btn-outline-secondary" href="/Admin/Businesses/Details/@Model.Invoice.BusinessId">İşletme → Abonelik</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

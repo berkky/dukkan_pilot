@@ -54,9 +54,11 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] `/Account/Login`
 - [ ] Owner: Business Dashboard + DemoCenter + Onboarding + Success
 - [ ] SuperAdmin: Admin Dashboard + SalesCenter + Onboarding + CustomerSuccess
+- [ ] SuperAdmin: Admin Billing (`/Admin/Billing`) + Payments (`/Admin/Billing/Payments`)
 - [ ] Onboarding routes smoke: `/Business/Onboarding` `/Admin/Onboarding` (auth yok → 302)
 - [ ] Success routes smoke: `/Business/Success` `/Admin/CustomerSuccess` (auth yok → 302)
 - [ ] Quality Center: `/Admin/Quality` (SuperAdmin)
+- [ ] BusinessOwner: Billing ledger (`/Business/Billing/Invoices`, `/Business/Billing/Payments`)
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`

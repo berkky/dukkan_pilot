@@ -28,6 +28,8 @@ public class AppDbContext : DbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<SalesRequest> SalesRequests => Set<SalesRequest>();
+    public DbSet<BillingInvoice> BillingInvoices => Set<BillingInvoice>();
+    public DbSet<BillingPayment> BillingPayments => Set<BillingPayment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +54,8 @@ public class AppDbContext : DbContext
         ConfigureAuditLog(modelBuilder);
         ConfigureNotification(modelBuilder);
         ConfigureSalesRequest(modelBuilder);
+        ConfigureBillingInvoice(modelBuilder);
+        ConfigureBillingPayment(modelBuilder);
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)
@@ -241,6 +245,60 @@ public class AppDbContext : DbContext
                 .WithMany(p => p.OrderItems)
                 .HasForeignKey(e => e.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    private static void ConfigureBillingInvoice(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BillingInvoice>(entity =>
+        {
+            entity.Property(e => e.InvoiceNumber).HasMaxLength(60).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.Currency).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(30).IsRequired();
+            entity.Property(e => e.PaymentStatus).HasMaxLength(30).IsRequired();
+            entity.Property(e => e.Source).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.AdminNotes).HasMaxLength(2000);
+            entity.Property(e => e.BusinessVisibleNote).HasMaxLength(2000);
+            entity.Property(e => e.OfficialInvoiceReference).HasMaxLength(200);
+            entity.Property(e => e.CreatedByUserEmail).HasMaxLength(256);
+            entity.Property(e => e.MetadataJson).HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.BusinessId, e.Status });
+            entity.HasIndex(e => new { e.BusinessId, e.PaymentStatus });
+            entity.HasIndex(e => e.DueDate);
+            entity.HasIndex(e => e.InvoiceNumber);
+            entity.HasIndex(e => e.RelatedSalesRequestId);
+        });
+    }
+
+    private static void ConfigureBillingPayment(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BillingPayment>(entity =>
+        {
+            entity.Property(e => e.Currency).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.Method).HasMaxLength(30).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(30).IsRequired();
+            entity.Property(e => e.ReferenceNumber).HasMaxLength(100);
+            entity.Property(e => e.PayerName).HasMaxLength(200);
+            entity.Property(e => e.AdminNotes).HasMaxLength(2000);
+            entity.Property(e => e.BusinessVisibleNote).HasMaxLength(2000);
+            entity.Property(e => e.RecordedByUserEmail).HasMaxLength(256);
+            entity.Property(e => e.MetadataJson).HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
+            entity.HasIndex(e => e.BillingInvoiceId);
+            entity.HasIndex(e => e.PaymentDate);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.Method);
         });
     }
 

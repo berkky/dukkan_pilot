@@ -149,6 +149,22 @@ public class SalesRequestsController : AdminBaseController
             }
         }
 
+        model.RelatedBillingInvoices = await _context.BillingInvoices.AsNoTracking()
+            .Where(i => i.RelatedSalesRequestId == id)
+            .OrderByDescending(i => i.CreatedAtUtc)
+            .Select(i => new AdminSalesRequestRelatedInvoiceViewModel
+            {
+                Id = i.Id,
+                InvoiceNumber = i.InvoiceNumber,
+                Title = i.Title,
+                TotalAmount = i.TotalAmount,
+                Currency = i.Currency,
+                DueDate = i.DueDate,
+                Status = i.Status,
+                PaymentStatus = i.PaymentStatus
+            })
+            .ToListAsync(cancellationToken);
+
         return View(model);
     }
 

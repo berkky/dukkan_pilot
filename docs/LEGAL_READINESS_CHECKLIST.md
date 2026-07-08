@@ -15,6 +15,7 @@ Bu liste hukuki danışmanlık değildir. Canlı satış / canlı müşteri veri
 - [ ] İşletme müşteri verileri (public sipariş + CRM) için işletmeye rehber verildi
 - [ ] WhatsApp yönlendirme (`wa.me`, API yok) doğru anlatıldı
 - [ ] Backup / Audit / Notification’da hassas veri minimizasyonu gözden geçirildi
+- [ ] Manuel tahsilat/invoice kayıtlarının resmi belge olmadığı net: UI ve docs “resmi e-Belge yerine geçmez” ifadesi içeriyor
 - [ ] Public Demo sayfasında panel şifresi yok
 - [ ] Cookie notice çalışıyor (zorunlu bilgilendirme; consent-management iddiası yok)
 - [ ] Public sales form (`/Sales/RequestDemo`, `/Sales/RequestPlan`) Privacy/KVKK checkbox + link kontrolü

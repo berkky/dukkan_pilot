@@ -34,14 +34,16 @@ Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 
 ## Won sonrası
 
-1. `/Admin/Businesses/Subscription/{id}` planı güncelle
-2. Talebi Won bırak / not ekle
-3. `BusinessId` bağlı değilse işletme oluştur / bağla
-4. `/Admin/Onboarding` ile kurulum skorunu aç; Details’ten checklist izle
-5. Kickoff: `docs/KICKOFF_MEETING_SCRIPT.md`
-6. Handoff: `docs/IMPLEMENTATION_HANDOFF_CHECKLIST.md`
-7. Müşteriye `/Business/Onboarding` göster
-8. Go-live sonrası `/Admin/CustomerSuccess` ile health monitoring başlat
+1. `BusinessId` bağlı değilse işletme oluştur / bağla
+2. (Opsiyonel) `/Admin/Billing/CreateInvoice` ile **iç tahsilat kaydı** oluştur (resmi fatura değildir)
+3. Ödeme geldiyse `/Admin/Billing/RecordPayment` ile manuel ödeme kaydı gir
+4. Aboneliği manuel güncelle: `/Admin/Businesses/Details/{businessId}` (abonelik alanı)
+5. Talebi Won bırak / not ekle
+6. `/Admin/Onboarding` ile kurulum skorunu aç; Details’ten checklist izle
+7. Kickoff: `docs/KICKOFF_MEETING_SCRIPT.md`
+8. Handoff: `docs/IMPLEMENTATION_HANDOFF_CHECKLIST.md`
+9. Müşteriye `/Business/Onboarding` göster
+10. Go-live sonrası `/Admin/CustomerSuccess` ile health monitoring başlat
 
 ## Checklist (müşteri dönüşü)
 

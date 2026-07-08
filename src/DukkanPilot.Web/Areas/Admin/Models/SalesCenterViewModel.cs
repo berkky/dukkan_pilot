@@ -10,6 +10,13 @@ public class SalesCenterViewModel
     public int OnboardingReadyBusinesses { get; set; }
     public int HealthyBusinesses { get; set; }
     public int UpgradeOpportunityCount { get; set; }
+
+    public decimal BillingOpenAmount { get; set; }
+    public decimal BillingOverdueAmount { get; set; }
+    public int BillingOverdueCount { get; set; }
+    public decimal BillingPaidThisMonth { get; set; }
+    public int WonWithoutInvoiceCount { get; set; }
+
     public List<SalesCenterBusinessRowViewModel> DemoReadyList { get; set; } = new();
     public List<SalesCenterBusinessRowViewModel> OnboardingReadyList { get; set; } = new();
     public List<SalesCenterBusinessRowViewModel> HealthyList { get; set; } = new();

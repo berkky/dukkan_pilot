@@ -70,7 +70,28 @@ public class AdminSalesRequestDetailViewModel
 
     public string? CustomerSuccessTopRisk { get; set; }
 
+    public List<AdminSalesRequestRelatedInvoiceViewModel> RelatedBillingInvoices { get; set; } = new();
+
     public AdminSalesRequestUpdateViewModel Update { get; set; } = new();
+}
+
+public class AdminSalesRequestRelatedInvoiceViewModel
+{
+    public int Id { get; set; }
+
+    public string InvoiceNumber { get; set; } = string.Empty;
+
+    public string Title { get; set; } = string.Empty;
+
+    public decimal TotalAmount { get; set; }
+
+    public string Currency { get; set; } = "TRY";
+
+    public DateTime DueDate { get; set; }
+
+    public string Status { get; set; } = string.Empty;
+
+    public string PaymentStatus { get; set; } = string.Empty;
 }
 
 public class AdminSalesRequestUpdateViewModel

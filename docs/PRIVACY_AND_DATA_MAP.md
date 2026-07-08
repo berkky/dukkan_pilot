@@ -14,6 +14,7 @@ Taslak operasyon haritası. Hukuki sınıflandırma (sorumlu/işleyen) sözleşm
 | AuditLogs | DB + Admin/Business listeler | Yetkili roller | İzlenebilirlik |
 | Notifications | DB + paneller | Yetkili roller | Uyarılar |
 | SalesRequests | `/Sales/*`, Billing upgrade | SuperAdmin; Owner (kendi) | Demo/plan satış pipeline |
+| BillingInvoices / BillingPayments | Admin Billing + Business ledger | SuperAdmin; Owner (kendi) | İç tahsilat takibi (resmi belge değil) |
 | Backups (`.bak`) | `artifacts/db-backups` / sunucu | Ops ekibi | Felaket kurtarma |
 
 ## Tutma
@@ -25,6 +26,7 @@ Taslak operasyon haritası. Hukuki sınıflandırma (sorumlu/işleyen) sözleşm
 ## Minimizasyon
 
 - Notification/Audit metadata’sında secret yok hedefi
+- Billing: kart/banka hesap/IBAN gibi hassas finansal veri DB’ye yazılmaz
 - Tracking token’ların access log’a yazılmaması önerilir
 - Public Demo’da panel şifresi yok
 - Production secret’lar repoda yok

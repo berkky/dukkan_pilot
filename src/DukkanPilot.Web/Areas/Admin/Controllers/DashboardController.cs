@@ -19,19 +19,22 @@ public class DashboardController : AdminBaseController
     private readonly ISalesRequestService _salesRequests;
     private readonly CustomerOnboardingHelper _onboardingHelper;
     private readonly CustomerSuccessHealthHelper _successHelper;
+    private readonly IBillingOperationsService _billing;
 
     public DashboardController(
         AppDbContext context,
         INotificationService notifications,
         ISalesRequestService salesRequests,
         CustomerOnboardingHelper onboardingHelper,
-        CustomerSuccessHealthHelper successHelper)
+        CustomerSuccessHealthHelper successHelper,
+        IBillingOperationsService billing)
     {
         _context = context;
         _notifications = notifications;
         _salesRequests = salesRequests;
         _onboardingHelper = onboardingHelper;
         _successHelper = successHelper;
+        _billing = billing;
     }
 
     [HttpGet("")]
@@ -167,6 +170,11 @@ public class DashboardController : AdminBaseController
         var successSnaps = await _successHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
         model.CustomerSuccessAtRiskCount = successSnaps.Count(s => s.IsAtRisk);
         model.CustomerSuccessHealthyCount = successSnaps.Count(s => s.IsHealthyOrBetter);
+
+        var billingSummary = await _billing.GetAdminBillingSummaryAsync();
+        model.BillingOpenAmount = billingSummary.OpenAmount;
+        model.BillingOverdueCount = billingSummary.OverdueCount;
+        model.BillingPaidThisMonth = billingSummary.PaidThisMonth;
 
         return View(model);
     }

@@ -18,6 +18,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 6. Satış sonrası kurulum desteği ve onboarding (Kurulum Sihirbazı + Admin Kurulum Takibi)
 7. Customer success / retention health (İşletme Sağlığı + Customer Success Merkezi)
 8. Release quality gate + QA dokümanları (Kalite Merkezi + script tabanlı doğrulama)
+9. Manuel tahsilat operasyonu (Admin Billing + işletme tahsilat defteri; resmi e-Belge değil)
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon
@@ -29,7 +30,8 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 - Starter: tek şube günlük operasyon
 - Pro: yüksek ürün/kampanya kullanımı  
 Plan yükseltme talebi paneldendir; ödeme gateway yok.
-Satış akışı: **Talep oluştur → Admin SalesRequests takip → manuel abonelik güncellemesi** (`docs/SALES_PIPELINE_RUNBOOK.md`).
+Satış akışı: **Talep oluştur → Admin SalesRequests takip → iç tahsilat kaydı + manuel ödeme → manuel abonelik güncellemesi** (`docs/SALES_PIPELINE_RUNBOOK.md`, `docs/MANUAL_BILLING_RUNBOOK.md`).
+İç tahsilat kayıtları muhasebe/resmi fatura yerine geçmez.
 
 ## Demo cümleleri
 - “Menüyü telefonla açın, sepete 100₺ koyun; indirim otomatik gelsin.”

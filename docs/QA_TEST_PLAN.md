@@ -25,6 +25,7 @@ Bu katman:
 - Order flow: cart → WhatsApp order → confirmation/tracking → kitchen
 - Business: dashboard, onboarding, success, golive, demos
 - Admin: dashboard, salescenter, onboarding, customersuccess, operations, quality
+- Billing: admin invoice/payment operasyonu + business ledger (read-only)
 - System: health, robots, sitemap, security headers
 - Deployment/backup: backup, verify, restore, migration status
 
@@ -43,6 +44,7 @@ Bu katman:
 - Tracking/confirmation sayfaları
 - Mobile polish: hero/nav/cart bar/drawer/form/tracking (bkz. `MOBILE_WEB_POLISH_CHECKLIST.md`)
 - Sales request form legal checkbox’ları
+- Billing: invoice create, payment record, cancel, business ledger görüntüleme (bkz. `docs/MANUAL_PAYMENT_UAT_SCRIPT.md`)
 
 ## Kritik risk alanları
 

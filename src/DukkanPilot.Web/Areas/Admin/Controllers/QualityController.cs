@@ -53,6 +53,7 @@ public class QualityController : AdminBaseController
                 new QualityQuickLinkViewModel { Title = "Onboarding", Url = "/Admin/Onboarding", ButtonClass = "btn-outline-primary" },
                 new QualityQuickLinkViewModel { Title = "SalesCenter", Url = "/Admin/SalesCenter", ButtonClass = "btn-outline-primary" },
                 new QualityQuickLinkViewModel { Title = "SalesRequests", Url = "/Admin/SalesRequests", ButtonClass = "btn-outline-secondary" },
+                new QualityQuickLinkViewModel { Title = "Billing", Url = "/Admin/Billing", ButtonClass = "btn-outline-warning" },
                 new QualityQuickLinkViewModel { Title = "Landing Demo", Url = "/Demo", ButtonClass = "btn-outline-primary" },
                 new QualityQuickLinkViewModel { Title = "Public Menu", Url = "/m/demo-kafe", ButtonClass = "btn-outline-success" }
             ]
@@ -85,6 +86,9 @@ public class QualityController : AdminBaseController
             new QualityChecklistItemViewModel { Title = "Admin dashboard kontrol edildi mi?", Description = "SalesCenter/Onboarding/CustomerSuccess/Operations" },
             new QualityChecklistItemViewModel { Title = "Business dashboard kontrol edildi mi?", Description = "Onboarding/Success/GoLive/DemoCenter" },
             new QualityChecklistItemViewModel { Title = "Backup verify yapıldı mı?", Description = "db-backup + db-verify-backup + restore test" },
+            new QualityChecklistItemViewModel { Title = "Billing invoice create test edildi mi?", Description = "/Admin/Billing/CreateInvoice → kayıt oluşturma + audit + notification" },
+            new QualityChecklistItemViewModel { Title = "Billing payment record test edildi mi?", Description = "/Admin/Billing/RecordPayment → Partial/Paid status güncelleme" },
+            new QualityChecklistItemViewModel { Title = "Business billing ledger erişimi test edildi mi?", Description = "Owner: /Business/Billing/Invoices; Staff erişmemeli" },
             new QualityChecklistItemViewModel { Title = "Release quality gate çalıştırıldı mı?", Description = "scripts/release-quality-gate.ps1 PASS" }
         ];
 

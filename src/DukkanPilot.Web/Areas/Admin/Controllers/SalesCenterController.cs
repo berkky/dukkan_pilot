@@ -2,6 +2,7 @@ using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
 using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Models.Onboarding;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,15 +14,18 @@ public class SalesCenterController : AdminBaseController
     private readonly AppDbContext _context;
     private readonly CustomerOnboardingHelper _onboardingHelper;
     private readonly CustomerSuccessHealthHelper _successHelper;
+    private readonly IBillingOperationsService _billing;
 
     public SalesCenterController(
         AppDbContext context,
         CustomerOnboardingHelper onboardingHelper,
-        CustomerSuccessHealthHelper successHelper)
+        CustomerSuccessHealthHelper successHelper,
+        IBillingOperationsService billing)
     {
         _context = context;
         _onboardingHelper = onboardingHelper;
         _successHelper = successHelper;
+        _billing = billing;
     }
 
     [HttpGet("")]
@@ -240,6 +244,8 @@ public class SalesCenterController : AdminBaseController
             };
         }).ToList();
 
+        var billingSummary = await _billing.GetAdminBillingSummaryAsync();
+
         var model = new SalesCenterViewModel
         {
             TotalBusinesses = businesses.Count,
@@ -250,6 +256,11 @@ public class SalesCenterController : AdminBaseController
             OnboardingReadyBusinesses = onboardingReady.Count,
             HealthyBusinesses = successSnaps.Count(s => s.IsHealthyOrBetter),
             UpgradeOpportunityCount = successSnaps.Count(s => s.ExpansionPotentialLabel is "GoodFit" or "StrongFit"),
+            BillingOpenAmount = billingSummary.OpenAmount,
+            BillingOverdueAmount = billingSummary.OverdueAmount,
+            BillingOverdueCount = billingSummary.OverdueCount,
+            BillingPaidThisMonth = billingSummary.PaidThisMonth,
+            WonWithoutInvoiceCount = billingSummary.WonWithoutInvoiceCount,
             DemoReadyList = rows.Where(r => r.IsDemoReady)
                 .OrderByDescending(r => r.HealthScore)
                 .ThenByDescending(r => r.OrderCount)

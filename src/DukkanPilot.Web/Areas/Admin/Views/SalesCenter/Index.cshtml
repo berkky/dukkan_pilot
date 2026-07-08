@@ -54,6 +54,15 @@
             </div>
         </a>
     </div>
+    <div class="col-sm-6 col-xl">
+        <a href="/Admin/Billing" class="text-decoration-none">
+            <div class="stat-card h-100 border-warning">
+                <div class="stat-label">Billing operasyon</div>
+                <div class="stat-value text-warning">@Model.BillingOverdueCount gecikmiş</div>
+                <small class="text-muted">Açık: @Model.BillingOpenAmount.ToString("N2") ₺ · Bu ay: @Model.BillingPaidThisMonth.ToString("N2") ₺</small>
+            </div>
+        </a>
+    </div>
 </div>
 
 <div class="panel-card mb-4">

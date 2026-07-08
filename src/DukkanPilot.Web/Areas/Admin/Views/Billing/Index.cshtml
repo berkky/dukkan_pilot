@@ -1,0 +1,169 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminBillingViewModel
+@using DukkanPilot.Web.Helpers
+@using System.Globalization
+@{
+    ViewData["Title"] = "Billing Operasyonları";
+    ViewData["Subtitle"] = "Manuel tahsilat / iç fatura kayıtları";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string Money(decimal amount) => BillingDisplayHelper.FormatMoney(amount, "TRY");
+}
+
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+            <h2 class="h4 mb-1">Billing Operasyonları</h2>
+            <p class="text-muted mb-0">İç tahsilat/fatura takip kayıtları (resmi belge yerine geçmez).</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/Admin/Billing/CreateInvoice" class="btn btn-primary btn-sm">Yeni tahsilat kaydı</a>
+            <a href="/Admin/Billing/Payments" class="btn btn-outline-secondary btn-sm">Ödemeler</a>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-light border small mb-4">
+    <strong>Not:</strong> Bu ekran “iç tahsilat/fatura takip kaydı” içindir.
+    Resmi e-Fatura/e-Arşiv/e-Belge yerine geçmez; resmi süreçler muhasebe/e-Belge kanalından yürütülmelidir.
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="panel-card h-100 border-primary mb-0">
+            <div class="panel-card-body">
+                <div class="text-muted small mb-1">Açık tutar</div>
+                <div class="h4 mb-0 text-primary">@Money(Model.OpenAmount)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="panel-card h-100 border-danger mb-0">
+            <div class="panel-card-body">
+                <div class="text-muted small mb-1">Gecikmiş</div>
+                <div class="h4 mb-0 text-danger">@Money(Model.OverdueAmount)</div>
+                <div class="small text-muted">@Model.OverdueInvoicesCount kayıt</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="panel-card h-100 border-success mb-0">
+            <div class="panel-card-body">
+                <div class="text-muted small mb-1">Bu ay tahsil</div>
+                <div class="h4 mb-0 text-success">@Money(Model.PaidThisMonth)</div>
+                <div class="small text-muted">@Model.ManualPaymentsThisMonth ödeme</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="panel-card h-100 border-warning mb-0">
+            <div class="panel-card-body">
+                <div class="text-muted small mb-1">Won ama invoice yok</div>
+                <div class="h4 mb-0 text-warning">@Model.WonWithoutInvoiceCount</div>
+                <div class="small text-muted">Yeni invoice: @Model.NewInvoicesThisMonth</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h3 class="h6 mb-0">Filtreler</h3>
+        <a class="btn btn-sm btn-outline-secondary" href="/Admin/Billing">Sıfırla</a>
+    </div>
+    <div class="panel-card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">İşletme</label>
+                <select class="form-select form-select-sm" name="businessId">
+                    <option value="">Tümü</option>
+                    @foreach (var b in Model.Businesses)
+                    {
+                        <option value="@b.Id" selected="@(Model.BusinessId == b.Id)">@b.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <input class="form-control form-control-sm" name="status" value="@Model.Status" placeholder="Issued/Paid/Overdue..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">PaymentStatus</label>
+                <input class="form-control form-control-sm" name="paymentStatus" value="@Model.PaymentStatus" placeholder="Unpaid/Partial/Paid..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Vade (from)</label>
+                <input type="date" class="form-control form-control-sm" name="dueFrom" value="@(Model.DueFrom?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Vade (to)</label>
+                <input type="date" class="form-control form-control-sm" name="dueTo" value="@(Model.DueTo?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Arama</label>
+                <input class="form-control form-control-sm" name="search" value="@Model.Search" placeholder="InvoiceNo / başlık" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-sm btn-primary w-100" type="submit">Uygula</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Invoice listesi</h3>
+        <span class="badge bg-light text-dark border">@Model.Invoices.Count kayıt</span>
+    </div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>No</th>
+                    <th>İşletme</th>
+                    <th>Başlık</th>
+                    <th>Vade</th>
+                    <th class="text-end">Toplam</th>
+                    <th class="text-end">Ödenen</th>
+                    <th class="text-end">Kalan</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Invoices.Any())
+                {
+                    <tr><td colspan="10" class="text-center text-muted py-4">Kayıt yok.</td></tr>
+                }
+                else
+                {
+                    foreach (var i in Model.Invoices)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@i.InvoiceNumber</td>
+                            <td>
+                                <div class="fw-semibold">@i.BusinessName</div>
+                                <div class="small text-muted">#@i.BusinessId</div>
+                            </td>
+                            <td class="small">@i.Title</td>
+                            <td class="small">
+                                @i.DueDate.ToLocalTime().ToString("dd.MM.yyyy", culture)
+                                <div class="text-muted small">@BillingDisplayHelper.GetDueStatusText(i.DueDate)</div>
+                            </td>
+                            <td class="text-end fw-semibold">@BillingDisplayHelper.FormatMoney(i.TotalAmount, i.Currency)</td>
+                            <td class="text-end">@BillingDisplayHelper.FormatMoney(i.PaidAmount, i.Currency)</td>
+                            <td class="text-end">@BillingDisplayHelper.FormatMoney(i.RemainingAmount, i.Currency)</td>
+                            <td><span class="badge @BillingDisplayHelper.GetInvoiceStatusBadgeClass(i.Status)">@BillingDisplayHelper.GetInvoiceStatusLabel(i.Status)</span></td>
+                            <td><span class="badge @BillingDisplayHelper.GetPaymentStatusBadgeClass(i.PaymentStatus)">@BillingDisplayHelper.GetPaymentStatusLabel(i.PaymentStatus)</span></td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="/Admin/Billing/Details/@i.Id">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

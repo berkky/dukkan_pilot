@@ -174,6 +174,14 @@ public class OperationsController : AdminBaseController
                 IsReadyHint = FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "QualityController.cs")
                     && FileExists("scripts", "release-quality-gate.ps1")
             }
+            ,
+            new OpsChecklistItemViewModel
+            {
+                Title = "Manual billing operations available",
+                Description = "/Admin/Billing (invoice/payment/cancel) + Business ledger (read-only). Resmi e-Belge değildir.",
+                IsReadyHint = FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "BillingController.cs")
+                    && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Views", "Billing", "Index.cshtml")
+            }
         ];
 
         model.LegalReadinessChecklist =
