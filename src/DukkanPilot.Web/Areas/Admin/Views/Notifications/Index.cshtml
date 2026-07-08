@@ -1,0 +1,156 @@
+@model DukkanPilot.Web.Areas.Business.Models.AdminNotificationIndexViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Platform Bildirimleri";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    string SeverityClass(string s) => s switch
+    {
+        "Critical" => "bg-danger",
+        "Warning" => "bg-warning text-dark",
+        "Success" => "bg-success",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Platform Bildirimleri</h2>
+        <p class="text-muted mb-0">SaaS genelindeki kritik uyarılar ve işletme olayları</p>
+    </div>
+    <form method="post" action="/Admin/Notifications/MarkAllRead">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-secondary btn-sm" @(Model.UnreadCount == 0 ? "disabled" : null)>
+            Tümünü okundu yap
+        </button>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Okunmamış</div>
+            <div class="stat-value">@Model.UnreadCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Bugün</div>
+            <div class="stat-value">@Model.TodayCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Kritik</div>
+            <div class="stat-value">@Model.CriticalCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">İşletme Uyarıları</div>
+            <div class="stat-value">@Model.BusinessAlertCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small">BusinessId</label>
+                <input type="number" name="businessId" value="@Model.BusinessId" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Ara</label>
+                <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Tip</label>
+                <input type="text" name="type" value="@Model.Type" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Severity</label>
+                <select name="severity" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var s in new[] { "Info", "Success", "Warning", "Critical" })
+                    {
+                        if (Model.Severity == s) { <option value="@s" selected>@s</option> }
+                        else { <option value="@s">@s</option> }
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="unreadOnly" value="true" id="unreadOnly" @(Model.UnreadOnly ? "checked" : null) />
+                    <label class="form-check-label small" for="unreadOnly">Okunmamış</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Filtrele</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="panel-card">
+        <div class="panel-card-body text-center py-5">
+            <p class="text-muted mb-0">Şu an yeni platform bildirimi yok.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="panel-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>İşletme</th>
+                    <th>Tip</th>
+                    <th>Başlık</th>
+                    <th>Mesaj</th>
+                    <th>Tarih</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr class="@(item.IsRead ? "" : "table-warning")">
+                        <td><span class="badge @SeverityClass(item.Severity)">@item.Severity</span></td>
+                        <td>
+                            @if (item.BusinessId.HasValue)
+                            {
+                                <a href="/Admin/Businesses/Details/@item.BusinessId">@(item.BusinessName ?? $"#{item.BusinessId}")</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Platform</span>
+                            }
+                        </td>
+                        <td><code class="small">@item.Type</code></td>
+                        <td class="fw-semibold">@item.Title</td>
+                        <td class="small text-muted">@item.Message</td>
+                        <td class="small">@item.CreatedAtUtc.ToLocalTime().ToString("g", culture)</td>
+                        <td class="text-end text-nowrap">
+                            @if (!string.IsNullOrWhiteSpace(item.ActionUrl))
+                            {
+                                <a href="@item.ActionUrl" class="btn btn-sm btn-outline-primary">Git</a>
+                            }
+                            @if (!item.IsRead)
+                            {
+                                <form method="post" action="/Admin/Notifications/MarkRead/@item.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Okundu</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -4,6 +4,15 @@
     Layout = "_Layout";
     var isSuperAdmin = User.IsInRole(nameof(UserRole.SuperAdmin));
     var isBusinessUser = User.IsInRole(nameof(UserRole.BusinessOwner)) || User.IsInRole(nameof(UserRole.Staff));
+    var returnUrl = ViewData["ReturnUrl"] as string
+        ?? Context.Request.Query["ReturnUrl"].ToString();
+    var isAdminTarget = !string.IsNullOrWhiteSpace(returnUrl)
+        && returnUrl.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase);
+    var isOwnerOnlyBusinessTarget = !string.IsNullOrWhiteSpace(returnUrl)
+        && (returnUrl.Contains("/Business/Staff", StringComparison.OrdinalIgnoreCase)
+            || returnUrl.Contains("/Business/Settings", StringComparison.OrdinalIgnoreCase)
+            || returnUrl.Contains("/Business/Billing", StringComparison.OrdinalIgnoreCase));
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
 }
 
 <section class="landing-page-hero py-5">
@@ -14,9 +23,17 @@
                     <div class="display-6 fw-bold text-warning mb-2">403</div>
                     <h1 class="h4 fw-bold mb-3">Erişim Reddedildi</h1>
                     <p class="text-muted mb-4">
-                        @if (isBusinessUser)
+                        @if (!isAuthenticated)
                         {
-                            <text>Bu sayfa veya işlem Owner yetkisi gerektiriyor olabilir.</text>
+                            <text>Bu sayfaya erişmek için giriş yapmanız gerekir.</text>
+                        }
+                        else if (isAdminTarget)
+                        {
+                            <text>Bu sayfa SuperAdmin yetkisi gerektiriyor olabilir.</text>
+                        }
+                        else if (isBusinessUser && isOwnerOnlyBusinessTarget)
+                        {
+                            <text>Bu işlem Owner yetkisi gerektiriyor olabilir.</text>
                         }
                         else
                         {

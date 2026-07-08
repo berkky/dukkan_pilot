@@ -39,6 +39,7 @@ builder.Services.AddScoped<BusinessPlanLimitHelper>();
 builder.Services.AddScoped<GoLiveHelper>();
 builder.Services.AddScoped<PublicOrderPricingHelper>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<RequireActiveSubscriptionFilter>();
 
 builder.Services.AddAntiforgery(options =>

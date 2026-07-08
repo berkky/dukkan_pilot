@@ -15,11 +15,13 @@ public class OrdersController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
-    public OrdersController(AppDbContext context, IAuditLogService auditLog)
+    public OrdersController(AppDbContext context, IAuditLogService auditLog, INotificationService notifications)
     {
         _context = context;
         _auditLog = auditLog;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
@@ -325,6 +327,52 @@ public class OrdersController : BusinessBaseController
                 newStatus = status.ToString(),
                 totalAmount = order.TotalAmount
             });
+
+        if (previousStatus != status)
+        {
+            if (status == OrderStatus.Preparing)
+            {
+                await _notifications.CreateBusinessAsync(
+                    businessId,
+                    "OrderStatusChanged",
+                    "Sipariş hazırlanıyor",
+                    $"Sipariş durumu güncellendi: {previousStatus} → Preparing",
+                    $"/Business/Orders/Details/{order.Id}",
+                    "Info",
+                    "Order",
+                    order.Id,
+                    new { orderId = order.Id, oldStatus = previousStatus.ToString(), newStatus = status.ToString() },
+                    allowDuplicate: true);
+            }
+            else if (status == OrderStatus.Completed)
+            {
+                await _notifications.CreateBusinessAsync(
+                    businessId,
+                    "OrderCompleted",
+                    "Sipariş tamamlandı",
+                    $"Sipariş tamamlandı (#{order.OrderNumber}).",
+                    $"/Business/Orders/Details/{order.Id}",
+                    "Success",
+                    "Order",
+                    order.Id,
+                    new { orderId = order.Id, oldStatus = previousStatus.ToString(), newStatus = status.ToString() },
+                    allowDuplicate: true);
+            }
+            else if (status == OrderStatus.Cancelled)
+            {
+                await _notifications.CreateBusinessAsync(
+                    businessId,
+                    "OrderCancelled",
+                    "Sipariş iptal edildi",
+                    $"Sipariş iptal edildi (#{order.OrderNumber}).",
+                    $"/Business/Orders/Details/{order.Id}",
+                    "Warning",
+                    "Order",
+                    order.Id,
+                    new { orderId = order.Id, oldStatus = previousStatus.ToString(), newStatus = status.ToString() },
+                    allowDuplicate: true);
+            }
+        }
 
         return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
     }

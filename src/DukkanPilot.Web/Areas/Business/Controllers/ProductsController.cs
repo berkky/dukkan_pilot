@@ -20,12 +20,18 @@ public class ProductsController : BusinessBaseController
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
-    public ProductsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
+    public ProductsController(
+        AppDbContext context,
+        BusinessPlanLimitHelper planLimitHelper,
+        IAuditLogService auditLog,
+        INotificationService notifications)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
         _auditLog = auditLog;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
@@ -354,6 +360,8 @@ public class ProductsController : BusinessBaseController
                     errorRows = importResult.ErrorRows,
                     skippedByPlanLimitRows = importResult.SkippedByPlanLimitRows
                 });
+
+            await NotifyProductLimitIfNeededAsync(businessId);
         }
         else if (isDryRun && importResult.ValidRows > 0)
         {
@@ -630,6 +638,8 @@ public class ProductsController : BusinessBaseController
             $"Ürün kopyalandı: {source.Name} → {copyName}",
             new { sourceProductId = source.Id, duplicateProductId = duplicate.Id });
 
+        await NotifyProductLimitIfNeededAsync(businessId);
+
         return LocalRedirect(ValidateReturnUrl(returnUrl));
     }
 
@@ -709,6 +719,8 @@ public class ProductsController : BusinessBaseController
             "Product",
             product.Id,
             $"Ürün oluşturuldu: {product.Name}");
+
+        await NotifyProductLimitIfNeededAsync(businessId);
 
         return RedirectToAction(nameof(Index));
     }
@@ -951,6 +963,43 @@ public class ProductsController : BusinessBaseController
         }
 
         return parts.Count > 0 ? "?" + string.Join("&", parts) : string.Empty;
+    }
+
+    private async Task NotifyProductLimitIfNeededAsync(int businessId)
+    {
+        var usage = await _planLimitHelper.GetUsageAsync(businessId);
+        var metric = usage.Products;
+        if (metric.IsUnlimited)
+        {
+            return;
+        }
+
+        if (metric.IsLimitReached)
+        {
+            await _notifications.CreateBusinessAsync(
+                businessId,
+                "ProductLimitWarning",
+                "Ürün limiti doldu",
+                $"Ürün kullanım limiti doldu ({metric.Used}/{metric.Limit}).",
+                "/Business/Billing",
+                "Critical",
+                "PlanLimit",
+                businessId);
+            return;
+        }
+
+        if (metric.IsNearLimit)
+        {
+            await _notifications.CreateBusinessAsync(
+                businessId,
+                "ProductLimitWarning",
+                "Ürün limitine yaklaşılıyor",
+                $"Ürün kullanımı %{metric.UsagePercent} seviyesinde ({metric.Used}/{metric.Limit}).",
+                "/Business/Billing",
+                "Warning",
+                "PlanLimit",
+                businessId);
+        }
     }
 
     private static string ValidateReturnUrl(string? returnUrl)

@@ -16,6 +16,27 @@
     <p class="text-muted mb-0">Platform genelindeki işletme, abonelik ve kullanım durumunu takip edin.</p>
 </div>
 
+@if (Model.CriticalNotifications.Count > 0)
+{
+    <div class="panel-card mb-4 border-warning">
+        <div class="panel-card-header d-flex justify-content-between align-items-center">
+            <h3 class="h6 mb-0">Kritik Bildirimler</h3>
+            <a href="/Admin/Notifications" class="btn btn-sm btn-outline-warning">Tümünü Gör</a>
+        </div>
+        <div class="panel-card-body p-0">
+            <ul class="list-group list-group-flush">
+                @foreach (var n in Model.CriticalNotifications)
+                {
+                    <li class="list-group-item">
+                        <div class="fw-semibold small">@n.Title</div>
+                        <div class="text-muted small">@n.Message</div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card h-100">
@@ -220,6 +241,7 @@
             </div>
             <div class="panel-card-body d-grid gap-2">
                 <a href="/Admin/Businesses" class="btn btn-outline-primary">İşletmeler</a>
+                <a href="/Admin/Notifications" class="btn btn-outline-warning">Bildirimler</a>
                 <a href="/Admin/AuditLogs" class="btn btn-outline-dark">Aktivite Logları</a>
                 <a href="/Admin/SubscriptionPlans" class="btn btn-outline-secondary">Abonelik Planları</a>
                 <a href="/Admin/SubscriptionPlans/Create" class="btn btn-outline-secondary">Yeni Plan</a>

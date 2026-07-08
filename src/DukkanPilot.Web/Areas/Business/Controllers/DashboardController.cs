@@ -2,6 +2,7 @@ using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,17 +14,20 @@ public class DashboardController : BusinessBaseController
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
     private readonly GoLiveHelper _goLiveHelper;
+    private readonly INotificationService _notifications;
 
     public DashboardController(
         AppDbContext context,
         BusinessSubscriptionStatusHelper subscriptionStatusHelper,
         BusinessPlanLimitHelper planLimitHelper,
-        GoLiveHelper goLiveHelper)
+        GoLiveHelper goLiveHelper,
+        INotificationService notifications)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
         _planLimitHelper = planLimitHelper;
         _goLiveHelper = goLiveHelper;
+        _notifications = notifications;
     }
 
     public async Task<IActionResult> Index()
@@ -35,6 +39,8 @@ public class DashboardController : BusinessBaseController
         {
             return forbidResult;
         }
+
+        await _notifications.GenerateSmartBusinessAlertsAsync(businessId);
 
         var business = await _context.Businesses
             .AsNoTracking()
@@ -173,9 +179,43 @@ public class DashboardController : BusinessBaseController
             Subscription = await _subscriptionStatusHelper.GetStatusAsync(businessId),
             PlanUsage = await _planLimitHelper.GetUsageAsync(businessId),
             GoLiveStatus = await _goLiveHelper.BuildDashboardCardAsync(businessId),
+            Notifications = await BuildNotificationCardAsync(businessId),
             IsBusinessOwner = User.IsInRole(nameof(UserRole.BusinessOwner))
         };
 
         return View(model);
+    }
+
+    private async Task<DashboardNotificationCardViewModel> BuildNotificationCardAsync(int businessId)
+    {
+        var query = _context.Notifications.AsNoTracking()
+            .Where(n => n.BusinessId == businessId);
+
+        var unread = query.Where(n => !n.IsRead);
+        var recent = await query
+            .OrderBy(n => n.IsRead)
+            .ThenByDescending(n => n.CreatedAtUtc)
+            .Take(5)
+            .Select(n => new NotificationRowViewModel
+            {
+                Id = n.Id,
+                CreatedAtUtc = n.CreatedAtUtc,
+                Area = n.Area,
+                Type = n.Type,
+                Title = n.Title,
+                Message = n.Message,
+                ActionUrl = n.ActionUrl,
+                Severity = n.Severity,
+                IsRead = n.IsRead,
+                BusinessId = n.BusinessId
+            })
+            .ToListAsync();
+
+        return new DashboardNotificationCardViewModel
+        {
+            UnreadCount = await unread.CountAsync(),
+            CriticalCount = await unread.CountAsync(n => n.Severity == "Critical"),
+            RecentItems = recent
+        };
     }
 }

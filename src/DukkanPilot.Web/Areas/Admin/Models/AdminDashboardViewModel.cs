@@ -1,3 +1,5 @@
+using DukkanPilot.Web.Areas.Business.Models;
+
 namespace DukkanPilot.Web.Areas.Admin.Models;
 
 public class AdminDashboardViewModel
@@ -13,6 +15,8 @@ public class AdminDashboardViewModel
     public List<AdminRiskyBusinessViewModel> RiskyBusinesses { get; set; } = [];
 
     public List<AdminBusinessActivityViewModel> RecentBusinesses { get; set; } = [];
+
+    public List<NotificationRowViewModel> CriticalNotifications { get; set; } = [];
 }
 
 public class AdminPlatformKpiViewModel

@@ -24,15 +24,18 @@ public class PublicMenuController : Controller
     private readonly PublicOrderTrackingTokenHelper _trackingTokenHelper;
     private readonly PublicOrderPricingHelper _pricingHelper;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
     public PublicMenuController(
         AppDbContext context,
         PublicOrderTrackingTokenHelper trackingTokenHelper,
         PublicOrderPricingHelper pricingHelper,
-        IAuditLogService auditLog)
+        IAuditLogService auditLog,
+        INotificationService notifications)
     {
         _context = context;
         _trackingTokenHelper = trackingTokenHelper;
+        _notifications = notifications;
         _pricingHelper = pricingHelper;
         _auditLog = auditLog;
     }
@@ -277,6 +280,18 @@ public class PublicMenuController : Controller
                 totalAmount = order.TotalAmount,
                 itemCount = order.Items.Count
             });
+
+        await _notifications.CreateBusinessAsync(
+            business.Id,
+            "NewOrder",
+            "Yeni sipariş geldi",
+            $"Public menüden yeni sipariş oluşturuldu: {orderNumber}",
+            "/Business/Orders/Kitchen",
+            "Info",
+            "Order",
+            order.Id,
+            new { orderId = order.Id, orderNumber, totalAmount = order.TotalAmount, itemCount = order.Items.Count },
+            allowDuplicate: true);
 
         var messageLines = pricing.Items
             .Select(i => (i.ProductName, i.Quantity, i.UnitPrice))

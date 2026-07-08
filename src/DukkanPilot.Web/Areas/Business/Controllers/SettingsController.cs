@@ -16,11 +16,13 @@ public class SettingsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
-    public SettingsController(AppDbContext context, IAuditLogService auditLog)
+    public SettingsController(AppDbContext context, IAuditLogService auditLog, INotificationService notifications)
     {
         _context = context;
         _auditLog = auditLog;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
@@ -111,6 +113,19 @@ public class SettingsController : BusinessBaseController
             {
                 updatedFields = new[] { "BusinessName", "Phone", "LogoUrl", "Address", "Description", "WhatsAppNumber", "ThemeColor", "Currency" }
             });
+
+        if (!string.IsNullOrWhiteSpace(business.Setting?.WhatsAppNumber))
+        {
+            await _notifications.CreateBusinessAsync(
+                businessId,
+                "GoLiveProgress",
+                "WhatsApp ayarı tamamlandı",
+                "WhatsApp sipariş numarası kaydedildi. Go-Live adımlarını kontrol edebilirsiniz.",
+                "/Business/GoLive",
+                "Success",
+                "BusinessSetting",
+                businessId);
+        }
 
         return RedirectToAction(nameof(Index));
     }

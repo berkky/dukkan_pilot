@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 27B aşaması (Audit Log / Aktivite Geçmişi) tamamlandı.
+> Son güncelleme: 27C aşaması (Bildirim Merkezi / Akıllı Uyarılar) tamamlandı.
 
 ---
 
@@ -526,6 +526,19 @@ DukkanPilot.sln
 - **UI:** `/Business/AuditLogs` (tenant filtresi), `/Admin/AuditLogs` (SuperAdmin); sidebar + dashboard kısayolları
 - Identity yok; SignalR yok; yeni NuGet dependency yok
 
+### 27C aşaması — Bildirim Merkezi / Akıllı Uyarılar
+- **Entity:** `Notification` (yalnızca yeni tablo; mevcut entity’ler değişmedi)
+- **Migration:** `AddNotifications` (`20260708132718`) — yalnızca `Notifications` + indeksler
+- **Service:** `INotificationService` / `NotificationService` — fail-safe (bildirim hatası ana işlemi kırmaz); şifre/token/cookie/tracking token/telefon metadata’da yok; duplicate unread smart alerts skip
+- **Persistent events:** Public `NewOrder`; Order status `OrderStatusChanged` / `OrderCompleted` / `OrderCancelled`; Campaign create/update (+expiring); Product create/import/duplicate plan limit uyarıları; Billing upgrade request; Settings WhatsApp Go-Live progress; Account register → Admin `NewBusinessRegistered`
+- **Smart business alerts:** abonelik bitiyor/bitmiş, Go-Live eksik, aktif ürün/kategori yok, WhatsApp eksik, plan limit ≥80%/100%, kampanya yakında bitiyor — Dashboard/Notifications açılışında
+- **Smart admin alerts:** ürünsüz/aktif siparişsiz/riskli işletmeler, abonelik expired/expiring özetleri — Admin Dashboard/Notifications açılışında
+- **UI:** `/Business/Notifications` (tenant, subscription gate dışında), `/Admin/Notifications` (SuperAdmin); MarkRead / MarkAllRead; Summary JSON; sidebar + dashboard kartları
+- **AccessDenied polish:** ReturnUrl `/Admin*` → SuperAdmin mesajı; Owner-only business hedefleri → Owner mesajı
+- **Audit:** notification read eylemleri audit gürültüsü yaratmamak için loglanmadı
+- Public/Business/Admin/Account/Audit akışları bozulmadı
+- Identity yok; SignalR yok; yeni NuGet dependency yok; background job/push/email yok
+
 ---
 
 ## 6. Veritabanı
@@ -534,7 +547,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`) |
 
 ### Seed verisi
 
@@ -587,7 +600,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-27B tamamlandı — AuditLog entity/migration, fail-safe audit service, Business/Admin aktivite ekranları.
+27C tamamlandı — Notification entity/migration, fail-safe NotificationService, Business/Admin bildirim merkezleri, smart alerts.
 
 ---
 
@@ -624,7 +637,9 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
 | `/Business/GoLive` | Go-Live Merkezi — kurulum sihirbazı / yayına hazırlık |
 | `/Business/AuditLogs` | İşletme aktivite geçmişi |
+| `/Business/Notifications` | İşletme bildirim merkezi |
 | `/Admin/AuditLogs` | Platform aktivite logları (SuperAdmin) |
+| `/Admin/Notifications` | Platform bildirim merkezi (SuperAdmin) |
 | `/Business/Products/ImportCsv` | CSV ile ürün içe aktarma |
 | `/Business/Products/DownloadImportTemplate` | CSV ürün şablonu indirme |
 | `POST /Business/Products/BulkAction` | Toplu ürün aktif/pasif ve fiyat işlemleri |

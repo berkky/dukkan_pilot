@@ -17,12 +17,18 @@ public class CampaignsController : BusinessBaseController
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
-    public CampaignsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
+    public CampaignsController(
+        AppDbContext context,
+        BusinessPlanLimitHelper planLimitHelper,
+        IAuditLogService auditLog,
+        INotificationService notifications)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
         _auditLog = auditLog;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
@@ -136,6 +142,8 @@ public class CampaignsController : BusinessBaseController
             campaign.Id,
             $"Kampanya oluşturuldu: {campaign.Title}");
 
+        await NotifyCampaignAsync(businessId, campaign);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -226,6 +234,8 @@ public class CampaignsController : BusinessBaseController
             "Campaign",
             campaign.Id,
             $"Kampanya güncellendi: {campaign.Title}");
+
+        await NotifyCampaignAsync(businessId, campaign);
 
         return RedirectToAction(nameof(Index));
     }
@@ -393,6 +403,38 @@ public class CampaignsController : BusinessBaseController
                 RecentOrders = recentOrders
             }
         };
+    }
+
+    private async Task NotifyCampaignAsync(int businessId, Campaign campaign)
+    {
+        await _notifications.CreateBusinessAsync(
+            businessId,
+            "CampaignUpdated",
+            "Kampanya kaydedildi",
+            $"Kampanya güncellendi: {campaign.Title}",
+            "/Business/Campaigns",
+            "Info",
+            "Campaign",
+            campaign.Id,
+            allowDuplicate: true);
+
+        var now = DateTime.UtcNow;
+        if (campaign.IsActive
+            && campaign.EndDate.HasValue
+            && campaign.EndDate.Value >= now
+            && campaign.EndDate.Value <= now.AddDays(7))
+        {
+            var daysLeft = Math.Max(0, (int)Math.Ceiling((campaign.EndDate.Value - now).TotalDays));
+            await _notifications.CreateBusinessAsync(
+                businessId,
+                "CampaignExpiring",
+                "Kampanya yakında bitiyor",
+                $"“{campaign.Title}” kampanyasının bitmesine {daysLeft} gün kaldı.",
+                "/Business/Campaigns",
+                "Warning",
+                "Campaign",
+                campaign.Id);
+        }
     }
 
     private static DateTime ToStartOfUtcDay(DateTime date)

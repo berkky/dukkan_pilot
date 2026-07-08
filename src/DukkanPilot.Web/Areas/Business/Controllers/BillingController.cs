@@ -17,17 +17,20 @@ public class BillingController : BusinessBaseController
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
     public BillingController(
         AppDbContext context,
         BusinessSubscriptionStatusHelper subscriptionStatusHelper,
         BusinessPlanLimitHelper planLimitHelper,
-        IAuditLogService auditLog)
+        IAuditLogService auditLog,
+        INotificationService notifications)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
         _planLimitHelper = planLimitHelper;
         _auditLog = auditLog;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
@@ -132,6 +135,30 @@ public class BillingController : BusinessBaseController
             planId,
             $"Plan yükseltme talebi oluşturuldu: {builtModel.CurrentPlanName} → {builtModel.RequestedPlanName}",
             new { requestedPlanId = planId, requestedPlanName = builtModel.RequestedPlanName });
+
+        await _notifications.CreateBusinessAsync(
+            businessId,
+            "SubscriptionUpgradeRequested",
+            "Plan yükseltme talebi oluşturuldu",
+            $"{builtModel.CurrentPlanName} → {builtModel.RequestedPlanName} yükseltme talebi hazırlandı.",
+            "/Business/Billing",
+            "Info",
+            "BusinessSubscription",
+            planId,
+            new { requestedPlanId = planId, requestedPlanName = builtModel.RequestedPlanName },
+            allowDuplicate: true);
+
+        await _notifications.CreateAdminAsync(
+            "SubscriptionUpgradeRequested",
+            "Plan yükseltme talebi",
+            $"İşletme #{businessId} plan yükseltme talebi oluşturdu: {builtModel.CurrentPlanName} → {builtModel.RequestedPlanName}",
+            $"/Admin/Businesses/Details/{businessId}",
+            "Info",
+            "Business",
+            businessId,
+            new { requestedPlanId = planId },
+            businessId: businessId,
+            allowDuplicate: true);
 
         return RedirectToAction(nameof(RequestUpgradeConfirmation));
     }

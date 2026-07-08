@@ -3,7 +3,9 @@ using DukkanPilot.Core.Entities;
 using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
+using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +15,20 @@ namespace DukkanPilot.Web.Areas.Admin.Controllers;
 public class DashboardController : AdminBaseController
 {
     private readonly AppDbContext _context;
+    private readonly INotificationService _notifications;
 
-    public DashboardController(AppDbContext context)
+    public DashboardController(AppDbContext context, INotificationService notifications)
     {
         _context = context;
+        _notifications = notifications;
     }
 
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
         ViewData["ActiveMenu"] = "dashboard";
+
+        await _notifications.GenerateSmartAdminAlertsAsync();
 
         var now = DateTime.UtcNow;
         var todayStart = now.Date;
@@ -135,10 +141,33 @@ public class DashboardController : AdminBaseController
             RecentBusinesses = businessActivities
                 .OrderByDescending(b => b.CreatedAt)
                 .Take(10)
-                .ToList()
+                .ToList(),
+            CriticalNotifications = await BuildCriticalNotificationsAsync()
         };
 
         return View(model);
+    }
+
+    private async Task<List<NotificationRowViewModel>> BuildCriticalNotificationsAsync()
+    {
+        return await _context.Notifications.AsNoTracking()
+            .Where(n => n.Area == "Admin" && !n.IsRead && (n.Severity == "Critical" || n.Severity == "Warning"))
+            .OrderByDescending(n => n.CreatedAtUtc)
+            .Take(5)
+            .Select(n => new NotificationRowViewModel
+            {
+                Id = n.Id,
+                CreatedAtUtc = n.CreatedAtUtc,
+                Area = n.Area,
+                Type = n.Type,
+                Title = n.Title,
+                Message = n.Message,
+                ActionUrl = n.ActionUrl,
+                Severity = n.Severity,
+                IsRead = n.IsRead,
+                BusinessId = n.BusinessId
+            })
+            .ToListAsync();
     }
 
     private static AdminSubscriptionKpiViewModel BuildSubscriptionKpis(List<BusinessEntity> businesses, DateTime now)

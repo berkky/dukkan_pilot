@@ -26,6 +26,7 @@ public class AppDbContext : DbContext
     public DbSet<Campaign> Campaigns => Set<Campaign>();
     public DbSet<QrCode> QrCodes => Set<QrCode>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +49,7 @@ public class AppDbContext : DbContext
         ConfigureCampaign(modelBuilder);
         ConfigureQrCode(modelBuilder);
         ConfigureAuditLog(modelBuilder);
+        ConfigureNotification(modelBuilder);
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)
@@ -348,6 +350,31 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
             entity.HasIndex(e => e.Action);
             entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.EntityName, e.EntityId });
+        });
+    }
+
+    private static void ConfigureNotification(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("Notifications");
+
+            entity.Property(e => e.Area).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.Type).HasMaxLength(80).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Message).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.TargetRole).HasMaxLength(50);
+            entity.Property(e => e.Severity).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.ActionUrl).HasMaxLength(400);
+            entity.Property(e => e.EntityName).HasMaxLength(80);
+            entity.Property(e => e.MetadataJson).HasMaxLength(4000);
+
+            entity.HasIndex(e => new { e.BusinessId, e.IsRead, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.UserId, e.IsRead, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.Area, e.CreatedAtUtc });
+            entity.HasIndex(e => e.Type);
+            entity.HasIndex(e => e.Severity);
             entity.HasIndex(e => new { e.EntityName, e.EntityId });
         });
     }

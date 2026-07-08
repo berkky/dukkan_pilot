@@ -20,12 +20,18 @@ public class AccountController : Controller
     private readonly AppDbContext _context;
     private readonly PasswordResetTokenHelper _passwordResetTokenHelper;
     private readonly IAuditLogService _auditLog;
+    private readonly INotificationService _notifications;
 
-    public AccountController(AppDbContext context, PasswordResetTokenHelper passwordResetTokenHelper, IAuditLogService auditLog)
+    public AccountController(
+        AppDbContext context,
+        PasswordResetTokenHelper passwordResetTokenHelper,
+        IAuditLogService auditLog,
+        INotificationService notifications)
     {
         _context = context;
         _passwordResetTokenHelper = passwordResetTokenHelper;
         _auditLog = auditLog;
+        _notifications = notifications;
     }
 
     [HttpGet("/Account/Register")]
@@ -121,6 +127,18 @@ public class AccountController : Controller
             new { businessId = business.Id },
             businessId: business.Id,
             userEmail: user.Email);
+
+        await _notifications.CreateAdminAsync(
+            "NewBusinessRegistered",
+            "Yeni işletme kaydı",
+            $"Yeni işletme kaydı: {business.Name}",
+            $"/Admin/Businesses/Details/{business.Id}",
+            "Info",
+            "Business",
+            business.Id,
+            new { businessId = business.Id, slug = business.Slug },
+            businessId: business.Id,
+            allowDuplicate: true);
 
         return RedirectToAction(nameof(Login));
     }
@@ -247,8 +265,9 @@ public class AccountController : Controller
 
     [HttpGet("/Account/AccessDenied")]
     [AllowAnonymous]
-    public IActionResult AccessDenied()
+    public IActionResult AccessDenied(string? returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
 

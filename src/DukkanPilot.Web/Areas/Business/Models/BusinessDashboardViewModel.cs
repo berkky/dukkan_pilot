@@ -20,5 +20,6 @@ public class BusinessDashboardViewModel
     public BusinessSubscriptionStatusViewModel Subscription { get; set; } = new();
     public BusinessPlanUsageViewModel PlanUsage { get; set; } = new();
     public GoLiveDashboardCardViewModel? GoLiveStatus { get; set; }
+    public DashboardNotificationCardViewModel Notifications { get; set; } = new();
     public bool IsBusinessOwner { get; set; }
 }
