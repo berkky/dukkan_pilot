@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DukkanPilot.Web.Validation;
 
 namespace DukkanPilot.Web.Models.Sales;
 
@@ -34,11 +35,11 @@ public class PublicSalesRequestFormViewModel
     public string? RequestedPlanName { get; set; }
     public decimal? RequestedPlanPrice { get; set; }
 
-    [Range(typeof(bool), "true", "true", ErrorMessage = "Gizlilik Politikası bağlantısını incelediğinizi onaylayın.")]
+    [RequiredTrue(ErrorMessage = "Gizlilik Politikası bağlantısını incelediğinizi onaylayın.")]
     [Display(Name = "Gizlilik politikası")]
     public bool PrivacyNoticeAcknowledged { get; set; }
 
-    [Range(typeof(bool), "true", "true", ErrorMessage = "KVKK Aydınlatma Metni bağlantısını incelediğinizi onaylayın.")]
+    [RequiredTrue(ErrorMessage = "KVKK Aydınlatma Metni bağlantısını incelediğinizi onaylayın.")]
     [Display(Name = "KVKK aydınlatma")]
     public bool KvkkNoticeAcknowledged { get; set; }
 }

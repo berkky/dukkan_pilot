@@ -14,6 +14,7 @@ public class DashboardController : BusinessBaseController
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
     private readonly GoLiveHelper _goLiveHelper;
+    private readonly CustomerOnboardingHelper _onboardingHelper;
     private readonly INotificationService _notifications;
 
     public DashboardController(
@@ -21,12 +22,14 @@ public class DashboardController : BusinessBaseController
         BusinessSubscriptionStatusHelper subscriptionStatusHelper,
         BusinessPlanLimitHelper planLimitHelper,
         GoLiveHelper goLiveHelper,
+        CustomerOnboardingHelper onboardingHelper,
         INotificationService notifications)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
         _planLimitHelper = planLimitHelper;
         _goLiveHelper = goLiveHelper;
+        _onboardingHelper = onboardingHelper;
         _notifications = notifications;
     }
 
@@ -179,6 +182,7 @@ public class DashboardController : BusinessBaseController
             Subscription = await _subscriptionStatusHelper.GetStatusAsync(businessId),
             PlanUsage = await _planLimitHelper.GetUsageAsync(businessId),
             GoLiveStatus = await _goLiveHelper.BuildDashboardCardAsync(businessId),
+            OnboardingStatus = await _onboardingHelper.BuildDashboardCardAsync(businessId),
             Notifications = await BuildNotificationCardAsync(businessId),
             IsBusinessOwner = User.IsInRole(nameof(UserRole.BusinessOwner))
         };

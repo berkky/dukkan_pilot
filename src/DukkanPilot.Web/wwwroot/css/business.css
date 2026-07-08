@@ -317,3 +317,82 @@
 .dp-demo-step-card .panel-card-body {
     min-height: 10.5rem;
 }
+
+/* 31A — Customer Onboarding */
+.onboarding-score-card,
+.onboarding-dashboard-card {
+    border-width: 1px;
+}
+
+.onboarding-score-ring {
+    width: 5.5rem;
+    height: 5.5rem;
+    margin-inline: auto;
+    border-radius: 50%;
+    border: 4px solid #2563eb;
+    display: grid;
+    place-items: center;
+    background: #eff6ff;
+}
+
+.onboarding-score-ring-sm {
+    width: 4.25rem;
+    height: 4.25rem;
+}
+
+.onboarding-score-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.onboarding-score-ring-sm .onboarding-score-value {
+    font-size: 1.2rem;
+}
+
+.onboarding-progress {
+    height: 10px;
+}
+
+.onboarding-next-action {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.65rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+}
+
+.onboarding-checklist .onboarding-step {
+    padding: 1rem 1.15rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.onboarding-checklist .onboarding-step:last-child {
+    border-bottom: 0;
+}
+
+.onboarding-checklist .onboarding-step.is-complete {
+    background: #f8fafc;
+}
+
+.onboarding-step-actions {
+    flex-shrink: 0;
+}
+
+.onboarding-launch-list {
+    padding-left: 1.1rem;
+}
+
+.onboarding-launch-list li {
+    margin-bottom: 0.4rem;
+}
+
+@media (max-width: 575.98px) {
+    .onboarding-score-ring {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+
+    .onboarding-score-value {
+        font-size: 1.25rem;
+    }
+}

@@ -1,0 +1,227 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminOnboardingViewModel
+@using DukkanPilot.Web.Models.Onboarding
+@using DukkanPilot.Web.Models.Shared
+@{
+    ViewData["Title"] = "Müşteri Kurulum Takibi";
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Müşteri Kurulum Takibi</h2>
+        <p class="text-muted mb-0">İşletmelerin onboarding skorunu ve satış sonrası kurulum durumunu izleyin.</p>
+    </div>
+    <a href="/Admin/SalesRequests" class="btn btn-sm btn-outline-primary">Satış Talepleri</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl"><div class="stat-card h-100"><div class="stat-label">Toplam işletme</div><div class="stat-value">@Model.TotalBusinesses</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat-card h-100"><div class="stat-label">Kurulumda</div><div class="stat-value">@Model.SetupInProgressCount</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat-card h-100"><div class="stat-label">Yayına hazır</div><div class="stat-value text-success">@Model.ReadyToLaunchCount</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat-card h-100"><div class="stat-label">Canlı</div><div class="stat-value text-success">@Model.LiveCount</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat-card h-100"><div class="stat-label">Riskli</div><div class="stat-value text-warning">@Model.AtRiskCount</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat-card h-100"><div class="stat-label">Won (7 gün)</div><div class="stat-value text-primary">@Model.WonSalesLast7Days</div></div></div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Filtreler</h3></div>
+    <div class="panel-card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small">Durum</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (OnboardingStatus st in Enum.GetValues(typeof(OnboardingStatus)))
+                    {
+                        if (Model.StatusFilter == st.ToString())
+                        {
+                            <option value="@st" selected>@st</option>
+                        }
+                        else
+                        {
+                            <option value="@st">@st</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Ara</label>
+                <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm" placeholder="Ad / slug" />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">Min skor</label>
+                <input type="number" name="minScore" value="@Model.MinScore" class="form-control form-control-sm" min="0" max="100" />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">Max skor</label>
+                <input type="number" name="maxScore" value="@Model.MaxScore" class="form-control form-control-sm" min="0" max="100" />
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="hasOpenSalesRequest" value="true" id="fOpen" @(Model.HasOpenSalesRequest == true ? "checked" : null) />
+                    <label class="form-check-label small" for="fOpen">Açık satış talebi</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="hasNoActiveProduct" value="true" id="fProd" @(Model.HasNoActiveProduct == true ? "checked" : null) />
+                    <label class="form-check-label small" for="fProd">Ürün yok</label>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="hasNoOrder" value="true" id="fOrd" @(Model.HasNoOrder == true ? "checked" : null) />
+                    <label class="form-check-label small" for="fOrd">Sipariş yok</label>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-sm btn-primary w-100">Filtrele</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">İşletmeler</h3>
+        <span class="small text-muted">@Model.Rows.Count kayıt</span>
+    </div>
+    <div class="panel-card-body p-0">
+        @if (Model.Rows.Count == 0)
+        {
+            <div class="p-4">
+                @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+                {
+                    Title = "Henüz onboarding takip edilecek işletme yok.",
+                    Description = "Filtreleri temizleyin veya yeni işletme oluşturun.",
+                    PrimaryActionText = "İşletmeler",
+                    PrimaryActionUrl = "/Admin/Businesses"
+                })
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0 onboarding-board-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>İşletme</th>
+                            <th>Plan</th>
+                            <th>Skor</th>
+                            <th>Durum</th>
+                            <th>Eksik</th>
+                            <th>Sıradaki</th>
+                            <th>Ürün</th>
+                            <th>Sipariş</th>
+                            <th>Kampanya</th>
+                            <th>Son aktivite</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr class="@(row.IsAtRisk ? "table-warning" : null)">
+                            <td>
+                                <div class="fw-semibold">@row.BusinessName</div>
+                                <div class="small text-muted">@row.Slug</div>
+                                @if (row.HasOpenSalesRequest)
+                                {
+                                    <span class="badge bg-info text-dark">Açık talep</span>
+                                }
+                            </td>
+                            <td class="small">
+                                @(row.PlanName ?? "-")
+                                <div class="text-muted">@(row.SubscriptionStatusLabel ?? "")</div>
+                            </td>
+                            <td>
+                                <div class="onboarding-mini-progress" title="@row.Score">
+                                    <div class="progress" style="height:6px;width:64px;">
+                                        <div class="progress-bar" style="width:@row.Score%"></div>
+                                    </div>
+                                    <span class="small">@row.Score</span>
+                                </div>
+                            </td>
+                            <td><span class="badge @row.StatusBadgeClass">@row.StatusLabel</span></td>
+                            <td>@row.MissingRequiredCount</td>
+                            <td class="small">@(row.NextBestActionTitle ?? "-")</td>
+                            <td>@row.ActiveProductCount</td>
+                            <td>@row.OrderCount</td>
+                            <td>@row.CampaignCount</td>
+                            <td class="small text-muted">@(row.LastActivityAtUtc?.ToLocalTime().ToString("g") ?? "-")</td>
+                            <td class="text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" href="/Admin/Onboarding/Details/@row.BusinessId">Detay</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="@row.PublicMenuUrl" target="_blank" rel="noopener">Menü</a>
+                                <a class="btn btn-sm btn-link" href="/Admin/Businesses/Details/@row.BusinessId">İşletme</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Sales handoff (Won / Qualified)</h3></div>
+    <div class="panel-card-body p-0">
+        @if (Model.SalesHandoffs.Count == 0)
+        {
+            <p class="p-3 mb-0 small text-muted">Won veya Qualified satış talebi yok.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Talep</th>
+                            <th>Durum</th>
+                            <th>İletişim</th>
+                            <th>İşletme bağlama</th>
+                            <th>Onboarding</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var h in Model.SalesHandoffs)
+                    {
+                        <tr>
+                            <td>#@h.SalesRequestId</td>
+                            <td><span class="badge bg-secondary">@h.Status</span></td>
+                            <td class="small">@h.ContactName<div class="text-muted">@(h.BusinessNameFromRequest ?? "")</div></td>
+                            <td class="small">
+                                @if (h.BusinessId is int bid)
+                                {
+                                    <span>@h.LinkedBusinessName (#@bid)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-warning">İşletme hesabı oluşturulmalı veya bağlanmalı</span>
+                                }
+                            </td>
+                            <td>
+                                @if (h.OnboardingScore is int sc)
+                                {
+                                    <span class="badge @(h.OnboardingBadgeClass ?? "bg-secondary")">@h.OnboardingStatusLabel · @sc</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
+                                }
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="/Admin/SalesRequests/Details/@h.SalesRequestId" class="btn btn-sm btn-outline-secondary">Talep</a>
+                                @if (h.BusinessId is int linkedId)
+                                {
+                                    <a href="/Admin/Onboarding/Details/@linkedId" class="btn btn-sm btn-outline-primary">Kurulum</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

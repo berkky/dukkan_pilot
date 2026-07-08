@@ -1,5 +1,6 @@
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class DemoCenterController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly CustomerOnboardingHelper _onboardingHelper;
 
-    public DemoCenterController(AppDbContext context)
+    public DemoCenterController(AppDbContext context, CustomerOnboardingHelper onboardingHelper)
     {
         _context = context;
+        _onboardingHelper = onboardingHelper;
     }
 
     [HttpGet("")]
@@ -166,6 +169,14 @@ public class DemoCenterController : BusinessBaseController
                 }
             ]
         };
+
+        var onboardingCard = await _onboardingHelper.BuildDashboardCardAsync(businessId);
+        if (onboardingCard is not null)
+        {
+            model.OnboardingScore = onboardingCard.Score;
+            model.OnboardingStatusLabel = onboardingCard.StatusLabel;
+            model.OnboardingBadgeClass = onboardingCard.StatusBadgeClass;
+        }
 
         return View(model);
     }

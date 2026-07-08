@@ -17,15 +17,18 @@ public class DashboardController : AdminBaseController
     private readonly AppDbContext _context;
     private readonly INotificationService _notifications;
     private readonly ISalesRequestService _salesRequests;
+    private readonly CustomerOnboardingHelper _onboardingHelper;
 
     public DashboardController(
         AppDbContext context,
         INotificationService notifications,
-        ISalesRequestService salesRequests)
+        ISalesRequestService salesRequests,
+        CustomerOnboardingHelper onboardingHelper)
     {
         _context = context;
         _notifications = notifications;
         _salesRequests = salesRequests;
+        _onboardingHelper = onboardingHelper;
     }
 
     [HttpGet("")]
@@ -153,6 +156,10 @@ public class DashboardController : AdminBaseController
         var salesSummary = await _salesRequests.GetAdminSummaryAsync();
         model.NewSalesRequestCount = salesSummary.NewCount;
         model.OpenSalesRequestCount = salesSummary.OpenCount;
+
+        var onboardingSnaps = await _onboardingHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
+        model.OnboardingAtRiskCount = onboardingSnaps.Count(s => s.IsAtRisk || s.Score < 40);
+        model.OnboardingLiveCount = onboardingSnaps.Count(s => s.IsLive);
 
         return View(model);
     }

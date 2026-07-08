@@ -115,6 +115,8 @@ Test-Url "/Admin/SalesCenter" @(302, 301) "Auth redirect"
 Test-Url "/Admin/Operations" @(302, 301) "Auth redirect"
 Test-Url "/Business/Billing/Requests" @(302, 301) "Auth redirect"
 Test-Url "/Admin/SalesRequests" @(302, 301) "Auth redirect"
+Test-Url "/Business/Onboarding" @(302, 301) "Auth redirect"
+Test-Url "/Admin/Onboarding" @(302, 301) "Auth redirect"
 
 $results | Format-Table -AutoSize Path, Status, Expected, Result, Note
 

@@ -1,6 +1,7 @@
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Models.Onboarding;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,12 @@ namespace DukkanPilot.Web.Areas.Admin.Controllers;
 public class SalesCenterController : AdminBaseController
 {
     private readonly AppDbContext _context;
+    private readonly CustomerOnboardingHelper _onboardingHelper;
 
-    public SalesCenterController(AppDbContext context)
+    public SalesCenterController(AppDbContext context, CustomerOnboardingHelper onboardingHelper)
     {
         _context = context;
+        _onboardingHelper = onboardingHelper;
     }
 
     [HttpGet("")]
@@ -144,6 +147,54 @@ public class SalesCenterController : AdminBaseController
             });
         }
 
+        var onboardingSnaps = await _onboardingHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
+        var onboardingById = onboardingSnaps.ToDictionary(s => s.BusinessId);
+        var onboardingReady = onboardingSnaps
+            .Where(s => s.Status is OnboardingStatus.ReadyToLaunch or OnboardingStatus.Live)
+            .OrderByDescending(s => s.Score)
+            .Take(15)
+            .Select(s => new SalesCenterBusinessRowViewModel
+            {
+                BusinessId = s.BusinessId,
+                BusinessName = s.BusinessName,
+                Slug = s.BusinessSlug,
+                PublicMenuUrl = s.PublicMenuUrl,
+                HealthScore = s.Score,
+                HealthLabel = s.StatusLabel,
+                HealthBadgeClass = s.StatusBadgeClass,
+                OrderCount = s.OrderCount,
+                ActiveProductCount = s.ActiveProductCount,
+                CampaignCount = s.CampaignCount,
+                IsDemoReady = true
+            })
+            .ToList();
+
+        var wonRequests = await _context.SalesRequests.AsNoTracking()
+            .Where(r => r.Status == "Won")
+            .OrderByDescending(r => r.ClosedAtUtc ?? r.UpdatedAtUtc ?? r.CreatedAtUtc)
+            .Take(12)
+            .ToListAsync();
+
+        var wonHandoffs = wonRequests.Select(r =>
+        {
+            CustomerOnboardingSnapshot? snap = null;
+            if (r.BusinessId is int bid)
+            {
+                onboardingById.TryGetValue(bid, out snap);
+            }
+
+            return new SalesCenterWonHandoffViewModel
+            {
+                SalesRequestId = r.Id,
+                ContactName = r.ContactName ?? "-",
+                BusinessName = r.BusinessName,
+                BusinessId = r.BusinessId,
+                OnboardingScore = snap?.Score,
+                OnboardingStatusLabel = snap?.StatusLabel,
+                OnboardingBadgeClass = snap?.StatusBadgeClass
+            };
+        }).ToList();
+
         var model = new SalesCenterViewModel
         {
             TotalBusinesses = businesses.Count,
@@ -151,16 +202,19 @@ public class SalesCenterController : AdminBaseController
             TrialBusinesses = trial,
             ExpiringSoonBusinesses = expiring,
             DemoReadyBusinesses = rows.Count(r => r.IsDemoReady),
+            OnboardingReadyBusinesses = onboardingReady.Count,
             DemoReadyList = rows.Where(r => r.IsDemoReady)
                 .OrderByDescending(r => r.HealthScore)
                 .ThenByDescending(r => r.OrderCount)
                 .Take(15)
                 .ToList(),
+            OnboardingReadyList = onboardingReady,
             NeedsAttentionList = rows.Where(r => !string.IsNullOrWhiteSpace(r.AttentionReason))
                 .OrderBy(r => r.HealthScore)
                 .ThenBy(r => r.BusinessName)
                 .Take(15)
-                .ToList()
+                .ToList(),
+            WonHandoffs = wonHandoffs
         };
 
         return View(model);

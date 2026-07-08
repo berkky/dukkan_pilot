@@ -51,8 +51,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] `/` landing
 - [ ] `/Demo` ve `/m/demo-kafe`
 - [ ] `/Account/Login`
-- [ ] Owner: Business Dashboard + DemoCenter
-- [ ] SuperAdmin: Admin Dashboard + SalesCenter
+- [ ] Owner: Business Dashboard + DemoCenter + Onboarding
+- [ ] SuperAdmin: Admin Dashboard + SalesCenter + Onboarding
+- [ ] Onboarding routes smoke: `/Business/Onboarding` `/Admin/Onboarding` (auth yok → 302)
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`

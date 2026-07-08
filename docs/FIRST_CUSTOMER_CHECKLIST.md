@@ -13,10 +13,12 @@
 - [ ] (Opsiyonel) Kampanya: 100₺ üzeri %10 auto-apply
 - [ ] (Opsiyonel) Ödül + sadakat kuralı
 - [ ] Go-Live skoru kontrol (`/Business/GoLive`)
+- [ ] Kurulum Sihirbazı (`/Business/Onboarding`) — skor + next action
 - [ ] Personel ekle (Owner)
 - [ ] Demo Merkezi checklist yeşil (`/Business/DemoCenter`)
 - [ ] Plan/talep ihtiyacı varsa `/Business/Billing` veya public `/Sales/RequestPlan`
 - [ ] Admin satış taleplerini `/Admin/SalesRequests` ile takip
+- [ ] Admin Kurulum Takibi (`/Admin/Onboarding`) — skor / risk / Won handoff
 
 ## Müşteriye eğitim (30 dk)
 1. Public menü + sepet
@@ -24,13 +26,15 @@
 3. Ürün/kategori hızlı güncelleme
 4. Kampanya / ödül
 5. Raporlar
-6. Bildirimler + Go-Live
+6. Bildirimler + Go-Live + Kurulum Sihirbazı
 
 ## İlk hafta takip
 - [ ] Gün 1: Test siparişi var mı?
 - [ ] Gün 2–3: QR masada mı? WhatsApp numara doğru mu?
 - [ ] Gün 5: En az bir gerçek sipariş / kampanya denemesi
 - [ ] Gün 7: Rapor ekranı + upgrade ihtiyacı konuşması
+- [ ] Admin Onboarding Board’da skor yükseldi mi?
 
 ## Not
 Hukuki/KVKK metinleri bu checklist’te yok (30A). Ödeme entegrasyonu yok.
+Onboarding runbook: `docs/CUSTOMER_ONBOARDING_RUNBOOK.md`.

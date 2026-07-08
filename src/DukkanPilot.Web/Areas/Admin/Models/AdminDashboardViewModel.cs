@@ -21,6 +21,10 @@ public class AdminDashboardViewModel
     public int NewSalesRequestCount { get; set; }
 
     public int OpenSalesRequestCount { get; set; }
+
+    public int OnboardingAtRiskCount { get; set; }
+
+    public int OnboardingLiveCount { get; set; }
 }
 
 public class AdminPlatformKpiViewModel

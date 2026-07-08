@@ -32,12 +32,30 @@
         </div>
         <div class="d-flex flex-wrap gap-2 mt-3">
             <a href="/Business/GoLive" class="btn btn-sm btn-success">Go-Live Merkezi</a>
+            <a href="/Business/Onboarding" class="btn btn-sm btn-primary">Kurulum Sihirbazı</a>
             <a href="/Business/Products/Create" class="btn btn-sm btn-outline-primary">Ürün Ekle</a>
             <a href="/Business/Campaigns/Create" class="btn btn-sm btn-outline-primary">Kampanya Oluştur</a>
             <a href="@Model.PublicMenuUrl" class="btn btn-sm btn-outline-success" target="_blank" rel="noopener">Test Siparişi Ver</a>
         </div>
     </div>
 </div>
+
+@if (Model.OnboardingScore is int onboardingScore)
+{
+    <div class="panel-card mb-4 onboarding-dashboard-card border-primary">
+        <div class="panel-card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <div class="small text-muted mb-1">Onboarding skoru</div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="h4 mb-0">@onboardingScore</span>
+                    <span class="badge @(Model.OnboardingBadgeClass ?? "bg-secondary")">@(Model.OnboardingStatusLabel ?? "Kurulum")</span>
+                </div>
+                <p class="small text-muted mb-0 mt-1">Demo hazırlığının yanında müşteri kurulum yolculuğunu da takip edin.</p>
+            </div>
+            <a href="/Business/Onboarding" class="btn btn-sm btn-primary">Kurulum Sihirbazı</a>
+        </div>
+    </div>
+}
 
 <div class="panel-card mb-4 border-info">
     <div class="panel-card-header"><h3 class="h6 mb-0">Yasal hazırlık (hatırlatma)</h3></div>

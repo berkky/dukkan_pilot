@@ -58,6 +58,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Admin/Dashboard` | SuperAdmin | 200 | Operations CTA |
 | `/Admin/Operations` | SuperAdmin | 200 | Salt okunur; secret yok; auth yok → 302 |
 | `/Admin/SalesCenter` | SuperAdmin | 200 | |
+| `/Admin/Onboarding` | SuperAdmin | 200 | Auth yok → 302 |
+| `/Admin/Onboarding/Details/{id}` | SuperAdmin | 200 | |
 | `/Admin/Businesses` | SuperAdmin | 200 | |
 | `/Admin/AuditLogs` | SuperAdmin | 200 | |
 | `/Admin/Notifications` | SuperAdmin | 200 | |
@@ -82,13 +84,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | Admin list | Platform geneli |
 | Hassas veri | Token/şifre metadata’da yok |
 
-## Demo / Sales
+## Demo / Sales / Onboarding
 
 | URL | Beklenen |
 |-----|----------|
 | `/Demo` | Satış akışı |
-| `/Business/DemoCenter` | Skor / CTA |
-| `/Admin/SalesCenter` | Demo-ready list |
+| `/Business/DemoCenter` | Skor / CTA + onboarding kart |
+| `/Business/Onboarding` | Kurulum skoru + checklist (auth yok → 302) |
+| `/Admin/SalesCenter` | Demo-ready + onboarding-ready list |
+| `/Admin/Onboarding` | Board + Sales handoff |
+| `/Admin/SalesRequests/Details/{id}` | BusinessId varsa onboarding mini kart |
 
 ## Security / SEO
 

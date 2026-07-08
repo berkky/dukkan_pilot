@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 30B aşaması (Abonelik Satış Talep Akışı / Lead-to-Subscription Pipeline) tamamlandı.
+> Son güncelleme: 31A (Customer Onboarding & Implementation Center) tamamlandı.
 
 ---
 
@@ -593,6 +593,18 @@ DukkanPilot.sln
 - Identity/SignalR/ödeme/NuGet yok; mevcut Business/Order/Campaign entity’leri değişmedi
 - Public/Business/Admin/Account/Audit/Notification/Demo/Legal/Operations akışları bozulmadı
 
+### 30B-FIX — Public sales Privacy/KVKK checkbox validation
+- Hata: `[Range(typeof(bool), "true", "true")]` checked olsa bile server validation fail ediyordu
+- Düzeltme: `RequiredTrueAttribute` + ViewModel attribute değişimi; checkbox’lar zaten `asp-for` ile bağlı
+- Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet yok
+
+### 31A — Customer Onboarding & Implementation Center
+- `CustomerOnboardingHelper` — mevcut veriden 0–100 skor + status (NotStarted → Live); DB yazmaz
+- Business: `/Business/Onboarding` (ungated, read-only) + Dashboard/GoLive/DemoCenter/sidebar
+- Admin: `/Admin/Onboarding` + `/Admin/Onboarding/Details/{businessId}` + Dashboard/SalesCenter/Operations/SalesRequests handoff
+- Docs: CUSTOMER_ONBOARDING_RUNBOOK, KICKOFF_MEETING_SCRIPT, IMPLEMENTATION_HANDOFF_CHECKLIST, CUSTOMER_SUCCESS_PLAYBOOK
+- Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet/ödeme yok; Notification/Audit gürültüsü yok (read-only)
+
 ---
 
 ## 6. Veritabanı
@@ -663,6 +675,10 @@ Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 30A tamamlandı — Legal/Trust pages; cookie notice; footer/account/business/admin legal polish; legal docs; sitemap.
 
 30B tamamlandı — SalesRequest entity/migration; public demo/plan forms; Business Billing pipeline; Admin SalesRequests; notifications/audit; sales pipeline docs.
+
+30B-FIX — Public sales Privacy/KVKK checkbox validation (`RequiredTrueAttribute`).
+
+31A — Customer Onboarding & Implementation Center (read-only helper + Business/Admin UI + docs; migration yok).
 
 ---
 

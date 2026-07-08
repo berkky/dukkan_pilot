@@ -15,6 +15,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 3. Gerçek kampanya indirim motoru + performans
 4. Sadakat puanı / ödül
 5. Audit log + bildirim merkezi ile güven
+6. Satış sonrası kurulum desteği ve onboarding (Kurulum Sihirbazı + Admin Kurulum Takibi)
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon
@@ -31,7 +32,7 @@ Satış akışı: **Talep oluştur → Admin SalesRequests takip → manuel abon
 ## Demo cümleleri
 - “Menüyü telefonla açın, sepete 100₺ koyun; indirim otomatik gelsin.”
 - “Sipariş geldiğinde mutfak ekranı ve müşteri kaydı hazır.”
-- “Kurulum skoru Go-Live’da; eksikleri adım adım kapatın.”
+- “Kurulum skoru Go-Live ve Onboarding’de; eksikleri adım adım kapatın.”
 
 ## Landing kısa metinler
 - Hero: QR Menü, WhatsApp Sipariş ve Sadakat tek panelde

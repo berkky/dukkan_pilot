@@ -54,6 +54,14 @@ public class AdminSalesRequestDetailViewModel
 
     public bool KvkkNoticeAcknowledged { get; set; }
 
+    public int? OnboardingScore { get; set; }
+
+    public string? OnboardingStatusLabel { get; set; }
+
+    public string? OnboardingBadgeClass { get; set; }
+
+    public string? OnboardingNextAction { get; set; }
+
     public AdminSalesRequestUpdateViewModel Update { get; set; } = new();
 }
 

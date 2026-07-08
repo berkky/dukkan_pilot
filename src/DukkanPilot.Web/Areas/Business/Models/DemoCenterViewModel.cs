@@ -10,6 +10,9 @@ public class DemoCenterViewModel
     public string ReadinessBadgeClass { get; set; } = "bg-secondary";
     public List<DemoCenterCheckViewModel> Checks { get; set; } = new();
     public List<DemoCenterStepViewModel> Steps { get; set; } = new();
+    public int? OnboardingScore { get; set; }
+    public string? OnboardingStatusLabel { get; set; }
+    public string? OnboardingBadgeClass { get; set; }
 }
 
 public class DemoCenterCheckViewModel

@@ -1,0 +1,156 @@
+@model DukkanPilot.Web.Areas.Business.Models.BusinessOnboardingViewModel
+@using DukkanPilot.Web.Models.Shared
+@{
+    ViewData["Title"] = "Kurulum Sihirbazı";
+    ViewData["Subtitle"] = Model.Snapshot.BusinessName;
+    var s = Model.Snapshot;
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Kurulum Sihirbazı</h2>
+        <p class="text-muted mb-0">İşletmenizi satışa ve yayına hazırlamak için adımları tamamlayın.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/GoLive" class="btn btn-outline-success btn-sm">Go-Live</a>
+        <a href="/Business/DemoCenter" class="btn btn-outline-primary btn-sm">Demo Merkezi</a>
+        <a href="@s.PublicMenuUrl" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener">Public Menü</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Nasıl kullanılır?",
+    Description = "Bu ekran mevcut verilerinizden hesaplanır; kaydetme veya yeni bildirim üretmez. Her adım ilgili modüle yönlendirir. Go-Live teknik hazırlık checklist’idir; Kurulum Sihirbazı ise müşteri yolculuğunu adım adım gösterir.",
+    Variant = "info"
+})
+
+<div class="panel-card mb-4 onboarding-score-card @s.CardVariantClass">
+    <div class="panel-card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col-sm-3 col-md-2 text-center">
+                <div class="onboarding-score-ring" aria-label="Onboarding skoru @s.Score">
+                    <span class="onboarding-score-value">@s.Score</span>
+                </div>
+                <div class="small text-muted mt-1">Skor</div>
+            </div>
+            <div class="col-sm-9 col-md-7">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <span class="badge @s.StatusBadgeClass">@s.StatusLabel</span>
+                    <span class="small text-muted">Zorunlu: @s.RequiredCompletedCount / @s.RequiredTotalCount · Adım: @s.CompletedStepCount / @s.TotalStepCount</span>
+                </div>
+                <div class="progress onboarding-progress" role="progressbar" aria-valuenow="@s.Score" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar @(s.IsReadyToLaunch || s.IsLive ? "bg-success" : "bg-primary")" style="width: @s.Score%"></div>
+                </div>
+                @if (s.IsAtRisk)
+                {
+                    <p class="small text-warning mb-0 mt-2">Kritik eksikler var (ürün, WhatsApp veya test siparişi). Önce zorunlu adımları tamamlayın.</p>
+                }
+            </div>
+            <div class="col-md-3">
+                @if (!string.IsNullOrWhiteSpace(s.NextBestActionUrl))
+                {
+                    <div class="onboarding-next-action">
+                        <div class="small text-muted mb-1">Sıradaki adım</div>
+                        <div class="fw-semibold small mb-2">@s.NextBestActionTitle</div>
+                        @if (s.NextBestActionOwnerOnly && !Model.IsBusinessOwner)
+                        {
+                            <div class="alert alert-light border small mb-2 py-2">Bu adım Owner yetkisi gerektirir.</div>
+                        }
+                        else
+                        {
+                            <a href="@s.NextBestActionUrl" class="btn btn-sm btn-primary w-100">@(s.NextBestActionText ?? "Git")</a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (s.Steps.Count == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Title = "Onboarding adımı yok",
+        Description = "Henüz hesaplanacak kurulum verisi bulunamadı.",
+        PrimaryActionText = "Dashboard",
+        PrimaryActionUrl = "/Business/Dashboard"
+    })
+}
+else
+{
+    <div class="panel-card mb-4">
+        <div class="panel-card-header"><h3 class="h6 mb-0">Kurulum checklist</h3></div>
+        <div class="panel-card-body p-0">
+            <div class="onboarding-checklist">
+                @foreach (var step in s.Steps)
+                {
+                    <div class="onboarding-step @(step.IsCompleted ? "is-complete" : "")">
+                        <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                    <strong>@step.Title</strong>
+                                    <span class="badge @step.BadgeClass">@step.BadgeText</span>
+                                    @if (step.IsRequired)
+                                    {
+                                        <span class="badge bg-light text-dark border">Zorunlu</span>
+                                    }
+                                </div>
+                                <p class="small text-muted mb-1">@step.Description</p>
+                                @if (!string.IsNullOrWhiteSpace(step.HelpText))
+                                {
+                                    <p class="small mb-0 text-secondary">@step.HelpText</p>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(step.WarningText))
+                                {
+                                    <p class="small text-warning mb-0 mt-1">@step.WarningText</p>
+                                }
+                            </div>
+                            <div class="onboarding-step-actions">
+                                @if (!string.IsNullOrWhiteSpace(step.ActionUrl) && !string.IsNullOrWhiteSpace(step.ActionText))
+                                {
+                                    if (step.OwnerOnly && !Model.IsBusinessOwner)
+                                    {
+                                        <span class="small text-muted">Owner gerekli</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="@step.ActionUrl" class="btn btn-sm @(step.IsCompleted ? "btn-outline-secondary" : "btn-outline-primary")">@step.ActionText</a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Launch checklist</h3></div>
+            <div class="panel-card-body">
+                <ul class="onboarding-launch-list mb-0">
+                    @foreach (var item in s.LaunchChecklist)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Hızlı bağlantılar</h3></div>
+            <div class="panel-card-body d-flex flex-wrap gap-2">
+                @foreach (var link in s.QuickLinks)
+                {
+                    <a href="@link.Url" class="btn btn-sm btn-outline-secondary">@link.Title</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

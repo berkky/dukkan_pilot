@@ -12,11 +12,16 @@ public class SalesRequestsController : AdminBaseController
 {
     private readonly AppDbContext _context;
     private readonly ISalesRequestService _salesRequests;
+    private readonly CustomerOnboardingHelper _onboardingHelper;
 
-    public SalesRequestsController(AppDbContext context, ISalesRequestService salesRequests)
+    public SalesRequestsController(
+        AppDbContext context,
+        ISalesRequestService salesRequests,
+        CustomerOnboardingHelper onboardingHelper)
     {
         _context = context;
         _salesRequests = salesRequests;
+        _onboardingHelper = onboardingHelper;
     }
 
     [HttpGet("")]
@@ -119,6 +124,19 @@ public class SalesRequestsController : AdminBaseController
         }
 
         var model = MapDetail(entity);
+
+        if (entity.BusinessId is int businessId)
+        {
+            var snap = await _onboardingHelper.BuildAsync(businessId, string.Empty, isBusinessOwner: true, cancellationToken);
+            if (snap is not null)
+            {
+                model.OnboardingScore = snap.Score;
+                model.OnboardingStatusLabel = snap.StatusLabel;
+                model.OnboardingBadgeClass = snap.StatusBadgeClass;
+                model.OnboardingNextAction = snap.NextBestActionTitle;
+            }
+        }
+
         return View(model);
     }
 

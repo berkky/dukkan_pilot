@@ -7,8 +7,22 @@ public class SalesCenterViewModel
     public int TrialBusinesses { get; set; }
     public int ExpiringSoonBusinesses { get; set; }
     public int DemoReadyBusinesses { get; set; }
+    public int OnboardingReadyBusinesses { get; set; }
     public List<SalesCenterBusinessRowViewModel> DemoReadyList { get; set; } = new();
+    public List<SalesCenterBusinessRowViewModel> OnboardingReadyList { get; set; } = new();
     public List<SalesCenterBusinessRowViewModel> NeedsAttentionList { get; set; } = new();
+    public List<SalesCenterWonHandoffViewModel> WonHandoffs { get; set; } = new();
+}
+
+public class SalesCenterWonHandoffViewModel
+{
+    public int SalesRequestId { get; set; }
+    public string ContactName { get; set; } = string.Empty;
+    public string? BusinessName { get; set; }
+    public int? BusinessId { get; set; }
+    public int? OnboardingScore { get; set; }
+    public string? OnboardingStatusLabel { get; set; }
+    public string? OnboardingBadgeClass { get; set; }
 }
 
 public class SalesCenterBusinessRowViewModel

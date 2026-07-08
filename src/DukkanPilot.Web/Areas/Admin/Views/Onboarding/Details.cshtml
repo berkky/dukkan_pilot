@@ -1,0 +1,129 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminOnboardingDetailViewModel
+@{
+    ViewData["Title"] = "Onboarding Detay";
+    var s = Model.Snapshot;
+}
+
+<div class="page-header mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <nav class="small mb-1"><a href="/Admin/Onboarding">Kurulum Takibi</a> · Detay</nav>
+        <h2 class="h4 mb-1">@s.BusinessName</h2>
+        <p class="text-muted mb-0">@s.BusinessSlug · @(s.PlanName ?? "Plansız") · @(s.SubscriptionStatusLabel ?? "")</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Admin/Businesses/Details/@s.BusinessId" class="btn btn-sm btn-outline-secondary">İşletme</a>
+        <a href="@s.PublicMenuUrl" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">Public Menü</a>
+        <a href="/Admin/SalesRequests" class="btn btn-sm btn-outline-dark">Satış Talepleri</a>
+        <a href="/Admin/Operations" class="btn btn-sm btn-outline-secondary">Operasyon</a>
+    </div>
+</div>
+
+<div class="panel-card mb-4 @s.CardVariantClass">
+    <div class="panel-card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <div>
+                <span class="display-6 fw-semibold">@s.Score</span>
+                <span class="badge @s.StatusBadgeClass ms-2">@s.StatusLabel</span>
+            </div>
+            <div class="small text-muted">
+                Zorunlu @s.RequiredCompletedCount/@s.RequiredTotalCount · Eksik @s.MissingRequiredCount
+            </div>
+        </div>
+        <div class="progress mb-2" style="height:8px;">
+            <div class="progress-bar" style="width:@s.Score%"></div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(s.NextBestActionTitle))
+        {
+            <p class="mb-0 small">Sıradaki: <strong>@s.NextBestActionTitle</strong></p>
+        }
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Checklist</h3></div>
+            <div class="panel-card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach (var step in s.Steps)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-start gap-2">
+                            <div>
+                                <div class="fw-semibold small">@step.Title</div>
+                                <div class="text-muted small">@step.Description</div>
+                            </div>
+                            <span class="badge @step.BadgeClass">@step.BadgeText</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">İlgili satış talepleri</h3></div>
+            <div class="panel-card-body p-0">
+                @if (Model.RelatedSalesRequests.Count == 0)
+                {
+                    <p class="p-3 mb-0 small text-muted">Bağlı SalesRequest yok.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var r in Model.RelatedSalesRequests)
+                        {
+                            <li class="list-group-item small">
+                                <a href="/Admin/SalesRequests/Details/@r.Id">#@r.Id</a>
+                                · @r.Status · @r.RequestType
+                                <div class="text-muted">@r.CreatedAtUtc.ToLocalTime().ToString("g")</div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Son audit</h3></div>
+            <div class="panel-card-body p-0">
+                @if (Model.RecentAudits.Count == 0)
+                {
+                    <p class="p-3 mb-0 small text-muted">Kayıt yok.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var a in Model.RecentAudits)
+                        {
+                            <li class="list-group-item small">
+                                <div class="fw-semibold">@a.Title</div>
+                                <div class="text-muted">@a.Detail</div>
+                                <div class="text-muted">@a.AtUtc.ToLocalTime().ToString("g")</div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Son bildirimler</h3></div>
+            <div class="panel-card-body p-0">
+                @if (Model.RecentNotifications.Count == 0)
+                {
+                    <p class="p-3 mb-0 small text-muted">Kayıt yok.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var n in Model.RecentNotifications)
+                        {
+                            <li class="list-group-item small">
+                                <div class="fw-semibold">@n.Title</div>
+                                <div class="text-muted">@n.Detail · @n.AtUtc.ToLocalTime().ToString("g")</div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>

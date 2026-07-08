@@ -88,3 +88,15 @@
         min-height: auto;
     }
 }
+
+/* 31A — Admin Onboarding Board */
+.onboarding-board-table th {
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.onboarding-mini-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}

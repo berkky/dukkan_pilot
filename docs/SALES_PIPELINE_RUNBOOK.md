@@ -36,7 +36,11 @@ Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 
 1. `/Admin/Businesses/Subscription/{id}` planı güncelle
 2. Talebi Won bırak / not ekle
-3. Müşteriye paneli doğrula
+3. `BusinessId` bağlı değilse işletme oluştur / bağla
+4. `/Admin/Onboarding` ile kurulum skorunu aç; Details’ten checklist izle
+5. Kickoff: `docs/KICKOFF_MEETING_SCRIPT.md`
+6. Handoff: `docs/IMPLEMENTATION_HANDOFF_CHECKLIST.md`
+7. Müşteriye `/Business/Onboarding` göster
 
 ## Checklist (müşteri dönüşü)
 
@@ -44,7 +48,8 @@ Online ödeme yoktur. Talep → admin takip → manuel abonelik güncellemesi.
 - [ ] Plan teyit
 - [ ] Legal/KVKK hatırlatma
 - [ ] Abonelik manuel set
-- [ ] Smoke: login + billing
+- [ ] Onboarding handoff (`/Admin/Onboarding`)
+- [ ] Smoke: login + billing + onboarding
 
 ## Spam / duplicate
 

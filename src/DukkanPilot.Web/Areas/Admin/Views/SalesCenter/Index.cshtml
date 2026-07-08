@@ -28,6 +28,15 @@
         <div class="stat-card h-100"><div class="stat-label">Demo-ready</div><div class="stat-value text-primary">@Model.DemoReadyBusinesses</div></div>
     </div>
     <div class="col-sm-6 col-xl">
+        <a href="/Admin/Onboarding" class="text-decoration-none">
+            <div class="stat-card h-100 border-success">
+                <div class="stat-label">Onboarding-ready</div>
+                <div class="stat-value text-success">@Model.OnboardingReadyBusinesses</div>
+                <small class="text-muted">Kurulum Takibi</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl">
         <a href="/Admin/SalesRequests" class="text-decoration-none">
             <div class="stat-card h-100 border-primary">
                 <div class="stat-label">Satış Talepleri</div>
@@ -140,6 +149,98 @@
                                     <div class="text-muted small">@b.AttentionReason</div>
                                 </div>
                                 <a href="/Admin/Businesses/Details/@b.BusinessId" class="btn btn-sm btn-outline-secondary">Detay</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Onboarding-ready işletmeler</h3>
+                <a href="/Admin/Onboarding" class="btn btn-sm btn-outline-primary">Kurulum Takibi</a>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>İşletme</th>
+                                <th>Onboarding</th>
+                                <th>Ürün</th>
+                                <th>Sipariş</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.OnboardingReadyList.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-4">Henüz yayına hazır / canlı işletme yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var b in Model.OnboardingReadyList)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@b.BusinessName</div>
+                                        <span class="small text-muted">@b.Slug</span>
+                                    </td>
+                                    <td><span class="badge @b.HealthBadgeClass">@b.HealthScore · @b.HealthLabel</span></td>
+                                    <td>@b.ActiveProductCount</td>
+                                    <td>@b.OrderCount</td>
+                                    <td class="text-end">
+                                        <a href="/Admin/Onboarding/Details/@b.BusinessId" class="btn btn-sm btn-outline-primary">Kurulum</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Won SalesRequests → onboarding</h3></div>
+            <div class="panel-card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if (!Model.WonHandoffs.Any())
+                    {
+                        <li class="list-group-item text-muted small">Won talep yok.</li>
+                    }
+                    else
+                    {
+                        foreach (var w in Model.WonHandoffs)
+                        {
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between gap-2">
+                                    <div>
+                                        <div class="fw-semibold small">#@w.SalesRequestId · @w.ContactName</div>
+                                        <div class="text-muted small">@(w.BusinessName ?? "İşletme adı yok")</div>
+                                        @if (w.OnboardingScore is int sc)
+                                        {
+                                            <span class="badge @(w.OnboardingBadgeClass ?? "bg-secondary")">@w.OnboardingStatusLabel · @sc</span>
+                                        }
+                                        else if (w.BusinessId is null)
+                                        {
+                                            <span class="small text-warning">İşletme bağlanmamış</span>
+                                        }
+                                    </div>
+                                    <div class="text-nowrap">
+                                        <a href="/Admin/SalesRequests/Details/@w.SalesRequestId" class="btn btn-sm btn-outline-secondary">Talep</a>
+                                        @if (w.BusinessId is int bid)
+                                        {
+                                            <a href="/Admin/Onboarding/Details/@bid" class="btn btn-sm btn-outline-primary">Kurulum</a>
+                                        }
+                                    </div>
+                                </div>
                             </li>
                         }
                     }

@@ -70,7 +70,11 @@ public class OperationsController : AdminBaseController
                 new OpsDocLinkViewModel { Title = "Operational security", Path = "docs/OPERATIONAL_SECURITY_CHECKLIST.md" },
                 new OpsDocLinkViewModel { Title = "First release operations", Path = "docs/FIRST_RELEASE_OPERATIONS.md" },
                 new OpsDocLinkViewModel { Title = "Legal readiness", Path = "docs/LEGAL_READINESS_CHECKLIST.md" },
-                new OpsDocLinkViewModel { Title = "Privacy & data map", Path = "docs/PRIVACY_AND_DATA_MAP.md" }
+                new OpsDocLinkViewModel { Title = "Privacy & data map", Path = "docs/PRIVACY_AND_DATA_MAP.md" },
+                new OpsDocLinkViewModel { Title = "Customer onboarding", Path = "docs/CUSTOMER_ONBOARDING_RUNBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Kickoff script", Path = "docs/KICKOFF_MEETING_SCRIPT.md" },
+                new OpsDocLinkViewModel { Title = "Implementation handoff", Path = "docs/IMPLEMENTATION_HANDOFF_CHECKLIST.md" },
+                new OpsDocLinkViewModel { Title = "Customer success", Path = "docs/CUSTOMER_SUCCESS_PLAYBOOK.md" }
             ],
             ScriptHints =
             [
@@ -140,6 +144,13 @@ public class OperationsController : AdminBaseController
                 Title = "Rollback plani hazir mi?",
                 Description = "Onceki publish yedegi + DB backup; EF down migration riskli.",
                 IsReadyHint = model.HasIncidentRunbook && model.HasBackupDocs
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Onboarding board available",
+                Description = "/Admin/Onboarding + docs/CUSTOMER_ONBOARDING_RUNBOOK.md",
+                IsReadyHint = FileExists("docs", "CUSTOMER_ONBOARDING_RUNBOOK.md")
+                    && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "OnboardingController.cs")
             }
         ];
 
