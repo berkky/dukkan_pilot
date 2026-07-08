@@ -18,6 +18,14 @@
     </div>
 </div>
 
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "Müşterilerinizi segmentlere ayırın, harcama ve son sipariş bilgisine göre filtreleyin, WhatsApp ile iletişime geçin.",
+    ActionText = "CRM İçgörüleri",
+    ActionUrl = "/Business/Customers/Insights"
+})
+
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card h-100">
@@ -69,6 +77,22 @@
     VIP: 5+ sipariş veya 1000₺ üzeri harcama · Tekrar Gelen: 2+ sipariş · Yeni: son 30 gün · Riskte: son sipariş 30+ gün önce
 </div>
 
+@if (Model.TotalCustomers == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "👥",
+        Title = "Henüz müşteri yok",
+        Description = "Siparişler geldikçe müşteriler otomatik oluşur; dilerseniz elle de ekleyebilirsiniz.",
+        PrimaryActionText = "Müşteri Ekle",
+        PrimaryActionUrl = "/Business/Customers/Create",
+        SecondaryActionText = "Siparişler",
+        SecondaryActionUrl = "/Business/Orders",
+        HelpText = "Segment kuralları sipariş ve harcama verisine göre çalışır."
+    })
+}
+else
+{
 <div class="panel-card mb-4">
     <div class="panel-card-header">
         <h3 class="h6 mb-0">Filtreler</h3>
@@ -179,3 +203,4 @@
         </div>
     </div>
 </div>
+}

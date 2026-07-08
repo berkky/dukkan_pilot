@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 27C aşaması (Bildirim Merkezi / Akıllı Uyarılar) tamamlandı.
+> Son güncelleme: 28A aşaması (UX Final Polish / Boş Ekranlar / Yardım Rehberi) tamamlandı.
 
 ---
 
@@ -539,6 +539,15 @@ DukkanPilot.sln
 - Public/Business/Admin/Account/Audit akışları bozulmadı
 - Identity yok; SignalR yok; yeni NuGet dependency yok; background job/push/email yok
 
+### 28A aşaması — UX Final Polish / Boş Ekranlar / Yardım Rehberi
+- **Partials:** `_EmptyState.cshtml`, `_HelpCard.cshtml` + `EmptyStateViewModel` / `HelpCardViewModel` (`Models/Shared`); Business/Admin/_ViewImports namespaces
+- **CSS:** `business.css` — empty state, help card stilleri
+- **Business:** Products, Categories, Campaigns, Rewards, Orders, Kitchen, Customers, Insights, Reports, Campaigns report, AuditLogs, Notifications; Dashboard Go-Live eksik adım CTA; Go-Live/MenuStudio yardım kartları
+- **Admin:** AuditLogs, Notifications, Businesses (empty), Dashboard riskli-boş metin polish
+- **Auth:** Login/Register CTA polish (“Ücretsiz…”)
+- Public sepet/order/confirmation/tracking’e dokunulmadı; campaign engine / audit / notification logic korunuyor
+- Migration yok; Entity/DbContext değişmedi; Identity yok; SignalR yok; yeni NuGet yok
+
 ---
 
 ## 6. Veritabanı
@@ -600,7 +609,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-27C tamamlandı — Notification entity/migration, fail-safe NotificationService, Business/Admin bildirim merkezleri, smart alerts.
+28A tamamlandı — Empty state / help card partial’ları; Business + Admin listede boş yönlendirme; Login/Register CTA polish.
 
 ---
 

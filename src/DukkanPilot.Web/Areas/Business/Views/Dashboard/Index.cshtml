@@ -65,9 +65,19 @@
                     {
                         <p class="small text-success mb-0 mt-2">İşletmeniz yayına hazır görünüyor.</p>
                     }
-                    else if (!string.IsNullOrWhiteSpace(Model.GoLiveStatus.PrimaryMissingStepTitle))
+                    else
                     {
-                        <p class="small text-muted mb-0 mt-2">Eksik adım: <strong>@Model.GoLiveStatus.PrimaryMissingStepTitle</strong></p>
+                        <p class="small text-warning mb-0 mt-2">
+                            Yayına hazır değilsiniz.
+                            @if (!string.IsNullOrWhiteSpace(Model.GoLiveStatus.PrimaryMissingStepTitle))
+                            {
+                                <span>Önce şu adımı tamamlayın: <strong>@Model.GoLiveStatus.PrimaryMissingStepTitle</strong></span>
+                            }
+                            else
+                            {
+                                <span>Eksik adımları Go-Live Merkezi’nden tamamlayın.</span>
+                            }
+                        </p>
                     }
                 </div>
                 <div class="col-md-3 text-md-end">

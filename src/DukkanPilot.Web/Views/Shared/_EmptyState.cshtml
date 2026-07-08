@@ -1,0 +1,29 @@
+@model DukkanPilot.Web.Models.Shared.EmptyStateViewModel
+@{
+    var btnClass = string.IsNullOrWhiteSpace(Model.PrimaryButtonClass) ? "btn-primary" : Model.PrimaryButtonClass;
+}
+
+<div class="dp-empty-state panel-card">
+    <div class="panel-card-body text-center py-5 px-4">
+        <div class="dp-empty-state-icon mb-3" aria-hidden="true">@Model.Icon</div>
+        <h3 class="h5 fw-semibold mb-2">@Model.Title</h3>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="text-muted mb-4 mx-auto dp-empty-state-desc">@Model.Description</p>
+        }
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+            @if (!string.IsNullOrWhiteSpace(Model.PrimaryActionUrl) && !string.IsNullOrWhiteSpace(Model.PrimaryActionText))
+            {
+                <a href="@Model.PrimaryActionUrl" class="btn @btnClass">@Model.PrimaryActionText</a>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.SecondaryActionUrl) && !string.IsNullOrWhiteSpace(Model.SecondaryActionText))
+            {
+                <a href="@Model.SecondaryActionUrl" class="btn btn-outline-secondary">@Model.SecondaryActionText</a>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+        {
+            <p class="small text-muted mb-0">@Model.HelpText</p>
+        }
+    </div>
+</div>

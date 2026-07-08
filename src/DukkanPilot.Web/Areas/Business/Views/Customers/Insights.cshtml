@@ -18,6 +18,35 @@
     </div>
 </div>
 
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "VIP, tekrar gelen, riskteki ve yeni müşteri segmentlerini tek bakışta görün; değer ve sıklık listelerine göre aksiyon alın.",
+    ActionText = "Müşteri Listesi",
+    ActionUrl = "/Business/Customers"
+})
+
+@if (segmentTotal == 0
+    && !Model.TopValuableCustomers.Any()
+    && !Model.TopFrequentCustomers.Any()
+    && !Model.AtRiskCustomers.Any()
+    && !Model.NewCustomers.Any())
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "📊",
+        Title = "Henüz CRM verisi yok",
+        Description = "Sipariş ve müşteri kaydı oluştukça segment dağılımı ve listeler burada dolacak.",
+        PrimaryActionText = "Müşteri Ekle",
+        PrimaryActionUrl = "/Business/Customers/Create",
+        SecondaryActionText = "Siparişler",
+        SecondaryActionUrl = "/Business/Orders",
+        HelpText = "İçgörüler sipariş geçmişine göre hesaplanır."
+    })
+}
+else
+{
+
 <div class="panel-card mb-4">
     <div class="panel-card-header">
         <h3 class="h6 mb-0">Segment Dağılımı</h3>
@@ -178,3 +207,4 @@
         </div>
     </div>
 </div>
+}

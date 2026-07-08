@@ -41,7 +41,7 @@
                 <div class="d-flex flex-wrap gap-2">
                     @if (Model.IsReadyToGoLive)
                     {
-                        <a href="/m/@Model.BusinessSlug" class="btn btn-success" target="_blank" rel="noopener">Public Menüyü Aç</a>
+                        <a href="/m/@Model.BusinessSlug" class="btn btn-success" target="_blank" rel="noopener">Public Menüyü Aç ve Paylaş</a>
                     }
                     else if (canUsePrimaryCta && !string.IsNullOrWhiteSpace(Model.PrimaryMissingStepActionUrl))
                     {
@@ -49,7 +49,7 @@
                            class="btn btn-primary"
                            target="@(Model.PrimaryMissingStepActionUrl.StartsWith("/m/") ? "_blank" : null)"
                            rel="@(Model.PrimaryMissingStepActionUrl.StartsWith("/m/") ? "noopener" : null)">
-                            @(Model.PrimaryMissingStepActionText ?? "İlk Eksik Adımı Tamamla")
+                            @(Model.PrimaryMissingStepActionText ?? "Sıradaki Eksik Adımı Tamamla")
                         </a>
                     }
                     else if (!string.IsNullOrWhiteSpace(Model.PrimaryMissingStepTitle))

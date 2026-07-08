@@ -21,6 +21,29 @@
     </div>
 </div>
 
+@if (!Model.HasCategory)
+{
+    @await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+    {
+        Title = "Önce kategori ekleyin",
+        Description = "Public menü için en az bir aktif kategori gerekir. Kategori olmadan ürün ekleseniz menüde görünmez.",
+        ActionText = "Kategori Oluştur",
+        ActionUrl = "/Business/Categories/Create",
+        Variant = "warning"
+    })
+}
+else if (!Model.HasActiveProduct)
+{
+    @await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+    {
+        Title = "Aktif ürün eksik",
+        Description = "Menünüzde aktif ürün yok. Müşterilerin sipariş verebilmesi için en az bir aktif ürün ekleyin.",
+        ActionText = "Ürün Oluştur",
+        ActionUrl = "/Business/Products/Create",
+        Variant = "warning"
+    })
+}
+
 <div class="row g-3 mb-4">
     <div class="col-lg-8">
         <div class="panel-card h-100">

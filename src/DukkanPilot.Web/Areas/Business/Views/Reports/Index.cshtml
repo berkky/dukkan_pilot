@@ -54,6 +54,21 @@
     </div>
 </div>
 
+@if (Model.Kpis.TotalOrders == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "📈",
+        Title = "Bu dönemde sipariş yok",
+        Description = "Seçili tarih aralığında raporlanacak sipariş bulunamadı. Dönemi değiştirin veya menünüzü paylaşarak sipariş alın.",
+        PrimaryActionText = "Siparişler",
+        PrimaryActionUrl = "/Business/Orders",
+        SecondaryActionText = "Go-Live Merkezi",
+        SecondaryActionUrl = "/Business/GoLive",
+        HelpText = "Raporlar iptal dışı siparişlere göre hesaplanır."
+    })
+}
+
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-4">
         <div class="stat-card h-100">

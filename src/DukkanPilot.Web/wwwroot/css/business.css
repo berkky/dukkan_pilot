@@ -237,3 +237,57 @@
         font-size: 1.25rem;
     }
 }
+
+/* 28A — Empty state & help cards */
+.dp-empty-state {
+    border: 1px dashed #cbd5e1;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.dp-empty-state-icon {
+    font-size: 2rem;
+    line-height: 1;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-inline: auto;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: #eff6ff;
+}
+
+.dp-empty-state-desc {
+    max-width: 32rem;
+}
+
+.dp-help-card {
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid transparent;
+}
+
+.dp-help-card-info {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+}
+
+.dp-help-card-warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.dp-help-card-success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.dp-quick-actions-grid .btn {
+    text-align: left;
+}
+
+@media (max-width: 575.98px) {
+    .dp-empty-state .panel-card-body {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}

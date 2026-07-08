@@ -8,13 +8,21 @@
     var culture = CultureInfo.GetCultureInfo("tr-TR");
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
     <div>
         <h2 class="h4 mb-1">Siparişler</h2>
         <p class="text-muted mb-0">WhatsApp ve diğer kaynaklardan gelen siparişler</p>
     </div>
     <button type="button" id="live-sound-toggle" class="btn btn-sm btn-outline-secondary">Sesli uyarıyı etkinleştir</button>
 </div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "Gelen siparişleri filtreleyin, durum güncelleyin ve mutfak ekranına geçiş yapın. Yeni siparişlerde canlı uyarı alabilirsiniz.",
+    ActionText = "Mutfak Modu",
+    ActionUrl = "/Business/Orders/Kitchen"
+})
 
 <div id="live-orders-root"
      data-live-orders="true"
@@ -134,57 +142,74 @@
     </div>
 </div>
 
-<div class="panel-card">
-    <div class="panel-card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Sipariş No</th>
-                        <th>Müşteri</th>
-                        <th>Telefon</th>
-                        <th>Tarih</th>
-                        <th>Toplam</th>
-                        <th>Durum</th>
-                        <th class="text-end">İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @if (!Model.Orders.Any())
-                {
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Filtreye uygun sipariş bulunamadı.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model.Orders)
+@if (!Model.Orders.Any() && Model.Summary.PendingCount == 0 && Model.Summary.TodayOrderCount == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "📦",
+        Title = "Henüz sipariş yok",
+        Description = "Public menünüzü paylaştığınızda siparişler burada görünecek. Yayına hazırlık için Go-Live veya QR menü adımlarını tamamlayın.",
+        PrimaryActionText = "Go-Live Merkezi",
+        PrimaryActionUrl = "/Business/GoLive",
+        SecondaryActionText = "QR Menü",
+        SecondaryActionUrl = "/Business/QrMenu",
+        HelpText = "Menü hazırsa müşteriler QR ile sipariş verebilir."
+    })
+}
+else
+{
+    <div class="panel-card">
+        <div class="panel-card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sipariş No</th>
+                            <th>Müşteri</th>
+                            <th>Telefon</th>
+                            <th>Tarih</th>
+                            <th>Toplam</th>
+                            <th>Durum</th>
+                            <th class="text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (!Model.Orders.Any())
                     {
                         <tr>
-                            <td class="fw-semibold">@item.OrderNumber</td>
-                            <td>@(item.CustomerName ?? "-")</td>
-                            <td>@(item.CustomerPhone ?? "-")</td>
-                            <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
-                            <td>@item.TotalAmount.ToString("N2", culture) ₺</td>
-                            <td>
-                                <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(item.Status)">
-                                    @OrderDisplayHelper.GetStatusLabel(item.Status)
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <div class="d-flex flex-wrap justify-content-end gap-1">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a>
-                                    <partial name="_OrderQuickActions" model='new OrderQuickActionsViewModel { OrderId = item.Id, Status = item.Status, StatusFilter = Model.StatusFilter, PeriodFilter = Model.PeriodFilter, Search = Model.Search, ReturnTo = "list" }' />
-                                </div>
-                            </td>
+                            <td colspan="7" class="text-center text-muted py-4">Filtreye uygun sipariş bulunamadı.</td>
                         </tr>
                     }
-                }
-                </tbody>
-            </table>
+                    else
+                    {
+                        foreach (var item in Model.Orders)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.OrderNumber</td>
+                                <td>@(item.CustomerName ?? "-")</td>
+                                <td>@(item.CustomerPhone ?? "-")</td>
+                                <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                                <td>@item.TotalAmount.ToString("N2", culture) ₺</td>
+                                <td>
+                                    <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(item.Status)">
+                                        @OrderDisplayHelper.GetStatusLabel(item.Status)
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex flex-wrap justify-content-end gap-1">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a>
+                                        <partial name="_OrderQuickActions" model='new OrderQuickActionsViewModel { OrderId = item.Id, Status = item.Status, StatusFilter = Model.StatusFilter, PeriodFilter = Model.PeriodFilter, Search = Model.Search, ReturnTo = "list" }' />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+}
 
 @section Scripts {
     <script src="~/js/business-orders-live.js" asp-append-version="true"></script>

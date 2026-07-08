@@ -55,13 +55,15 @@
                             <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Kayıt Ol</button>
+                        <button type="submit" class="btn btn-primary w-100">Ücretsiz Kayıt Ol</button>
                     </form>
 
-                    <p class="text-center text-muted small mt-4 mb-0">
+                    <p class="text-center text-muted small mt-3 mb-0">
                         Zaten hesabınız var mı?
-                        <a asp-action="Login" class="text-decoration-none">Giriş yapın</a>
                     </p>
+                    <div class="d-grid mt-2">
+                        <a asp-action="Login" class="btn btn-outline-secondary btn-sm">Giriş Yap</a>
+                    </div>
                 </div>
             </div>
         </div>

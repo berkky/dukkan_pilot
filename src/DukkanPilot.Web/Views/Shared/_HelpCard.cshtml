@@ -1,0 +1,22 @@
+@model DukkanPilot.Web.Models.Shared.HelpCardViewModel
+@{
+    var css = Model.Variant switch
+    {
+        "warning" => "dp-help-card dp-help-card-warning",
+        "success" => "dp-help-card dp-help-card-success",
+        _ => "dp-help-card dp-help-card-info"
+    };
+}
+
+<div class="@css mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+        <div>
+            <div class="fw-semibold small mb-1">@Model.Title</div>
+            <p class="small text-muted mb-0">@Model.Description</p>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.ActionUrl) && !string.IsNullOrWhiteSpace(Model.ActionText))
+        {
+            <a href="@Model.ActionUrl" class="btn btn-sm btn-outline-secondary flex-shrink-0">@Model.ActionText</a>
+        }
+    </div>
+</div>

@@ -6,16 +6,24 @@
     var culture = CultureInfo.GetCultureInfo("tr-TR");
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
     <div>
         <h2 class="h4 mb-1">İşletme Listesi</h2>
         <p class="text-muted mb-0">Platforma kayıtlı tüm işletmeler</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a href="@Model.ExportCsvUrl" class="btn btn-outline-secondary">CSV Dışa Aktar</a>
-        <a asp-action="Create" class="btn btn-primary">+ Yeni İşletme</a>
+        <a href="@Model.ExportCsvUrl" class="btn btn-outline-secondary btn-sm">CSV Dışa Aktar</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Yeni İşletme</a>
     </div>
 </div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "İşletmeleri arayın, abonelik ve sağlık durumlarını izleyin, public menüye hızlı geçiş yapın.",
+    ActionText = "Admin Dashboard",
+    ActionUrl = "/Admin/Dashboard"
+})
 
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl">
@@ -50,6 +58,21 @@
     </div>
 </div>
 
+@if (Model.TotalBusinesses == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "🏪",
+        Title = "Henüz işletme yok",
+        Description = "Platforma ilk işletmeyi ekleyerek abonelik ve menü yönetimine başlayın.",
+        PrimaryActionText = "İşletme Oluştur",
+        PrimaryActionUrl = "/Admin/Businesses/Create",
+        SecondaryActionText = "Admin Dashboard",
+        SecondaryActionUrl = "/Admin/Dashboard"
+    })
+}
+else
+{
 <div class="panel-card mb-4">
     <div class="panel-card-body">
         <form method="get" class="row g-3 align-items-end">
@@ -115,7 +138,7 @@
                 @if (!Model.Businesses.Any())
                 {
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">Kayıt bulunamadı.</td>
+                        <td colspan="8" class="text-center text-muted py-4">Filtreye uygun işletme bulunamadı.</td>
                     </tr>
                 }
                 else
@@ -174,3 +197,4 @@
         </div>
     </div>
 </div>
+}

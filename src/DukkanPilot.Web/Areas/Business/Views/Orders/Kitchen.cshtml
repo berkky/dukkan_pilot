@@ -42,6 +42,21 @@
     <button type="button" id="live-reload-btn" class="btn btn-sm btn-warning">Ekranı Yenile</button>
 </div>
 
+@if (Model.PendingCount == 0 && Model.PreparingCount == 0 && Model.CompletedTodayCount == 0 && !Model.CancelledTodayOrders.Any())
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "👨‍🍳",
+        Title = "Mutfak şu an boş",
+        Description = "Bekleyen veya hazırlanan sipariş yok. Yeni sipariş geldiğinde bu ekranda görünecek.",
+        PrimaryActionText = "Sipariş Listesi",
+        PrimaryActionUrl = "/Business/Orders",
+        SecondaryActionText = "Go-Live Merkezi",
+        SecondaryActionUrl = "/Business/GoLive",
+        HelpText = "Bu ekranı açık tutarak canlı sipariş takibi yapabilirsiniz."
+    })
+}
+
 <div class="row g-3 mb-3">
     <div class="col-md-3 col-6">
         <div class="border rounded p-2 text-center">

@@ -1,147 +1,89 @@
 @model IEnumerable<RewardListViewModel>
-
 @using System.Globalization
-
 @{
-
     ViewData["Title"] = "Ödüller";
-
     ViewData["Subtitle"] = "Sadakat ödülleri";
-
     var culture = CultureInfo.GetCultureInfo("tr-TR");
-
 }
 
-
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
     <div>
-
         <h2 class="h4 mb-1">Ödüller</h2>
-
-        <p class="text-muted mb-0">Demo Kafe sadakat ödülleri</p>
-
+        <p class="text-muted mb-0">İşletme sadakat ödülleri</p>
     </div>
-
-    <a asp-action="Create" class="btn btn-primary">+ Yeni Ödül</a>
-
+    <a asp-action="Create" class="btn btn-primary btn-sm">+ Yeni Ödül</a>
 </div>
 
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "Ödüller, müşterilerin puan biriktirerek kullanabileceği sadakat hediyeleridir. Puan kuralını Sadakat ekranından yönetebilirsiniz.",
+    ActionText = "Sadakat Merkezi",
+    ActionUrl = "/Business/Loyalty"
+})
 
-
-<div class="panel-card">
-
-    <div class="panel-card-body p-0">
-
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
-
-                    <tr>
-
-                        <th>Id</th>
-
-                        <th>Ödül Adı</th>
-
-                        <th>Gerekli Puan</th>
-
-                        <th>Durum</th>
-
-                        <th>Oluşturulma</th>
-
-                        <th class="text-end">İşlemler</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                @if (!Model.Any())
-
-                {
-
-                    <tr>
-
-                        <td colspan="6" class="text-center text-muted py-4">Henüz ödül yok.</td>
-
-                    </tr>
-
-                }
-
-                else
-
-                {
-
-                    foreach (var item in Model)
-
-                    {
-
+@if (!Model.Any())
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "🎁",
+        Title = "Henüz ödül yok",
+        Description = "Müşterilerinizin puanlarını kullanabileceği ilk ödülü oluşturun.",
+        PrimaryActionText = "Ödül Oluştur",
+        PrimaryActionUrl = "/Business/Rewards/Create",
+        SecondaryActionText = "Sadakat Merkezi",
+        SecondaryActionUrl = "/Business/Loyalty",
+        HelpText = "Ödül kullanmak için müşterinin yeterli puanı olmalıdır."
+    })
+}
+else
+{
+    <div class="panel-card">
+        <div class="panel-card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-
-                            <td>@item.Id</td>
-
-                            <td class="fw-semibold">@item.Name</td>
-
-                            <td>@item.RequiredPoints puan</td>
-
-                            <td>
-
-                                @if (item.IsActive)
-
-                                {
-
-                                    <span class="badge bg-success">Aktif</span>
-
-                                }
-
-                                else
-
-                                {
-
-                                    <span class="badge bg-secondary">Pasif</span>
-
-                                }
-
-                            </td>
-
-                            <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
-
-                            <td class="text-end">
-
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
-
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-
-                                @if (item.IsActive)
-
-                                {
-
-                                    <a asp-action="Redeem" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success">Kullan</a>
-
-                                }
-
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Pasif Yap</a>
-
-                            </td>
-
+                            <th>Id</th>
+                            <th>Ödül Adı</th>
+                            <th>Gerekli Puan</th>
+                            <th>Durum</th>
+                            <th>Oluşturulma</th>
+                            <th class="text-end">İşlemler</th>
                         </tr>
-
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td class="fw-semibold">@item.Name</td>
+                            <td>@item.RequiredPoints puan</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Pasif</span>
+                                }
+                            </td>
+                            <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                @if (item.IsActive)
+                                {
+                                    <a asp-action="Redeem" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success">Kullan</a>
+                                }
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Pasif Yap</a>
+                            </td>
+                        </tr>
                     }
-
-                }
-
-                </tbody>
-
-            </table>
-
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
-
-</div>
-
-
+}

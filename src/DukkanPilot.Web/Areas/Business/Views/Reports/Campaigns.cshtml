@@ -92,6 +92,21 @@
     </div>
 </div>
 
+@if (impact.OrdersWithCampaign == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "🏷️",
+        Title = "Kampanyalı sipariş yok",
+        Description = "Seçili dönemde kampanya uygulanmış sipariş bulunamadı. Kampanya oluşturup yayına alın veya dönemi genişletin.",
+        PrimaryActionText = "Kampanya Oluştur",
+        PrimaryActionUrl = "/Business/Campaigns/Create",
+        SecondaryActionText = "Kampanyalar",
+        SecondaryActionUrl = "/Business/Campaigns",
+        HelpText = "Otomatik kampanyalar uygun sepetlerde siparişe uygulanır."
+    })
+}
+
 <div class="panel-card mb-4">
     <div class="panel-card-header">
         <h3 class="h6 mb-0">Kampanya Bazlı Performans</h3>

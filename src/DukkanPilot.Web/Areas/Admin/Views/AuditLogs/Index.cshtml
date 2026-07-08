@@ -18,6 +18,14 @@
     </div>
 </div>
 
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "Platform genelindeki kritik işlemleri işletme, alan ve severity bazında izleyin. Destek ve denetim için kullanın.",
+    ActionText = "Platform Bildirimleri",
+    ActionUrl = "/Admin/Notifications"
+})
+
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card h-100">
@@ -105,7 +113,22 @@
     <div class="panel-card-body p-0">
         @if (!Model.Items.Any())
         {
-            <p class="text-muted mb-0 p-4">Henüz aktivite kaydı yok.</p>
+            if (Model.TotalCount == 0 && string.IsNullOrWhiteSpace(Model.Search) && string.IsNullOrWhiteSpace(Model.Action) && string.IsNullOrWhiteSpace(Model.Severity) && string.IsNullOrWhiteSpace(Model.UserEmail) && string.IsNullOrWhiteSpace(Model.Area) && !Model.BusinessId.HasValue)
+            {
+                @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+                {
+                    Icon = "📝",
+                    Title = "Henüz platform aktivitesi yok",
+                    Description = "Admin ve işletme panellerinde kritik işlemler yapıldıkça kayıtlar burada görünür.",
+                    PrimaryActionText = "Admin Dashboard",
+                    PrimaryActionUrl = "/Admin/Dashboard",
+                    HelpText = "Kayıtlar otomatik oluşur."
+                })
+            }
+            else
+            {
+                <p class="text-muted mb-0 p-4 text-center">Filtreye uygun aktivite kaydı bulunamadı.</p>
+            }
         }
         else
         {

@@ -25,6 +25,26 @@
     </div>
 </div>
 
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Bu ekran ne işe yarar?",
+    Description = "Ürünler public QR menünüzde görünür. Pasif ürünler müşteriye gösterilmez. CSV ile toplu aktarım yapabilirsiniz.",
+    ActionText = "Menü Stüdyosu",
+    ActionUrl = "/Business/MenuStudio"
+})
+
+@if (!Model.AvailableCategories.Any())
+{
+    @await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+    {
+        Title = "Önce kategori gerekli",
+        Description = "Ürün eklemeden önce en az bir kategori oluşturun.",
+        ActionText = "Kategori Oluştur",
+        ActionUrl = "/Business/Categories/Create",
+        Variant = "warning"
+    })
+}
+
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card h-100">
@@ -53,6 +73,24 @@
     </div>
 </div>
 
+@if (Model.TotalProducts == 0)
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "🍽️",
+        Title = "Henüz ürün eklenmedi",
+        Description = Model.AvailableCategories.Any()
+            ? "Menünüzü yayına almak için ilk ürününüzü ekleyin veya CSV ile toplu aktarım yapın."
+            : "Önce bir kategori oluşturun, ardından ürün ekleyebilirsiniz.",
+        PrimaryActionText = Model.AvailableCategories.Any() ? "Yeni Ürün Ekle" : "Kategori Oluştur",
+        PrimaryActionUrl = Model.AvailableCategories.Any() ? "/Business/Products/Create" : "/Business/Categories/Create",
+        SecondaryActionText = Model.AvailableCategories.Any() ? "CSV ile İçe Aktar" : "Menü Stüdyosu",
+        SecondaryActionUrl = Model.AvailableCategories.Any() ? "/Business/Products/ImportCsv" : "/Business/MenuStudio",
+        HelpText = "Önce kategori oluşturduğunuzdan emin olun."
+    })
+}
+else
+{
 <div class="panel-card mb-4">
     <div class="panel-card-header">
         <h3 class="h6 mb-0">Filtreler</h3>
@@ -254,8 +292,8 @@
                 </table>
             </div>
         </div>
-    </div>
 </div>
+}
 
 @section Scripts {
     <script>
