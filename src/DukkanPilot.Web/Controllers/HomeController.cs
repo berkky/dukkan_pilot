@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Helpers;
-using DukkanPilot.Web.Models;
 using DukkanPilot.Web.Models.Landing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -92,7 +90,7 @@ public class HomeController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return Redirect("/Error/500");
     }
 
     private async Task<(List<LandingPlanCardViewModel> Plans, bool FromDatabase)> LoadPlansAsync()

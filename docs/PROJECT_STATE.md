@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 26B aşaması (SaaS Satış Sitesi / Landing + Pricing + Demo Funnel) tamamlandı.
+> Son güncelleme: 27A aşaması (Production Readiness / Güvenlik / Hata Sayfaları) tamamlandı.
 
 ---
 
@@ -504,6 +504,17 @@ DukkanPilot.sln
 - Business/Admin/Public menu/order/kampanya/sadakat akışına dokunulmadı
 - Migration yok; Identity yok; SignalR yok; yeni NuGet dependency yok
 
+### 27A aşaması — Production Readiness / Güvenlik / Hata Sayfaları / Canlıya Hazırlık
+- **Error pages:** `/Error`, `/Error/404`, `/Error/500`, status re-execute; AccessDenied rol-aware CTA
+- **Program.cs:** Development DeveloperExceptionPage + migrate/seed; Production ExceptionHandler + HSTS; HTTPS redirection yalnızca Production
+- **Security headers:** nosniff, SAMEORIGIN, Referrer-Policy, Permissions-Policy (CSP yok — inline JS/CSS korunumu)
+- **Cookie:** HttpOnly, SameSite=Lax, Secure SameAsRequest (Dev) / Always (Prod), SlidingExpiration
+- **Health:** `GET /health` JSON (DB CanConnect; fail → 503, secret yok)
+- **SEO:** `/robots.txt`, `/sitemap.xml` (host-aware; Admin/Business/Account/order tracking disallow)
+- **Docs:** `docs/DEPLOYMENT_CHECKLIST.md`, `appsettings.Production.example.json`
+- Admin Dashboard’a `/health` kısayolu
+- Public/Business/Admin/Account akışları bozulmadı; Migration yok; Identity yok; SignalR yok; yeni NuGet yok
+
 ---
 
 ## 6. Veritabanı
@@ -565,7 +576,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-26B tamamlandı — SaaS landing / Pricing / Features / Demo funnel eklendi.
+27A tamamlandı — production readiness (error pages, security headers, health, robots/sitemap, deployment checklist).
 
 ---
 
@@ -587,6 +598,11 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Features` | Özellikler |
 | `/Pricing` | Plan / fiyat karşılaştırma |
 | `/Demo` | Demo funnel rehberi |
+| `/health` | Sistem durumu JSON |
+| `/robots.txt` | Arama motoru yönergeleri |
+| `/sitemap.xml` | Public sayfa sitemap |
+| `/Error/404` | Profesyonel 404 |
+| `/Error/500` | Profesyonel 500 |
 | `/Admin/Dashboard` | Admin özet |
 | `/Admin/Businesses` | İşletme listesi |
 | `/Admin/Businesses/Details/{id}` | İşletme operasyon kontrol merkezi |

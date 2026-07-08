@@ -1,36 +1,38 @@
-@using DukkanPilot.Core.Enums
+@model ErrorPageViewModel
 @{
     ViewData["Title"] = "Erişim Reddedildi";
-    Layout = "_Layout";
-    var isSuperAdmin = User.IsInRole(nameof(UserRole.SuperAdmin));
-    var isBusinessUser = User.IsInRole(nameof(UserRole.BusinessOwner)) || User.IsInRole(nameof(UserRole.Staff));
 }
 
 <section class="landing-page-hero py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-7 col-lg-6">
+            <div class="col-lg-7">
                 <div class="landing-section-card p-4 p-md-5 text-center">
                     <div class="display-6 fw-bold text-warning mb-2">403</div>
-                    <h1 class="h4 fw-bold mb-3">Erişim Reddedildi</h1>
+                    <h1 class="h3 fw-bold mb-3">Bu işlem için yetkin yok</h1>
                     <p class="text-muted mb-4">
-                        @if (isBusinessUser)
+                        @if (Model.IsBusinessUser)
                         {
-                            <text>Bu sayfa veya işlem Owner yetkisi gerektiriyor olabilir.</text>
+                            <text>Bu sayfa veya işlem Owner yetkisi gerektiriyor olabilir. Dashboard’a dönebilirsin.</text>
+                        }
+                        else if (!Model.IsAuthenticated)
+                        {
+                            <text>Devam etmek için giriş yapman gerekiyor.</text>
                         }
                         else
                         {
-                            <text>Bu sayfaya erişim yetkiniz bulunmuyor.</text>
+                            <text>Bu sayfaya erişim yetkin bulunmuyor.</text>
                         }
                     </p>
                     <div class="d-flex flex-wrap justify-content-center gap-2">
-                        @if (isSuperAdmin)
+                        @if (Model.IsSuperAdmin)
                         {
                             <a href="/Admin/Dashboard" class="btn btn-primary">Admin Paneli</a>
                         }
-                        else if (isBusinessUser)
+                        else if (Model.IsBusinessUser)
                         {
                             <a href="/Business/Dashboard" class="btn btn-primary">İşletme Paneli</a>
+                            <a href="/Business/GoLive" class="btn btn-outline-primary">Go-Live Merkezi</a>
                         }
                         else
                         {
@@ -38,6 +40,10 @@
                         }
                         <a href="/" class="btn btn-outline-secondary">Ana Sayfa</a>
                     </div>
+                    @if (Model.ShowRequestId)
+                    {
+                        <p class="small text-muted mt-4 mb-0">İstek kodu: <code>@Model.RequestId</code></p>
+                    }
                 </div>
             </div>
         </div>
