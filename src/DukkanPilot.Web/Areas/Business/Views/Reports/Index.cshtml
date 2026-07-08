@@ -1,6 +1,7 @@
 @model ReportsIndexViewModel
 @using System.Globalization
 @using DukkanPilot.Core.Enums
+@using DukkanPilot.Web.Models.Shared
 @{
     ViewData["Title"] = "Raporlar";
     ViewData["Subtitle"] = "Satış ve performans analizi";
@@ -16,7 +17,16 @@
         <p class="text-muted mb-0">Satış, sipariş ve ürün performansınızı takip edin.</p>
     </div>
     <a href="@exportUrl" class="btn btn-outline-success btn-sm">CSV İndir</a>
+    <a href="/Business/HelpCenter/Article/raporlar" class="btn btn-outline-primary btn-sm">Rapor rehberi</a>
 </div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Raporlar nasıl okunur?",
+    Description = "Dönem seçerek satış, sipariş durumu ve ürün performansını izleyin. Veri yoksa önce test siparişi oluşturun.",
+    HelpGuideText = "Detaylı rehber",
+    HelpGuideUrl = "/Business/HelpCenter/Article/raporlar"
+})
 
 <partial name="_ReportNav" />
 

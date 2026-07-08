@@ -30,6 +30,10 @@
 | Customers/Reports | `/Business/Customers/Insights` | Auth+sub | İçgörü aç | Segmentler | Med | Manual |
 | Audit/Notifications | `/Business/Notifications` | Auth | Aç | 200 | Med | Manual |
 | Billing | `/Business/Billing/Requests` | Owner | Aç | 200 | Med | Manual |
+| Help Center | `/Help` | Anon | Aç | 200, şifre yok | Med | Script |
+| Help Center | `/Help/nedir` | Anon | Makale aç | 200 | Low | Script |
+| Help Center | `/Business/HelpCenter` | Auth | Aç | 200 + arama | Med | Manual |
+| Help Center | `/Admin/HelpCenter` | SuperAdmin | Aç | 200 | Med | Manual |
 | Admin Dashboard | `/Admin/Dashboard` | SuperAdmin | Aç | 200 + KPI | High | Manual |
 | Admin SalesRequests | `/Admin/SalesRequests` | SuperAdmin | Aç | 200 | High | Manual |
 | Admin Onboarding | `/Admin/Onboarding` | SuperAdmin | Aç | 200 | High | Manual |

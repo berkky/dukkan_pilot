@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 33A (Manual Payment / Invoice / Subscription Operations) tamamlandı.
+> Son güncelleme: 33B (Help Center / Eğitim Merkezi / Kullanım Kılavuzu) tamamlandı.
 
 ---
 
@@ -636,6 +636,16 @@ DukkanPilot.sln
 - SalesRequests Won entegrasyonu: Details ekranında tahsilat CTA
 - SalesCenter + Admin Dashboard + Operations + Quality + CustomerSuccess: billing snapshot/risk sinyalleri
 - Migration: `AddManualBillingOperations` (yalnızca iki yeni tablo)
+
+### 33B — Help Center / Eğitim Merkezi / Kullanım Kılavuzu
+- Public: `/Help`, `/Help/{slug}` (anonymous)
+- Business: `/Business/HelpCenter`, `/Business/HelpCenter/Article/{slug}` (Owner+Staff, read-only)
+- Admin: `/Admin/HelpCenter`, `/Admin/HelpCenter/Article/{slug}` (SuperAdmin, read-only)
+- `HelpContentHelper` static içerik; `help-center.js` client-side arama/filtre
+- Contextual help: `_HelpCard` → `HelpGuideUrl` + sidebar/footer linkleri
+- Sitemap: `/Help` + public makaleler; Admin/Business Help yok
+- Docs: HELP_CENTER_CONTENT_MAP, BUSINESS_USER_TRAINING_GUIDE, STAFF_TRAINING_CHEATSHEET, ADMIN_SUPPORT_KNOWLEDGE_BASE
+- Migration yok; Entity/DbContext değişmedi
 
 ---
 

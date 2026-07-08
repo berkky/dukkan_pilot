@@ -64,6 +64,7 @@ if ($sitemap.Status -eq 200) {
         "/Pricing",
         "/Features",
         "/Demo",
+        "/Help",
         "/Trust",
         "/Privacy",
         "/Kvkk",
@@ -77,7 +78,7 @@ if ($sitemap.Status -eq 200) {
         }
     }
 
-    $mustNotContain = @("/Admin/", "/Business/", "/Account/", "utm_", "tracking", "token")
+    $mustNotContain = @("/Admin/", "/Business/", "/Account/", "/Admin/HelpCenter", "/Business/HelpCenter", "utm_", "tracking", "token")
     foreach ($bad in $mustNotContain) {
         if ($sitemap.Body -match [regex]::Escape($bad)) {
             Write-Fail "sitemap contains private/sensitive pattern: $bad"

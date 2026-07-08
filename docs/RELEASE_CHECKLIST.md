@@ -59,6 +59,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] Success routes smoke: `/Business/Success` `/Admin/CustomerSuccess` (auth yok → 302)
 - [ ] Quality Center: `/Admin/Quality` (SuperAdmin)
 - [ ] BusinessOwner: Billing ledger (`/Business/Billing/Invoices`, `/Business/Billing/Payments`)
+- [ ] Help Center: `/Help` 200; `/Business/HelpCenter` `/Admin/HelpCenter` auth yok → 302
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`

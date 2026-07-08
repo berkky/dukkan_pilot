@@ -76,6 +76,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Business/Billing/Invoices` | Owner | 200 | Auth yok → 302; read-only; resmi belge değildir uyarısı |
 | `/Business/Billing/Payments` | Owner | 200 | Auth yok → 302; read-only |
 
+## Help Center
+
+| URL | Rol | Beklenen | Not |
+|-----|-----|----------|-----|
+| `/Help` | Anon | 200 | Public yardım |
+| `/Help/nedir` | Anon | 200 | Makale |
+| `/Business/HelpCenter` | Auth | 200 | Owner+Staff |
+| `/Admin/HelpCenter` | SuperAdmin | 200 | Auth yok → 302 |
+
 ## Sipariş / kampanya
 
 | Adım | Beklenen |

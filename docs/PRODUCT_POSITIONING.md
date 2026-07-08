@@ -19,6 +19,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 7. Customer success / retention health (İşletme Sağlığı + Customer Success Merkezi)
 8. Release quality gate + QA dokümanları (Kalite Merkezi + script tabanlı doğrulama)
 9. Manuel tahsilat operasyonu (Admin Billing + işletme tahsilat defteri; resmi e-Belge değil)
+10. Self-service Help Center + eğitim rehberleri (Public/Business/Admin)
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon

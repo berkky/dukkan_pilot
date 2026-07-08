@@ -1,0 +1,114 @@
+@model HelpCenterIndexViewModel
+
+<div class="dp-help-center" data-help-center>
+    <div class="dp-help-hero mb-4">
+        <h1 class="h3 mb-2">@Model.PageTitle</h1>
+        <p class="text-muted mb-3">@Model.Intro</p>
+        <div class="dp-help-search-wrap">
+            <label for="helpSearchInput" class="visually-hidden">Rehber ara</label>
+            <input type="search"
+                   id="helpSearchInput"
+                   class="form-control dp-help-search-input"
+                   placeholder="Rehber ara…"
+                   autocomplete="off"
+                   aria-label="Yardım rehberlerinde ara" />
+        </div>
+    </div>
+
+    @if (Model.StarterSteps.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Yeni başlayanlar için adımlar</h2>
+            <div class="row g-3" data-help-cards>
+                @foreach (var step in Model.StarterSteps)
+                {
+                    <div class="col-md-6 col-xl-4" data-help-card data-keywords="@step.SearchKeywords @step.Title @step.Category">
+                        <a href="@Model.ArticleBasePath/@step.Slug" class="dp-help-card text-decoration-none">
+                            <div class="dp-help-card-body">
+                                <span class="badge dp-help-role-badge mb-2">@step.Category</span>
+                                <h3 class="h6 mb-1">@step.Title</h3>
+                                <p class="small text-muted mb-2">@step.Summary</p>
+                                <div class="small text-muted">@step.EstimatedReadMinutes dk · @step.Difficulty</div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.ShowStaffTraining && !string.IsNullOrWhiteSpace(Model.StaffTrainingArticleSlug))
+    {
+        <section class="mb-4">
+            <div class="dp-help-staff-banner">
+                <div>
+                    <div class="fw-semibold">Personel eğitim paketi</div>
+                    <div class="small text-muted">Mutfak ve sipariş operasyonu için kısa rehber</div>
+                </div>
+                <a href="@Model.ArticleBasePath/@Model.StaffTrainingArticleSlug" class="btn btn-sm btn-primary">Personel rehberi</a>
+            </div>
+        </section>
+    }
+
+    @if (Model.PopularArticles.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">En çok kullanılan rehberler</h2>
+            <div class="row g-3" data-help-cards>
+                @foreach (var item in Model.PopularArticles)
+                {
+                    <div class="col-md-6 col-lg-4" data-help-card data-keywords="@item.SearchKeywords @item.Title @item.Category">
+                        <a href="@Model.ArticleBasePath/@item.Slug" class="dp-help-card text-decoration-none">
+                            <div class="dp-help-card-body">
+                                <span class="badge dp-help-role-badge mb-2">@item.Category</span>
+                                <h3 class="h6 mb-1">@item.Title</h3>
+                                <p class="small text-muted mb-0">@item.Summary</p>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.QuickLinks.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Hızlı bağlantılar</h2>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var link in Model.QuickLinks)
+                {
+                    <a href="@link.Url" class="btn btn-outline-secondary btn-sm">@link.Icon @link.Title</a>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="mb-4">
+        <h2 class="h6 text-uppercase text-muted mb-3">Tüm kategoriler</h2>
+        @foreach (var group in Model.Categories)
+        {
+            <div class="mb-4" data-help-category="@group.Category">
+                <h3 class="h6 mb-2">@group.Category</h3>
+                <div class="row g-3" data-help-cards>
+                    @foreach (var item in group.Articles)
+                    {
+                        <div class="col-md-6 col-lg-4" data-help-card data-keywords="@item.SearchKeywords @item.Title @group.Category">
+                            <a href="@Model.ArticleBasePath/@item.Slug" class="dp-help-card text-decoration-none">
+                                <div class="dp-help-card-body">
+                                    <h4 class="h6 mb-1">@item.Title</h4>
+                                    <p class="small text-muted mb-2">@item.Summary</p>
+                                    <div class="small text-muted">@item.EstimatedReadMinutes dk · @item.Difficulty</div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+
+    <div class="alert alert-light border dp-help-no-results d-none" data-help-no-results role="status">
+        Aramanızla eşleşen rehber bulunamadı. Farklı bir anahtar kelime deneyin.
+    </div>
+</div>

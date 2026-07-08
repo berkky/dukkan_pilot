@@ -24,7 +24,9 @@
 @await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
 {
     Title = "Bu skor neyi gösterir?",
-    Description = "Bu ekran read-only çalışır; veri yazmaz, audit veya yeni bildirim oluşturmaz. Amaç churn riski, kullanım sağlığı ve büyüme fırsatlarını önceliklendirmektir.",
+    Description = "Bu skor read-only çalışır; veri yazmaz, audit veya yeni bildirim oluşturmaz. Amaç churn riski, kullanım sağlığı ve büyüme fırsatlarını önceliklendirmektir.",
+    HelpGuideText = "İşletme sağlığı rehberi",
+    HelpGuideUrl = "/Business/HelpCenter/Article/isletme-sagligi",
     Variant = "info"
 })
 

@@ -20,6 +20,7 @@
 - Rapor + CRM inceleme görüşmesi
 - Plan kullanımını (limit) kontrol et
 - Yenileme / upgrade sinyallerini izle (SalesRequests + Billing)
+- Eğitim eksikliği churn riskidir: `/Business/HelpCenter` ve `BUSINESS_USER_TRAINING_GUIDE.md`
 - `CustomerSuccessHealthHelper` skoru ve risk listesiyle müdahale önceliği çıkar
 
 ## Başarı metrikleri

@@ -19,5 +19,7 @@ public class HelpCardViewModel
     public string Description { get; set; } = string.Empty;
     public string? ActionText { get; set; }
     public string? ActionUrl { get; set; }
+    public string? HelpGuideText { get; set; }
+    public string? HelpGuideUrl { get; set; }
     public string Variant { get; set; } = "info";
 }

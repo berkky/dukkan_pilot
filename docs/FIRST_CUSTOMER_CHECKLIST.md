@@ -24,6 +24,9 @@
 - [ ] İşletme sahibi tahsilat geçmişini `/Business/Billing/Invoices` üzerinden görebilir (Owner-only)
 
 ## Müşteriye eğitim (30 dk)
+- Eğitim planı: `docs/BUSINESS_USER_TRAINING_GUIDE.md`
+- Personel özeti: `docs/STAFF_TRAINING_CHEATSHEET.md`
+- Panel rehberi: `/Business/HelpCenter`
 1. Public menü + sepet
 2. Sipariş listesi / Mutfak
 3. Ürün/kategori hızlı güncelleme

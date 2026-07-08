@@ -1,4 +1,5 @@
 using System.Text;
+using DukkanPilot.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,7 @@ public class SeoController : Controller
             ("/Features", "0.8", "weekly"),
             ("/Pricing", "0.8", "weekly"),
             ("/Demo", "0.7", "weekly"),
+            ("/Help", "0.7", "weekly"),
             ("/Sales/RequestDemo", "0.6", "weekly"),
             ("/Sales/RequestPlan", "0.6", "weekly"),
             ("/Trust", "0.7", "monthly"),
@@ -49,6 +51,15 @@ public class SeoController : Controller
             ("/DataProcessing", "0.5", "monthly"),
             ("/m/demo-kafe", "0.7", "weekly")
         };
+
+        foreach (var slug in HelpContentHelper.GetPublicSitemapSlugs())
+        {
+            var path = $"/Help/{slug}";
+            if (!urls.Any(u => u.Item1 == path))
+            {
+                urls = urls.Append((path, "0.6", "monthly")).ToArray();
+            }
+        }
 
         var sb = new StringBuilder();
         sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");

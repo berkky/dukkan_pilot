@@ -1,0 +1,8 @@
+@model HelpArticleDetailViewModel
+@{
+    ViewData["Title"] ??= Model.Article.Title;
+}
+
+<div class="container py-5">
+    <partial name="Help/_HelpArticleContent" model="Model" />
+</div>

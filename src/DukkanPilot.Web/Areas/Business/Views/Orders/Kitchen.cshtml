@@ -1,5 +1,6 @@
 @model OrderKitchenViewModel
 @using System.Globalization
+@using DukkanPilot.Web.Models.Shared
 @{
     ViewData["Title"] = "Mutfak Modu";
     ViewData["Subtitle"] = "Operasyon";
@@ -15,8 +16,18 @@
         <button type="button" id="live-sound-toggle" class="btn btn-outline-secondary">Sesli uyarıyı etkinleştir</button>
         <button type="button" id="kitchen-refresh-btn" class="btn btn-outline-primary">Yenile</button>
         <a asp-action="Index" class="btn btn-secondary">Sipariş Listesine Dön</a>
+        <a href="/Business/HelpCenter/Article/siparis-mutfak" class="btn btn-outline-primary btn-sm">Mutfak rehberi</a>
     </div>
 </div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Mutfak operasyonu",
+    Description = "Pending → Preparing → Ready → Completed akışını kullanın. İptal durumlarında müşteriyi bilgilendirin.",
+    HelpGuideText = "Personel eğitimi",
+    HelpGuideUrl = "/Business/HelpCenter/Article/personel-egitimi",
+    Variant = "info"
+})
 
 @if (TempData["Success"] is string successMessage)
 {

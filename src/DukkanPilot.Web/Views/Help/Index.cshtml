@@ -1,0 +1,12 @@
+@model HelpCenterIndexViewModel
+@{
+    ViewData["Title"] ??= "Yardım Merkezi";
+}
+
+<div class="container py-5">
+    <partial name="Help/_HelpCenterIndexContent" model="Model" />
+</div>
+
+@section Scripts {
+    <script src="~/js/help-center.js" asp-append-version="true"></script>
+}

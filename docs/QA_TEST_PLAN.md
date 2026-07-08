@@ -26,6 +26,7 @@ Bu katman:
 - Business: dashboard, onboarding, success, golive, demos
 - Admin: dashboard, salescenter, onboarding, customersuccess, operations, quality
 - Billing: admin invoice/payment operasyonu + business ledger (read-only)
+- Help Center: `/Help`, `/Business/HelpCenter`, `/Admin/HelpCenter` + contextual links
 - System: health, robots, sitemap, security headers
 - Deployment/backup: backup, verify, restore, migration status
 

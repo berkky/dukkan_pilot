@@ -361,3 +361,54 @@
   .dp-cookie-notice-inner { flex-direction: column; align-items: stretch; }
   .dp-cookie-notice .btn { width: 100%; }
 }
+
+/* 33B — Public Help Center */
+.dp-help-center .dp-help-hero {
+  max-width: 48rem;
+}
+
+.dp-help-search-input {
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.9rem;
+}
+
+.dp-help-card {
+  display: block;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #fff;
+  color: #0f172a;
+  height: 100%;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.dp-help-card:hover {
+  border-color: #2563eb;
+  color: #0f172a;
+  transform: translateY(-2px);
+}
+
+.dp-help-card-body {
+  padding: 1.1rem;
+}
+
+.dp-help-role-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.dp-help-steps li {
+  margin-bottom: 0.75rem;
+}
+
+.dp-help-public-cta {
+  padding: 1rem;
+  border-radius: 0.85rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.dp-help-no-results {
+  border-style: dashed;
+}
+

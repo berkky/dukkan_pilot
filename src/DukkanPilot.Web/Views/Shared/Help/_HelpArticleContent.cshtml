@@ -1,0 +1,115 @@
+@model HelpArticleDetailViewModel
+@{
+    var a = Model.Article;
+}
+
+<article class="dp-help-article">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="@Model.IndexPath">Yardım Merkezi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@a.Title</li>
+        </ol>
+    </nav>
+
+    <header class="mb-4">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge dp-help-role-badge">@a.Category</span>
+            <span class="badge bg-light text-dark border">@a.Difficulty</span>
+            <span class="badge bg-light text-dark border">@a.EstimatedReadMinutes dk okuma</span>
+        </div>
+        <h1 class="h3 mb-2">@a.Title</h1>
+        <p class="lead text-muted mb-0">@a.Summary</p>
+    </header>
+
+    @if (a.Warnings.Count > 0)
+    {
+        <div class="alert alert-warning">
+            <div class="fw-semibold small mb-1">Dikkat</div>
+            <ul class="mb-0 small ps-3">
+                @foreach (var w in a.Warnings)
+                {
+                    <li>@w</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (a.Steps.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Adım adım</h2>
+            <ol class="dp-help-steps">
+                @foreach (var step in a.Steps)
+                {
+                    <li>@step</li>
+                }
+            </ol>
+        </section>
+    }
+
+    @if (a.Tips.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">İpuçları</h2>
+            <ul class="dp-help-tips mb-0">
+                @foreach (var tip in a.Tips)
+                {
+                    <li>@tip</li>
+                }
+            </ul>
+        </section>
+    }
+
+    @if (a.RelatedLinks.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">İlgili ekranlar</h2>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var link in a.RelatedLinks)
+                {
+                    <a href="@link.Url"
+                       class="btn btn-outline-primary btn-sm"
+                       @(link.OpenInNewTab ? "target=\"_blank\" rel=\"noopener\"" : null)>@link.Text</a>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.ShowPublicCtas)
+    {
+        <section class="dp-help-public-cta mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Devam edin</h2>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/m/demo-kafe" class="btn btn-primary btn-sm">Demo QR Menüyü Gör</a>
+                <a href="/Account/Register" class="btn btn-outline-primary btn-sm">Ücretsiz Başla</a>
+                <a href="/Sales/RequestPlan" class="btn btn-outline-secondary btn-sm">Plan Talebi</a>
+                <a href="/Trust" class="btn btn-outline-secondary btn-sm">Güven Merkezi</a>
+                <a href="/Pricing" class="btn btn-outline-secondary btn-sm">Fiyatları İncele</a>
+            </div>
+        </section>
+    }
+
+    @if (Model.RelatedArticles.Count > 0)
+    {
+        <section class="mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Sonraki önerilen rehberler</h2>
+            <div class="row g-3">
+                @foreach (var related in Model.RelatedArticles)
+                {
+                    <div class="col-md-6">
+                        <a href="@Model.ArticleBasePath/@related.Slug" class="dp-help-card text-decoration-none d-block h-100">
+                            <div class="dp-help-card-body">
+                                <h3 class="h6 mb-1">@related.Title</h3>
+                                <p class="small text-muted mb-0">@related.Summary</p>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <div class="mt-4">
+        <a href="@Model.IndexPath" class="btn btn-outline-secondary btn-sm">← Yardım Merkezi</a>
+    </div>
+</article>

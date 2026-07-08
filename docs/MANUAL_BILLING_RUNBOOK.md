@@ -38,6 +38,8 @@ Bu doküman **gerçek ödeme sağlayıcısı/e-Fatura/e-Arşiv entegrasyonu olma
 - Background job yok; gecikme mantığı invoice status’ünde taşınır (`Overdue`).
 - Admin izleme: `/Admin/Billing` (KPI + gecikmiş liste)
 - Business görünümü: `/Business/Billing/Invoices`
+- Business rehber: `/Business/HelpCenter/Article/tahsilat-kayitlari`
+- Admin rehber: `/Admin/HelpCenter/Article/manuel-tahsilat`
 - Spam riskinden kaçınmak için otomatik “overdue notification” üretilmez (33A kapsamı).
 
 ## İptal akışı

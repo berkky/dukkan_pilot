@@ -151,7 +151,21 @@ $required = @(
     "src\DukkanPilot.Web\Areas\Admin\Views\Billing\RecordPayment.cshtml",
     "src\DukkanPilot.Web\Areas\Admin\Views\Billing\Payments.cshtml",
     "src\DukkanPilot.Web\Areas\Business\Views\Billing\Invoices.cshtml",
-    "src\DukkanPilot.Web\Areas\Business\Views\Billing\Payments.cshtml"
+    "src\DukkanPilot.Web\Areas\Business\Views\Billing\Payments.cshtml",
+    "src\DukkanPilot.Web\Controllers\HelpController.cs",
+    "src\DukkanPilot.Web\Areas\Business\Controllers\HelpCenterController.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Controllers\HelpCenterController.cs",
+    "src\DukkanPilot.Web\Helpers\HelpContentHelper.cs",
+    "src\DukkanPilot.Web\Views\Help\Index.cshtml",
+    "src\DukkanPilot.Web\Views\Help\Article.cshtml",
+    "src\DukkanPilot.Web\Areas\Business\Views\HelpCenter\Index.cshtml",
+    "src\DukkanPilot.Web\Areas\Business\Views\HelpCenter\Article.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\HelpCenter\Index.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\HelpCenter\Article.cshtml",
+    "docs\HELP_CENTER_CONTENT_MAP.md",
+    "docs\BUSINESS_USER_TRAINING_GUIDE.md",
+    "docs\STAFF_TRAINING_CHEATSHEET.md",
+    "docs\ADMIN_SUPPORT_KNOWLEDGE_BASE.md"
 )
 
 foreach ($rel in $required) {

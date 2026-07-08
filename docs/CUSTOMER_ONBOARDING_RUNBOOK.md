@@ -19,6 +19,7 @@ Satış talebi **Won** olduktan sonra müşteriyi kuruluma alma ve ilk değeri g
 4. BusinessOwner’a `/Business/Onboarding` gösterin.
 5. Public menü + QR afiş + test sipariş “aha moment”ini birlikte yapın.
 6. Go-live sonrası `Business/Success` ve `Admin/CustomerSuccess` ile health takibine geçin.
+7. Owner’a `/Business/HelpCenter` ve eğitim planını (`BUSINESS_USER_TRAINING_GUIDE.md`) paylaşın.
 
 ## İşletme bilgileri
 
