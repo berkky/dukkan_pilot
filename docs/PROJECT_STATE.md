@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 28B aşaması (Demo & Sales Mode / Satışa Hazır Demo Deneyimi) tamamlandı.
+> Son güncelleme: 29A aşaması (Deployment / Publish / Release Package) tamamlandı.
 
 ---
 
@@ -556,6 +556,14 @@ DukkanPilot.sln
 - **Docs:** `SALES_DEMO_SCRIPT.md`, `FIRST_CUSTOMER_CHECKLIST.md`, `PRODUCT_POSITIONING.md`
 - Public şifre paylaşımı yok; Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet yok
 
+### 29A aşaması — Deployment / Publish / Release Package
+- **Scripts:** `scripts/publish-release.ps1`, `check-release.ps1`, `run-smoke-tests.ps1`
+- **Config:** `appsettings.Production.example.json` güçlendirildi (`App.PublicBaseUrl`, SupportEmail, placeholders)
+- **Docs:** `DEPLOYMENT_CHECKLIST.md` güncellendi; `RELEASE_CHECKLIST.md`, `SMOKE_TEST_CHECKLIST.md`, `PRODUCTION_CONFIGURATION.md`, `IIS_DEPLOYMENT_GUIDE.md`, `Kestrel_SERVICE_GUIDE.md`
+- **gitignore:** `appsettings.Production.json` ignore; `artifacts/` zaten ignore
+- Migration yok; Entity/DbContext değişmedi; Program.cs dokunulmadı; Identity/SignalR/NuGet yok
+- Public/Business/Admin/Account/Audit/Notification/Demo akışları bozulmadı
+
 ---
 
 ## 6. Veritabanı
@@ -618,6 +626,8 @@ DukkanPilot.sln
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
 28B tamamlandı — Landing Demo/Pricing satış polish; /Business/DemoCenter; /Admin/SalesCenter; demo-kafe seed enrich; satış docs.
+
+29A tamamlandı — Publish/check/smoke scripts; production example config; IIS/Kestrel/release/smoke/deployment docs.
 
 ---
 
@@ -731,3 +741,18 @@ dotnet run
 ```
 
 Tarayıcı: `https://localhost:7136` veya `http://localhost:5139`
+
+## Hızlı referans — Deployment / Release
+
+| Dosya | Açıklama |
+|-------|---------|
+| `scripts/publish-release.ps1` | Release publish → `artifacts/publish/DukkanPilot.Web` |
+| `scripts/check-release.ps1` | Build + EF pending + kritik dosya kontrolü |
+| `scripts/run-smoke-tests.ps1` | Çalışan instance HTTP smoke |
+| `docs/DEPLOYMENT_CHECKLIST.md` | Canlıya çıkış checklist |
+| `docs/RELEASE_CHECKLIST.md` | Release öncesi/sonrası |
+| `docs/SMOKE_TEST_CHECKLIST.md` | Manuel smoke matrisi |
+| `docs/PRODUCTION_CONFIGURATION.md` | Env, secrets, DataProtection notları |
+| `docs/IIS_DEPLOYMENT_GUIDE.md` | IIS kurulum |
+| `docs/Kestrel_SERVICE_GUIDE.md` | Kestrel / service |
+| `src/DukkanPilot.Web/appsettings.Production.example.json` | Production şablon (secret yok) |

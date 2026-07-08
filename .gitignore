@@ -6,6 +6,10 @@
 # dotenv files
 .env
 
+# Production secrets (keep *.example.json tracked)
+**/appsettings.Production.json
+!**/appsettings.Production.example.json
+
 # User-specific files
 *.rsuser
 *.suo
@@ -482,3 +486,7 @@ $RECYCLE.BIN/
 *.swp
 
 .build-out*/
+
+# DukkanPilot release output (also covered by artifacts/)
+artifacts/publish/
+
