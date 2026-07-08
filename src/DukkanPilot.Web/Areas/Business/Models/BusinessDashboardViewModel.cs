@@ -19,5 +19,6 @@ public class BusinessDashboardViewModel
     public CampaignDashboardSummaryViewModel CampaignSummary { get; set; } = new();
     public BusinessSubscriptionStatusViewModel Subscription { get; set; } = new();
     public BusinessPlanUsageViewModel PlanUsage { get; set; } = new();
+    public GoLiveDashboardCardViewModel? GoLiveStatus { get; set; }
     public bool IsBusinessOwner { get; set; }
 }

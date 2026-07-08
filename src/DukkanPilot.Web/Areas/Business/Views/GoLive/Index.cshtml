@@ -1,0 +1,332 @@
+@model DukkanPilot.Web.Areas.Business.Models.GoLiveViewModel
+@{
+    ViewData["Title"] = "Go-Live Merkezi";
+    ViewData["Subtitle"] = Model.BusinessName;
+    var canUsePrimaryCta = Model.IsReadyToGoLive
+        || !Model.PrimaryMissingStepOwnerOnly
+        || Model.IsBusinessOwner;
+}
+
+<div class="golive-hero panel-card mb-4">
+    <div class="panel-card-body">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <h2 class="h4 mb-0">Go-Live Merkezi</h2>
+                    <span class="badge @Model.HealthBadgeClass">@Model.HealthLabel</span>
+                    @if (Model.IsReadyToGoLive)
+                    {
+                        <span class="badge bg-success">Yayına Hazır</span>
+                    }
+                </div>
+                <p class="text-muted mb-3">@Model.BusinessName — işletmenizi adım adım yayına hazırlayın.</p>
+
+                <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
+                    <div class="golive-score-ring" aria-label="Yayına hazır skoru @Model.HealthScore">
+                        <span class="golive-score-value">@Model.HealthScore</span>
+                        <span class="golive-score-label">Skor</span>
+                    </div>
+                    <div class="flex-grow-1" style="min-width: 180px;">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>Zorunlu adımlar</span>
+                            <strong>@Model.RequiredCompletedCount / @Model.RequiredTotalCount</strong>
+                        </div>
+                        <div class="progress golive-progress" role="progressbar" aria-valuenow="@Model.ProgressPercent" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar @(Model.IsReadyToGoLive ? "bg-success" : "bg-primary")" style="width: @Model.ProgressPercent%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">Tüm adımlar: @Model.CompletedStepCount / @Model.TotalStepCount tamamlandı</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    @if (Model.IsReadyToGoLive)
+                    {
+                        <a href="/m/@Model.BusinessSlug" class="btn btn-success" target="_blank" rel="noopener">Public Menüyü Aç</a>
+                    }
+                    else if (canUsePrimaryCta && !string.IsNullOrWhiteSpace(Model.PrimaryMissingStepActionUrl))
+                    {
+                        <a href="@Model.PrimaryMissingStepActionUrl"
+                           class="btn btn-primary"
+                           target="@(Model.PrimaryMissingStepActionUrl.StartsWith("/m/") ? "_blank" : null)"
+                           rel="@(Model.PrimaryMissingStepActionUrl.StartsWith("/m/") ? "noopener" : null)">
+                            @(Model.PrimaryMissingStepActionText ?? "İlk Eksik Adımı Tamamla")
+                        </a>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.PrimaryMissingStepTitle))
+                    {
+                        <button type="button" class="btn btn-primary" disabled>@Model.PrimaryMissingStepTitle</button>
+                        <span class="small text-muted align-self-center">Owner yetkisi gerekir</span>
+                    }
+
+                    <a href="/Business/QrMenu/Print" class="btn btn-outline-primary" target="_blank" rel="noopener">QR Afişini Yazdır</a>
+                    <a href="/Business/MenuStudio" class="btn btn-outline-secondary">Menü Stüdyosu</a>
+                </div>
+
+                @if (!Model.IsReadyToGoLive && !string.IsNullOrWhiteSpace(Model.PrimaryMissingStepTitle))
+                {
+                    <p class="small text-muted mt-3 mb-0">Sıradaki adım: <strong>@Model.PrimaryMissingStepTitle</strong></p>
+                }
+            </div>
+            <div class="col-lg-4">
+                <div class="golive-quick-actions d-grid gap-2">
+                    @foreach (var action in Model.QuickActions)
+                    {
+                        <a href="@action.Url"
+                           class="btn @action.ButtonClass btn-sm text-start"
+                           target="@(action.IsExternal ? "_blank" : null)"
+                           rel="@(action.IsExternal ? "noopener" : null)">
+                            <strong class="d-block">@action.Title</strong>
+                            <span class="small opacity-75">@action.Description</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="panel-card h-100">
+            <div class="panel-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h3 class="h6 mb-0">Kurulum Kontrol Listesi</h3>
+                <span class="badge bg-light text-dark">@Model.CompletedStepCount / @Model.TotalStepCount</span>
+            </div>
+            <div class="panel-card-body p-0">
+                <div class="golive-steps">
+                    @foreach (var step in Model.SetupSteps)
+                    {
+                        <div class="golive-step @(step.IsCompleted ? "is-complete" : "is-pending")">
+                            <div class="golive-step-main">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                                    <span class="badge @step.BadgeClass">@step.StatusText</span>
+                                    @if (step.IsRequired)
+                                    {
+                                        <span class="badge bg-dark">Zorunlu</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark border">Opsiyonel</span>
+                                    }
+                                    <h4 class="h6 mb-0">@step.Title</h4>
+                                </div>
+                                <p class="text-muted small mb-2">@step.Description</p>
+                                @if (!string.IsNullOrWhiteSpace(step.WarningText))
+                                {
+                                    <div class="alert alert-warning py-2 px-3 small mb-2">@step.WarningText</div>
+                                }
+                            </div>
+                            <div class="golive-step-actions">
+                                @{
+                                    var showAction = !string.IsNullOrWhiteSpace(step.ActionUrl) && !string.IsNullOrWhiteSpace(step.ActionText);
+                                    var canClickOwnerAction = !step.OwnerOnly || Model.IsBusinessOwner;
+                                }
+                                @if (showAction && canClickOwnerAction)
+                                {
+                                    <a href="@step.ActionUrl"
+                                       class="btn btn-sm @(step.IsCompleted ? "btn-outline-secondary" : "btn-primary")"
+                                       target="@(step.ActionUrl!.StartsWith("/m/") ? "_blank" : null)"
+                                       rel="@(step.ActionUrl.StartsWith("/m/") ? "noopener" : null)">
+                                        @step.ActionText
+                                    </a>
+                                }
+                                else if (showAction && step.OwnerOnly && !Model.IsBusinessOwner)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>@step.ActionText</button>
+                                    <span class="small text-muted">Owner yetkisi gerekir</span>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(step.SecondaryActionUrl) && !string.IsNullOrWhiteSpace(step.SecondaryActionText))
+                                {
+                                    <a href="@step.SecondaryActionUrl"
+                                       class="btn btn-sm btn-outline-secondary"
+                                       target="@(step.SecondaryActionUrl.StartsWith("/m/") || step.SecondaryActionUrl.Contains("/Print") ? "_blank" : null)"
+                                       rel="noopener">
+                                        @step.SecondaryActionText
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="panel-card mb-4 golive-preview-card" style="border-top: 4px solid @Model.PublicMenuPreview.ThemeColor">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Yayına Hazır Önizleme</h3>
+            </div>
+            <div class="panel-card-body">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    @if (!string.IsNullOrWhiteSpace(Model.PublicMenuPreview.LogoUrl))
+                    {
+                        <img src="@Model.PublicMenuPreview.LogoUrl" alt="@Model.PublicMenuPreview.BusinessName logo" class="rounded" style="width: 48px; height: 48px; object-fit: cover;" />
+                    }
+                    <div class="min-w-0">
+                        <div class="fw-semibold">@Model.PublicMenuPreview.BusinessName</div>
+                        @if (!string.IsNullOrWhiteSpace(Model.PublicMenuPreview.Description))
+                        {
+                            <p class="text-muted small mb-0">@Model.PublicMenuPreview.Description</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" class="form-control" id="golive-public-url" value="@Model.PublicMenuUrl" readonly />
+                    <button type="button" class="btn btn-outline-secondary" id="golive-copy-url-btn" data-url="@Model.PublicMenuUrl">Kopyala</button>
+                </div>
+
+                <dl class="row small mb-3">
+                    <dt class="col-7">Aktif kategori</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.PublicMenuPreview.CategoryCount</dd>
+                    <dt class="col-7">Aktif ürün</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.PublicMenuPreview.ActiveProductCount</dd>
+                    <dt class="col-7">Kampanya</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.PublicMenuPreview.CampaignCount</dd>
+                    <dt class="col-7">Ödül</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.PublicMenuPreview.RewardCount</dd>
+                    <dt class="col-7">Para birimi</dt>
+                    <dd class="col-5 text-end fw-semibold">@Model.PublicMenuPreview.Currency</dd>
+                </dl>
+
+                <div class="d-grid gap-2">
+                    <a href="/m/@Model.BusinessSlug" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Menüyü Aç</a>
+                    <a href="/Business/QrMenu" class="btn btn-outline-primary btn-sm">QR Menü</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-card-header d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">Plan Kullanımı</h3>
+                @if (Model.IsBusinessOwner)
+                {
+                    <a href="/Business/Billing" class="btn btn-sm btn-outline-primary">Abonelik</a>
+                }
+            </div>
+            <div class="panel-card-body">
+                @if (!Model.PlanUsage.HasValidSubscription)
+                {
+                    <div class="alert alert-warning small mb-3">
+                        Geçerli abonelik bulunamadı.
+                        @if (Model.IsBusinessOwner)
+                        {
+                            <a href="/Business/Billing" class="alert-link">Billing’e git</a>
+                        }
+                        else
+                        {
+                            <span class="d-block mt-1">Owner yetkisi gerekir.</span>
+                        }
+                    </div>
+                }
+                else if (Model.PlanUsage.AllMetrics.Any(m => m.IsNearLimit || m.IsLimitReached))
+                {
+                    <div class="alert alert-warning small mb-3">Plan limitine yaklaşıyorsunuz veya limite ulaştınız.</div>
+                }
+
+                @foreach (var metric in Model.PlanUsage.AllMetrics)
+                {
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>@metric.Name</span>
+                            <span class="@metric.StatusCssClass">@metric.UsageDisplay</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar @metric.ProgressBarClass" style="width: @(metric.IsUnlimited ? 0 : metric.UsagePercent)%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Test Kontrol Listesi</h3>
+            </div>
+            <div class="panel-card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in Model.TestChecklist)
+                    {
+                        <li class="list-group-item d-flex flex-wrap justify-content-between align-items-start gap-2">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    @if (item.IsCompleted)
+                                    {
+                                        <span class="badge bg-success">Tamam</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark border">Test et</span>
+                                    }
+                                    <strong>@item.Title</strong>
+                                </div>
+                                <p class="small text-muted mb-0">@item.Description</p>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(item.ActionUrl) && !string.IsNullOrWhiteSpace(item.ActionText))
+                            {
+                                <a href="@item.ActionUrl"
+                                   class="btn btn-sm btn-outline-primary"
+                                   target="@(item.ActionUrl.StartsWith("/m/") ? "_blank" : null)"
+                                   rel="noopener">
+                                    @item.ActionText
+                                </a>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header">
+                <h3 class="h6 mb-0">Yayına Alma Önerileri</h3>
+            </div>
+            <div class="panel-card-body">
+                <ul class="golive-tips mb-0">
+                    @foreach (var tip in Model.LaunchTips)
+                    {
+                        <li>@tip</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var btn = document.getElementById('golive-copy-url-btn');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                var url = btn.getAttribute('data-url');
+                if (!url) return;
+                var original = btn.textContent;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(function () {
+                        btn.textContent = 'Kopyalandı!';
+                        setTimeout(function () { btn.textContent = original; }, 2000);
+                    }).catch(function () {
+                        var input = document.getElementById('golive-public-url');
+                        if (input) { input.focus(); input.select(); }
+                    });
+                } else {
+                    var input = document.getElementById('golive-public-url');
+                    if (input) {
+                        input.focus();
+                        input.select();
+                        try { document.execCommand('copy'); btn.textContent = 'Kopyalandı!'; } catch (e) { }
+                        setTimeout(function () { btn.textContent = original; }, 2000);
+                    }
+                }
+            });
+        })();
+    </script>
+}

@@ -12,15 +12,18 @@ public class DashboardController : BusinessBaseController
     private readonly AppDbContext _context;
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly GoLiveHelper _goLiveHelper;
 
     public DashboardController(
         AppDbContext context,
         BusinessSubscriptionStatusHelper subscriptionStatusHelper,
-        BusinessPlanLimitHelper planLimitHelper)
+        BusinessPlanLimitHelper planLimitHelper,
+        GoLiveHelper goLiveHelper)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
         _planLimitHelper = planLimitHelper;
+        _goLiveHelper = goLiveHelper;
     }
 
     public async Task<IActionResult> Index()
@@ -169,6 +172,7 @@ public class DashboardController : BusinessBaseController
             },
             Subscription = await _subscriptionStatusHelper.GetStatusAsync(businessId),
             PlanUsage = await _planLimitHelper.GetUsageAsync(businessId),
+            GoLiveStatus = await _goLiveHelper.BuildDashboardCardAsync(businessId),
             IsBusinessOwner = User.IsInRole(nameof(UserRole.BusinessOwner))
         };
 

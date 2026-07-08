@@ -24,6 +24,7 @@ builder.Services.AddSingleton<PasswordResetTokenHelper>();
 builder.Services.AddSingleton<PublicOrderTrackingTokenHelper>();
 builder.Services.AddScoped<BusinessSubscriptionStatusHelper>();
 builder.Services.AddScoped<BusinessPlanLimitHelper>();
+builder.Services.AddScoped<GoLiveHelper>();
 builder.Services.AddScoped<PublicOrderPricingHelper>();
 builder.Services.AddScoped<RequireActiveSubscriptionFilter>();
 

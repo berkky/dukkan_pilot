@@ -125,3 +125,115 @@
     border-left: none;
     border-right: none;
 }
+
+.golive-hero {
+    border: 1px solid #dbeafe;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+}
+
+.golive-score-ring {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 999px;
+    border: 4px solid #2563eb;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.golive-score-ring-sm {
+    width: 4rem;
+    height: 4rem;
+    border-width: 3px;
+}
+
+.golive-score-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #1e3a8a;
+}
+
+.golive-score-ring-sm .golive-score-value {
+    font-size: 1.15rem;
+}
+
+.golive-score-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.golive-progress {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.golive-steps {
+    display: flex;
+    flex-direction: column;
+}
+
+.golive-step {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.golive-step:last-child {
+    border-bottom: none;
+}
+
+.golive-step.is-complete {
+    background: #f0fdf4;
+}
+
+.golive-step-main {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.golive-step-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.golive-preview-card,
+.golive-dashboard-card {
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.golive-tips {
+    padding-left: 1.1rem;
+    margin: 0;
+}
+
+.golive-tips li {
+    margin-bottom: 0.65rem;
+    color: #334155;
+}
+
+.golive-tips li:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+    .golive-score-ring {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+
+    .golive-score-value {
+        font-size: 1.25rem;
+    }
+}

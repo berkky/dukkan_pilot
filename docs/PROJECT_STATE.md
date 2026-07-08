@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 25C aşaması (Kampanya Performans Analitiği / Gerçek İndirim Raporları) tamamlandı.
+> Son güncelleme: 26A aşaması (İşletme Kurulum Sihirbazı / Go-Live Merkezi) tamamlandı.
 
 ---
 
@@ -480,6 +480,20 @@ DukkanPilot.sln
 - Client fiyat/indirim verisine güvenilmiyor; 9C sadakat puanı kazanımı bozulmadı
 - Identity yok; SignalR yok; yeni NuGet dependency yok
 
+### 26A aşaması — İşletme Kurulum Sihirbazı / Go-Live Merkezi
+- **Go-Live Merkezi:** `GET /Business/GoLive` — read-only kurulum rehberi (POST yok)
+- **Kurulum checklist:** işletme bilgileri, WhatsApp, kategori, ürün, public menü, QR, kampanya, sadakat/ödül, test siparişi, mutfak, raporlar
+- **Yayına hazır skoru (0–100):** zorunlu adımlar + opsiyonel bonus; eksik zorunlu adım varken “Yayına Hazır” etiketi verilmez
+- **İlk eksik adım CTA:** zorunlu eksik adıma yönlendirir; Owner-only adımlarda Staff için disabled + uyarı
+- **Public menü preview + link kopyalama:** absolute URL (`Scheme`/`Host`), clipboard JS + görünür fallback input
+- **Plan kullanım özeti:** `BusinessPlanLimitHelper` metrikleri; limite yaklaşınca uyarı + Billing linki (Owner)
+- **Test checklist + launch tips:** statik / hafif durumlu kontrol listesi; DB’de saklanmaz
+- **Dashboard:** Go-Live Durumu kartı + hızlı aksiyon
+- **MenuStudio / Sidebar:** Go-Live Merkezi kısayolları
+- **Subscription gate:** onboarding/diagnostic için gate dışında bırakıldı (Dashboard/Billing/Settings gibi erişilebilir)
+- Tenant filtresi `BusinessId` claim üzerinden korundu; Public sepet/order/confirmation/tracking’e dokunulmadı
+- Migration yok; Identity yok; SignalR yok; yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -541,7 +555,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-25C tamamlandı — Order kampanya raporlama alanları, gerçek indirim raporları ve kampanya performans ekranı eklendi.
+26A tamamlandı — Go-Live Merkezi (kurulum checklist, yayına hazır skor, Dashboard/MenuStudio entegrasyonu) eklendi.
 
 ---
 
@@ -568,6 +582,7 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `POST /Admin/Businesses/ToggleActive/{id}` | İşletme hızlı aktif/pasif |
 | `/Admin/SubscriptionPlans` | Plan listesi |
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
+| `/Business/GoLive` | Go-Live Merkezi — kurulum sihirbazı / yayına hazırlık |
 | `/Business/Products/ImportCsv` | CSV ile ürün içe aktarma |
 | `/Business/Products/DownloadImportTemplate` | CSV ürün şablonu indirme |
 | `POST /Business/Products/BulkAction` | Toplu ürün aktif/pasif ve fiyat işlemleri |
