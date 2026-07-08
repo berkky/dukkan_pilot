@@ -163,3 +163,44 @@
     background: rgba(30, 41, 59, 0.5);
 }
 
+.value-calculator-disclaimer {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    background: rgba(120, 53, 15, 0.35);
+    color: #fde68a;
+}
+
+.value-scenario-card {
+    padding: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.55);
+    color: #f8fafc;
+}
+
+.value-scenario-card-selected {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 1px #60a5fa;
+}
+
+.value-metric-card {
+    padding: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 0.75rem;
+    background: rgba(30, 41, 59, 0.55);
+    color: #f8fafc;
+    height: 100%;
+}
+
+.value-metric-label {
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+.value-calculator-admin-picker {
+    background: rgba(30, 41, 59, 0.55);
+    border-color: rgba(148, 163, 184, 0.35);
+    color: #f8fafc;
+}
+

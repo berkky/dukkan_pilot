@@ -137,7 +137,8 @@ public static class HelpContentHelper
         Link("Ücretsiz Başla", "/Account/Register", "🚀"),
         Link("Plan Talebi", "/Sales/RequestPlan", "📋"),
         Link("Güven Merkezi", "/Trust", "🛡️"),
-        Link("Fiyatlar", "/Pricing", "💳")
+        Link("Fiyatlar", "/Pricing", "💳"),
+        Link("Değer Hesapla", "/RoiCalculator", "📈")
     };
 
     private static IReadOnlyList<HelpQuickLinkViewModel> BusinessQuickLinks() => new[]
@@ -148,7 +149,8 @@ public static class HelpContentHelper
         Link("Ürünler", "/Business/Products", "📦"),
         Link("Siparişler / Mutfak", "/Business/Orders", "🍳"),
         Link("Tahsilat Kayıtları", "/Business/Billing/Invoices", "🧾"),
-        Link("İşletme Sağlığı", "/Business/Success", "💚")
+        Link("İşletme Sağlığı", "/Business/Success", "💚"),
+        Link("Değer Senaryosu", "/Business/ValueCalculator", "📈")
     };
 
     private static IReadOnlyList<HelpQuickLinkViewModel> AdminQuickLinks() => new[]
@@ -159,7 +161,8 @@ public static class HelpContentHelper
         Link("Customer Success", "/Admin/CustomerSuccess", "💚"),
         Link("Kurulum Takibi", "/Admin/Onboarding", "🧭"),
         Link("Operasyon Merkezi", "/Admin/Operations", "🛠️"),
-        Link("Kalite Merkezi", "/Admin/Quality", "✅")
+        Link("Kalite Merkezi", "/Admin/Quality", "✅"),
+        Link("Değer Hesaplayıcı", "/Admin/ValueCalculator", "📈")
     };
 
     private static HelpQuickLinkViewModel Link(string title, string url, string icon) =>
@@ -302,6 +305,22 @@ public static class HelpContentHelper
             "başlangıç kurulum kayıt işletme",
             new[] { L("Ücretsiz Başla", "/Account/Register"), L("Demo Talebi", "/Sales/RequestDemo") },
             related: new[] { "nedir", "plan-talebi" }),
+
+        A(ScopePublic, "deger-hesaplayici", "Başlangıç", "Değer hesaplayıcı nasıl kullanılır?",
+            "Tahmini değer senaryosu oluşturma — garanti gelir vaadi değildir.",
+            4, "Başlangıç",
+            new[]
+            {
+                "/RoiCalculator sayfasını açın.",
+                "Aylık sipariş, ortalama sepet ve tekrar/kampanya artış varsayımlarını girin.",
+                "Opsiyonel: platform komisyon oranı ve zaman tasarrufu alanlarını doldurun.",
+                "Temkinli, temel ve iddialı senaryoları karşılaştırın.",
+                "Sonuç garanti değildir; plan talebi veya demo için CTA kullanın."
+            },
+            "değer roi hesaplayıcı tahmini senaryo",
+            new[] { L("Değer Hesaplayıcı", "/RoiCalculator"), L("Fiyatlar", "/Pricing"), L("Plan Talebi", "/Sales/RequestPlan") },
+            warnings: new[] { "Bu hesaplama garanti kazanç vaadi değildir; yalnızca varsayımlar üzerinden tahmini senaryo üretir." },
+            related: new[] { "plan-talebi", "demo-nasil-denenir" }),
 
         // —— Business ——
         A(ScopeBusiness, "ilk-kurulum", "Onboarding & Go-Live", "İlk kurulum rehberi",
@@ -466,13 +485,43 @@ public static class HelpContentHelper
             warnings: new[] { "Staff kullanıcıları finans/abonelik ekranlarına erişemeyebilir." },
             related: new[] { "siparis-mutfak" }),
 
+        A(ScopeBusiness, "deger-senaryosu", "Customer Success", "İşletme değer senaryosu",
+            "Kendi verilerinizle tahmini değer hesaplama.",
+            4, "Orta",
+            new[]
+            {
+                "/Business/ValueCalculator ekranını açın.",
+                "Son 30 günlük sipariş verilerinden önerilen başlangıç değerleri gelir; manuel değiştirebilirsiniz.",
+                "Kampanya, sadakat ve QR menü aksiyonları için sonraki adım CTA'larını kullanın.",
+                "Sonuçlar garanti değildir; tahmini senaryodur."
+            },
+            "değer roi senaryo hesap",
+            new[] { L("Değer Senaryosu", "/Business/ValueCalculator"), L("İşletme Sağlığı", "/Business/Success") },
+            warnings: new[] { "Hesaplama DB'ye yazılmaz; resmi finansal danışmanlık değildir." },
+            related: new[] { "isletme-sagligi", "kampanya-olusturma" }),
+
         // —— Admin ——
+        A(ScopeAdmin, "satis-deger-hesaplayici", "Satış", "Satış değer hesaplayıcı",
+            "Demo görüşmesinde ROI/değer senaryosu anlatımı.",
+            5, "Başlangıç",
+            new[]
+            {
+                "/Admin/ValueCalculator ekranını açın.",
+                "İsteğe bağlı işletme seçerek son 30 gün sipariş verisiyle prefill yapın.",
+                "Önce temkinli senaryoyu gösterin; varsayımları müşteriyle birlikte güncelleyin.",
+                "Sonuç garanti değildir; Won sonrası SalesRequests ve onboarding handoff kullanın."
+            },
+            "roi değer hesaplayıcı satış demo",
+            new[] { L("Değer Hesaplayıcı", "/Admin/ValueCalculator"), L("Satış Merkezi", "/Admin/SalesCenter") },
+            warnings: new[] { "Kesin kazanç veya garanti gelir dili kullanmayın." },
+            related: new[] { "demo-gorusmesi", "satis-pipeline" }),
+
         A(ScopeAdmin, "satis-pipeline", "Satış", "Satış pipeline",
             "Lead'ten Won'a satış akışı.",
             6, "Orta",
-            new[] { "SalesRequests'te yeni talepleri triage edin.", "Durum: New → Contacted → Qualified → Won/Lost.", "Won sonrası işletme bağlayın ve onboarding başlatın.", "SalesCenter özet KPI'ları izleyin." },
+            new[] { "SalesRequests'te yeni talepleri triage edin.", "Durum: New → Contacted → Qualified → Won/Lost.", "Görüşmede değer hesaplayıcı ile varsayım senaryosu gösterin.", "Won sonrası işletme bağlayın ve onboarding başlatın.", "SalesCenter özet KPI'ları izleyin." },
             "satış pipeline lead won",
-            new[] { L("Satış Talepleri", "/Admin/SalesRequests"), L("Satış Merkezi", "/Admin/SalesCenter") },
+            new[] { L("Satış Talepleri", "/Admin/SalesRequests"), L("Satış Merkezi", "/Admin/SalesCenter"), L("Değer Hesaplayıcı", "/Admin/ValueCalculator") },
             related: new[] { "won-lead-onboarding", "demo-gorusmesi" }),
 
         A(ScopeAdmin, "won-lead-onboarding", "Onboarding & Go-Live", "Won lead → onboarding",
@@ -547,9 +596,9 @@ public static class HelpContentHelper
         A(ScopeAdmin, "demo-gorusmesi", "Satış", "Demo görüşmesi",
             "Satış demo script özeti.",
             5, "Başlangıç",
-            new[] { "SALES_DEMO_SCRIPT.md akışını kullanın.", "Canlı /m/demo-kafe menüsünü gösterin.", "Sepet + kampanya + mutfak akışını anlatın.", "Plan talebi ve onboarding handoff'u kapatın." },
+            new[] { "SALES_DEMO_SCRIPT.md akışını kullanın.", "Canlı /m/demo-kafe menüsünü gösterin.", "Sepet + kampanya + mutfak akışını anlatın.", "Değer hesaplayıcı ile tahmini senaryo gösterin (garanti değil).", "Plan talebi ve onboarding handoff'u kapatın." },
             "demo satış görüşme",
-            new[] { L("Demo Menü", "/m/demo-kafe"), L("Satış Merkezi", "/Admin/SalesCenter") },
+            new[] { L("Demo Menü", "/m/demo-kafe"), L("Satış Merkezi", "/Admin/SalesCenter"), L("Değer Hesaplayıcı", "/Admin/ValueCalculator") },
             related: new[] { "satis-pipeline" }),
 
         A(ScopeAdmin, "ilk-musteri-kurulumu", "Onboarding & Go-Live", "İlk müşteri kurulumu",

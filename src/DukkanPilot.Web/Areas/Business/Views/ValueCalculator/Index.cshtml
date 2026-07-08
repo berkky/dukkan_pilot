@@ -1,0 +1,11 @@
+@model ValueCalculatorPageViewModel
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@Model.PageTitle</h2>
+        <p class="text-muted mb-0">@Model.Intro</p>
+    </div>
+    <a href="/Business/HelpCenter/Article/deger-senaryosu" class="btn btn-outline-secondary btn-sm">Rehber</a>
+</div>
+
+<partial name="~/Views/Shared/Value/_ValueCalculatorContent.cshtml" model="Model" />

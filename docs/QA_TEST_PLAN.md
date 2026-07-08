@@ -27,6 +27,7 @@ Bu katman:
 - Admin: dashboard, salescenter, onboarding, customersuccess, operations, quality
 - Billing: admin invoice/payment operasyonu + business ledger (read-only)
 - Help Center: `/Help`, `/Business/HelpCenter`, `/Admin/HelpCenter` + contextual links
+- ROI Calculator: `/RoiCalculator` 200; `/Business/ValueCalculator` `/Admin/ValueCalculator` auth yok → 302; POST sonuç + disclaimer
 - System: health, robots, sitemap, security headers
 - Deployment/backup: backup, verify, restore, migration status
 

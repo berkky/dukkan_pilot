@@ -1,0 +1,161 @@
+@model ValueCalculatorPageViewModel
+@using System.Globalization
+@{
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="value-calculator-disclaimer mb-4" role="note">
+    <strong>Tahmini hesaplamadır.</strong>
+    Bu hesaplama garanti kazanç vaadi değildir; yalnızca girdiğiniz varsayımlar üzerinden tahmini senaryo üretir.
+    Gerçek sonuçlar işletme, fiyatlama, müşteri kitlesi ve operasyon kalitesine göre değişir.
+</div>
+
+@if (Model.Prefill is { HasData: true } or { Note: not null })
+{
+    <div class="alert alert-info value-calculator-prefill-note">
+        @if (!string.IsNullOrWhiteSpace(Model.Prefill.Note))
+        {
+            <div>@Model.Prefill.Note</div>
+        }
+        @if (Model.Prefill.HasCampaignUsage)
+        {
+            <div class="small mt-1 mb-0">Son 30 günde kampanya kullanımı tespit edildi; kampanya etkisi varsayımını buna göre ayarlayabilirsiniz.</div>
+        }
+    </div>
+}
+
+@if (Model.Context == "Admin" && Model.Businesses.Count > 0)
+{
+    <div class="card value-calculator-admin-picker mb-4">
+        <div class="card-body">
+            <label class="form-label fw-semibold" for="businessPrefillSelect">İşletme seç (opsiyonel prefill)</label>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <select id="businessPrefillSelect" class="form-select" style="max-width: 20rem;">
+                    <option value="">Manuel giriş</option>
+                    @foreach (var business in Model.Businesses)
+                    {
+                        if (Model.SelectedBusinessId == business.Id)
+                        {
+                            <option value="@business.Id" selected="selected">@business.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@business.Id">@business.Name</option>
+                        }
+                    }
+                </select>
+                <a id="businessPrefillLink" class="btn btn-outline-primary btn-sm"
+                   href="/Admin/ValueCalculator@(Model.SelectedBusinessId.HasValue ? $"?businessId={Model.SelectedBusinessId}" : "")">
+                    İşletme verisiyle doldur
+                </a>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.SelectedBusinessName))
+            {
+                <div class="small text-muted mt-2">Seçili: <strong>@Model.SelectedBusinessName</strong></div>
+            }
+        </div>
+    </div>
+}
+
+<form method="post" action="@Model.FormAction" class="value-calculator-form">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card value-calculator-form-card h-100">
+                <div class="card-header fw-semibold">Sipariş ve gelir varsayımları</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Input.MonthlyOrders" class="form-label">Aylık sipariş sayısı</label>
+                        <input asp-for="Input.MonthlyOrders" class="form-control" type="number" min="0" step="1" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.AverageBasket" class="form-label">Ortalama sepet (₺)</label>
+                        <input asp-for="Input.AverageBasket" class="form-control" type="number" min="0" step="0.01" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.RepeatCustomerRatePercent" class="form-label">Mevcut tekrar müşteri oranı (%)</label>
+                        <input asp-for="Input.RepeatCustomerRatePercent" class="form-control" type="number" min="0" max="100" step="0.1" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.ExpectedRepeatIncreasePercent" class="form-label">Beklenen tekrar sipariş artışı (%)</label>
+                        <input asp-for="Input.ExpectedRepeatIncreasePercent" class="form-control" type="number" min="0" max="100" step="0.1" />
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="Input.CampaignOrderIncreasePercent" class="form-label">Kampanya etkisi tahmini (%)</label>
+                        <input asp-for="Input.CampaignOrderIncreasePercent" class="form-control" type="number" min="0" max="100" step="0.1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card value-calculator-form-card h-100">
+                <div class="card-header fw-semibold">Platform ve zaman varsayımları</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Input.CurrentMarketplaceCommissionPercent" class="form-label">Platform komisyon oranı (%) — opsiyonel</label>
+                        <input asp-for="Input.CurrentMarketplaceCommissionPercent" class="form-control" type="number" min="0" max="100" step="0.1" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.MarketplaceOrdersPercent" class="form-label">Platformdan gelen sipariş oranı (%) — opsiyonel</label>
+                        <input asp-for="Input.MarketplaceOrdersPercent" class="form-control" type="number" min="0" max="100" step="0.1" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.WeeklyMenuUpdateHours" class="form-label">Haftalık menü güncelleme saati</label>
+                        <input asp-for="Input.WeeklyMenuUpdateHours" class="form-control" type="number" min="0" step="0.1" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.WeeklyOrderHandlingSavedHours" class="form-label">Haftalık sipariş yönetiminde kazanılacak saat</label>
+                        <input asp-for="Input.WeeklyOrderHandlingSavedHours" class="form-control" type="number" min="0" step="0.1" />
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="Input.HourlyLaborCost" class="form-label">Saatlik operasyon maliyeti (₺)</label>
+                        <input asp-for="Input.HourlyLaborCost" class="form-control" type="number" min="0" step="0.01" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card value-calculator-form-card h-100">
+                <div class="card-header fw-semibold">Maliyet ve senaryo</div>
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3">
+                        <label asp-for="Input.MonthlySoftwareCost" class="form-label">Aylık yazılım maliyeti (₺)</label>
+                        <input asp-for="Input.MonthlySoftwareCost" class="form-control" type="number" min="0" step="0.01" />
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Input.Scenario" class="form-label">Öne çıkan senaryo</label>
+                        <select asp-for="Input.Scenario" class="form-select">
+                            <option value="Conservative">Temkinli (×0,5)</option>
+                            <option value="Base">Temel (×1,0)</option>
+                            <option value="Ambitious">İddialı (×1,5)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-auto">Senaryoyu Hesapla</button>
+                    <p class="small text-muted mt-3 mb-0">Varsayımlarınızı değiştirerek farklı sonuçları karşılaştırın.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.ShowResult && Model.Result is not null)
+{
+    <partial name="Value/_ValueCalculatorResults" model="Model" />
+}
+
+@if (Model.Context == "Admin")
+{
+    <script>
+        (function () {
+            var select = document.getElementById('businessPrefillSelect');
+            var link = document.getElementById('businessPrefillLink');
+            if (!select || !link) return;
+            select.addEventListener('change', function () {
+                link.href = select.value ? '/Admin/ValueCalculator?businessId=' + select.value : '/Admin/ValueCalculator';
+            });
+        })();
+    </script>
+}

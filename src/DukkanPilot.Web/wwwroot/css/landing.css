@@ -412,3 +412,97 @@
   border-style: dashed;
 }
 
+/* Value Calculator */
+.value-calculator-disclaimer {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 0.95rem;
+}
+
+.value-calculator-form-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.value-scenario-card {
+  padding: 1.1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #fff;
+}
+
+.value-scenario-card-selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.value-scenario-label {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.value-scenario-multiplier {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.value-metric-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.value-scenario-total {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+}
+
+.value-metric-card {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #f8fafc;
+  height: 100%;
+}
+
+.value-metric-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.value-metric-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.value-calculator-breakeven {
+  border-radius: 0.85rem;
+}
+
+.value-calculator-cta {
+  padding: 1rem;
+  border-radius: 0.85rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.value-calculator-prefill-note {
+  border-radius: 0.85rem;
+}
+
+.value-calculator-admin-picker {
+  border-radius: 0.85rem;
+}
+

@@ -20,6 +20,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 8. Release quality gate + QA dokümanları (Kalite Merkezi + script tabanlı doğrulama)
 9. Manuel tahsilat operasyonu (Admin Billing + işletme tahsilat defteri; resmi e-Belge değil)
 10. Self-service Help Center + eğitim rehberleri (Public/Business/Admin)
+11. ROI / Değer Hesaplayıcı — tahmini senaryo (garanti gelir vaadi değil; satış dönüşümü)
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon

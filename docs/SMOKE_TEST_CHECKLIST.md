@@ -85,6 +85,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 | `/Business/HelpCenter` | Auth | 200 | Owner+Staff |
 | `/Admin/HelpCenter` | SuperAdmin | 200 | Auth yok → 302 |
 
+## ROI / Değer Hesaplayıcı
+
+| URL | Rol | Beklenen | Not |
+|-----|-----|----------|-----|
+| `/RoiCalculator` | Anon | 200 | Disclaimer görünür |
+| `/ValueCalculator` | Anon | 200 | Alias |
+| `/Business/ValueCalculator` | Auth | 200 | Auth yok → 302 |
+| `/Admin/ValueCalculator` | SuperAdmin | 200 | Auth yok → 302 |
+
 ## Sipariş / kampanya
 
 | Adım | Beklenen |

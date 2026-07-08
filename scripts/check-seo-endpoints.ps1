@@ -69,7 +69,8 @@ if ($sitemap.Status -eq 200) {
         "/Privacy",
         "/Kvkk",
         "/Sales/RequestDemo",
-        "/Sales/RequestPlan"
+        "/Sales/RequestPlan",
+        "/RoiCalculator"
     )
     foreach ($path in $mustHave) {
         if ($sitemap.Body -notmatch [regex]::Escape(">$BaseUrl$path<") -and $sitemap.Body -notmatch [regex]::Escape(">$path<")) {
@@ -78,7 +79,7 @@ if ($sitemap.Status -eq 200) {
         }
     }
 
-    $mustNotContain = @("/Admin/", "/Business/", "/Account/", "/Admin/HelpCenter", "/Business/HelpCenter", "utm_", "tracking", "token")
+    $mustNotContain = @("/Admin/", "/Business/", "/Account/", "/Admin/HelpCenter", "/Business/HelpCenter", "/Business/ValueCalculator", "/Admin/ValueCalculator", "utm_", "tracking", "token")
     foreach ($bad in $mustNotContain) {
         if ($sitemap.Body -match [regex]::Escape($bad)) {
             Write-Fail "sitemap contains private/sensitive pattern: $bad"

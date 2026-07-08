@@ -17,6 +17,7 @@
 - [ ] Personel ekle (Owner)
 - [ ] Demo Merkezi checklist yeşil (`/Business/DemoCenter`)
 - [ ] Plan/talep ihtiyacı varsa `/Business/Billing` veya public `/Sales/RequestPlan`
+- [ ] (Opsiyonel) Demo öncesi/sonrası değer senaryosu: `/RoiCalculator` veya `/Business/ValueCalculator` (tahmini; garanti değil)
 - [ ] Admin satış taleplerini `/Admin/SalesRequests` ile takip
 - [ ] Admin Kurulum Takibi (`/Admin/Onboarding`) — skor / risk / Won handoff
 - [ ] Won talep sonrası Admin Billing (`/Admin/Billing`) — iç tahsilat kaydı oluştur (resmi fatura değil)

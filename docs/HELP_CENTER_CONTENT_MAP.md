@@ -15,6 +15,7 @@ Yardım içerikleri **static** (`HelpContentHelper`) + Razor view ile sunulur. D
 | qr-menu-nasil-calisir | QR Menü | Public menü |
 | siparis-takibi | Sipariş & Mutfak | Public order flow |
 | isletme-baslangic | Başlangıç | Register, Business Help |
+| deger-hesaplayici | Başlangıç | /RoiCalculator |
 
 **Güvenlik:** Demo/admin şifresi, secret, connection string yok.
 
@@ -40,6 +41,7 @@ Owner + Staff erişir. Read-only.
 | plan-talebi | Billing |
 | tahsilat-kayitlari | Billing/Invoices |
 | isletme-sagligi | Success |
+| deger-senaryosu | ValueCalculator |
 | personel-egitimi | Kitchen |
 
 ## Admin (`/Admin/HelpCenter`)
@@ -58,6 +60,7 @@ SuperAdmin only. Read-only.
 | backup-restore | scripts/db-* |
 | incident-response | INCIDENT_RESPONSE_RUNBOOK |
 | demo-gorusmesi | SalesCenter |
+| satis-deger-hesaplayici | ValueCalculator |
 | ilk-musteri-kurulumu | Businesses/Details |
 | audit-notification-izleme | AuditLogs, Notifications |
 | legal-readiness | Legal pages |

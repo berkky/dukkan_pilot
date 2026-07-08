@@ -34,6 +34,9 @@
 | Help Center | `/Help/nedir` | Anon | Makale aç | 200 | Low | Script |
 | Help Center | `/Business/HelpCenter` | Auth | Aç | 200 + arama | Med | Manual |
 | Help Center | `/Admin/HelpCenter` | SuperAdmin | Aç | 200 | Med | Manual |
+| ROI Calculator | `/RoiCalculator` | Anon | Aç + POST | 200, disclaimer | Med | Script |
+| ROI Calculator | `/Business/ValueCalculator` | Auth | Aç | 200 + prefill | Med | Manual |
+| ROI Calculator | `/Admin/ValueCalculator` | SuperAdmin | Aç | 200 | Med | Manual |
 | Admin Dashboard | `/Admin/Dashboard` | SuperAdmin | Aç | 200 + KPI | High | Manual |
 | Admin SalesRequests | `/Admin/SalesRequests` | SuperAdmin | Aç | 200 | High | Manual |
 | Admin Onboarding | `/Admin/Onboarding` | SuperAdmin | Aç | 200 | High | Manual |

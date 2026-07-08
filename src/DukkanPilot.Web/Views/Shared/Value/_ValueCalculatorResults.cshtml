@@ -1,0 +1,145 @@
+@model ValueCalculatorPageViewModel
+@using System.Globalization
+@{
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var result = Model.Result!;
+    var selected = result.SelectedScenario;
+}
+
+<section class="value-calculator-results mt-5">
+    <h2 class="h4 mb-3">Tahmini senaryo sonuçları</h2>
+
+    <div class="row g-3 mb-4">
+        @foreach (var scenario in result.ScenarioResults)
+        {
+            var isSelected = string.Equals(scenario.ScenarioKey, result.Input.Scenario, StringComparison.OrdinalIgnoreCase);
+            <div class="col-md-4">
+                <div class="value-scenario-card h-100 @(isSelected ? "value-scenario-card-selected" : "")">
+                    <div class="value-scenario-label">@scenario.ScenarioLabel</div>
+                    <div class="value-scenario-multiplier">Çarpan ×@scenario.Multiplier.ToString("0.0", culture)</div>
+                    <div class="value-metric-row">
+                        <span>Ek gelir</span>
+                        <strong>@scenario.IncrementalRevenueEstimate.ToString("N0", culture) ₺</strong>
+                    </div>
+                    <div class="value-metric-row">
+                        <span>Komisyon tasarrufu</span>
+                        <strong>@scenario.CommissionSavingEstimate.ToString("N0", culture) ₺</strong>
+                    </div>
+                    <div class="value-metric-row">
+                        <span>Zaman tasarrufu</span>
+                        <strong>@scenario.TimeSavingEstimate.ToString("N0", culture) ₺</strong>
+                    </div>
+                    <div class="value-scenario-total">
+                        Aylık tahmini toplam: <strong>@scenario.TotalEstimatedValue.ToString("N0", culture) ₺</strong>
+                    </div>
+                    <div class="small text-muted">Net (yazılım sonrası): @scenario.NetEstimatedValue.ToString("N0", culture) ₺</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="value-metric-card">
+                <div class="value-metric-label">Seçili senaryo — aylık tahmini değer</div>
+                <div class="value-metric-value">@selected.TotalEstimatedValue.ToString("N0", culture) ₺</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="value-metric-card">
+                <div class="value-metric-label">Yıllık tahmini değer</div>
+                <div class="value-metric-value">@result.YearlyTotalEstimatedValue.ToString("N0", culture) ₺</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="value-metric-card">
+                <div class="value-metric-label">Yazılım maliyeti sonrası net</div>
+                <div class="value-metric-value">@result.NetMonthlyValue.ToString("N0", culture) ₺</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="value-metric-card">
+                <div class="value-metric-label">Geri ödeme oranı</div>
+                <div class="value-metric-value">
+                    @(result.PaybackRatio.HasValue ? result.PaybackRatio.Value.ToString("0.##", culture) + "×" : "—")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-secondary value-calculator-breakeven">
+        @selected.BreakEvenText
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header fw-semibold">Uyarılar</div>
+                <ul class="list-unstyled mb-0 card-body small">
+                    @foreach (var warning in result.Warnings)
+                    {
+                        <li class="mb-2">@warning</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header fw-semibold">Varsayımlar</div>
+                <ul class="list-unstyled mb-0 card-body small">
+                    @foreach (var assumption in result.Assumptions)
+                    {
+                        <li class="mb-2">@assumption</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header fw-semibold">Önerilen sonraki adımlar</div>
+                <ul class="mb-0 card-body small">
+                    @foreach (var step in result.RecommendedNextSteps)
+                    {
+                        <li class="mb-2">@step</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="value-calculator-cta mt-4">
+        @if (Model.Context == "Public")
+        {
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/Pricing" class="btn btn-primary">Planları İncele</a>
+                <a href="/Sales/RequestDemo" class="btn btn-outline-primary">Demo Talep Et</a>
+                <a href="/Sales/RequestPlan" class="btn btn-outline-primary">Plan Talebi Oluştur</a>
+                <a href="/m/demo-kafe" class="btn btn-outline-secondary" target="_blank" rel="noopener">Demo QR Menüyü Gör</a>
+            </div>
+        }
+        else if (Model.Context == "Business")
+        {
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/Business/Campaigns" class="btn btn-primary">Kampanya Oluştur</a>
+                <a href="/Business/Rewards" class="btn btn-outline-primary">Sadakat Ödülü</a>
+                <a href="/Business/QrMenu" class="btn btn-outline-primary">QR Menüyü Paylaş</a>
+                <a href="/Business/GoLive" class="btn btn-outline-secondary">Go-Live Kontrol Listesi</a>
+                @if (Model.ShowOwnerCtas)
+                {
+                    <a href="/Business/Billing" class="btn btn-outline-dark">Faturalama / Plan</a>
+                    <a href="/Sales/RequestPlan" class="btn btn-outline-dark">Plan Talebi</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/Admin/SalesRequests" class="btn btn-primary">Sales Requests</a>
+                <a href="/Admin/SalesCenter" class="btn btn-outline-primary">Satış Merkezi</a>
+                <a href="/Demo" class="btn btn-outline-primary" target="_blank" rel="noopener">Landing Demo</a>
+                <a href="/Admin/HelpCenter/Article/demo-gorusmesi" class="btn btn-outline-secondary">Demo görüşmesi rehberi</a>
+                <a href="/Sales/RequestPlan" class="btn btn-outline-secondary" target="_blank" rel="noopener">Plan talebi (public)</a>
+            </div>
+        }
+    </div>
+</section>

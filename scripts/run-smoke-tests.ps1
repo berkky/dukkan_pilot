@@ -140,6 +140,8 @@ Test-Url "PublicMarketing" "/Trust" @(200) "Trust Center"
 
 Test-Url "PublicMarketing" "/Help" @(200) "Help Center"
 Test-Url "PublicMarketing" "/Help/nedir" @(200) "Help article"
+Test-Url "PublicMarketing" "/RoiCalculator" @(200) "ROI Calculator"
+Test-Url "PublicMarketing" "/ValueCalculator" @(200) "ROI Calculator alias"
 
 Test-Url "Legal" "/Privacy" @(200) "Legal"
 Test-Url "Legal" "/Terms" @(200) "Legal"
@@ -166,6 +168,7 @@ Test-Url "AuthRedirects" "/Business/Billing/Requests" @(302, 301) "Auth redirect
 Test-Url "AuthRedirects" "/Business/Billing/Invoices" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/Billing/Payments" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/HelpCenter" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Business/ValueCalculator" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/SalesRequests" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Onboarding" @(302, 301) "Auth redirect"
@@ -174,6 +177,7 @@ Test-Url "AuthRedirects" "/Admin/Operations" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Billing" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Billing/Payments" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/HelpCenter" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Admin/ValueCalculator" @(302, 301) "Auth redirect"
 
 $results | Sort-Object Group, Path | Format-Table -AutoSize Group, Path, Expected, Actual, Status, Note
 

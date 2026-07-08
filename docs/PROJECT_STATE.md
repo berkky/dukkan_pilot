@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 33B (Help Center / Eğitim Merkezi / Kullanım Kılavuzu) tamamlandı.
+> Son güncelleme: 34A (ROI Calculator / Değer Hesaplayıcı) tamamlandı.
 
 ---
 
@@ -646,6 +646,18 @@ DukkanPilot.sln
 - Sitemap: `/Help` + public makaleler; Admin/Business Help yok
 - Docs: HELP_CENTER_CONTENT_MAP, BUSINESS_USER_TRAINING_GUIDE, STAFF_TRAINING_CHEATSHEET, ADMIN_SUPPORT_KNOWLEDGE_BASE
 - Migration yok; Entity/DbContext değişmedi
+
+### 34A — ROI Calculator / Değer Hesaplayıcı
+- Public: `/RoiCalculator`, `/ValueCalculator` (anonymous, read-only hesaplama)
+- Business: `/Business/ValueCalculator` (Owner+Staff; son 30 gün prefill)
+- Admin: `/Admin/ValueCalculator` (SuperAdmin; opsiyonel businessId prefill)
+- `ValueCalculatorHelper` + view models; Conservative/Base/Ambitious senaryolar
+- Disclaimer: tahmini hesaplama, garanti gelir vaadi değil
+- CTA: Landing/Pricing/Features/Demo/Help + Business Dashboard/Success/Onboarding/GoLive + Admin SalesCenter
+- Help makaleleri: `deger-hesaplayici`, `deger-senaryosu`, `satis-deger-hesaplayici`
+- Sitemap: `/RoiCalculator` (+ alias); Business/Admin calculator yok
+- Docs: ROI_CALCULATOR_GUIDE, VALUE_SELLING_PLAYBOOK, ROI_CALCULATOR_ASSUMPTIONS
+- Migration yok; Entity/DbContext değişmedi; DB’ye sonuç yazılmaz; audit yok
 
 ---
 

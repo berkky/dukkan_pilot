@@ -63,3 +63,11 @@
 | Kurulum | Onboarding | Onboarding |
 | Sağlık | CustomerSuccess | Success |
 | Operasyon | Operations, Quality | GoLive, DemoCenter |
+| Değer senaryosu | ValueCalculator | ValueCalculator |
+
+## Senaryo: Müşteri “bana ne kazandırır?” diyor
+
+1. `/Admin/ValueCalculator` veya public `/RoiCalculator` açın
+2. Temkinli senaryoyu gösterin; garanti olmadığını söyleyin
+3. `docs/VALUE_SELLING_PLAYBOOK.md` ve Help `satis-deger-hesaplayici`
+4. Plan talebi: `/Sales/RequestPlan`

@@ -1,0 +1,39 @@
+@model ValueCalculatorPageViewModel
+
+<section class="landing-page-hero py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-9">
+                <span class="landing-pill landing-pill-dark mb-3">Değer Hesaplayıcı</span>
+                <h1 class="display-6 fw-bold mb-3">@Model.PageTitle</h1>
+                <p class="text-muted mb-4">@Model.Intro</p>
+                <div class="row g-3 text-start justify-content-center mb-2">
+                    <div class="col-md-4">
+                        <div class="landing-section-card h-100 p-3">
+                            <div class="fw-semibold mb-1">Daha fazla tekrar sipariş</div>
+                            <div class="small text-muted">Sadakat ve kampanya ile müşteri geri dönüş senaryosu.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="landing-section-card h-100 p-3">
+                            <div class="fw-semibold mb-1">Daha az operasyon zamanı</div>
+                            <div class="small text-muted">QR menü ve WhatsApp sipariş ile süreç tasarrufu.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="landing-section-card h-100 p-3">
+                            <div class="fw-semibold mb-1">Kontrollü kampanya/sadakat</div>
+                            <div class="small text-muted">Ölçülebilir kampanya etkisi varsayımı.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        <partial name="Value/_ValueCalculatorContent" model="Model" />
+    </div>
+</section>
