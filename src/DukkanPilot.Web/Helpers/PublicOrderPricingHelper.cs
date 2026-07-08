@@ -1,6 +1,7 @@
 using DukkanPilot.Core.Entities;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
+using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Models.PublicMenu;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,16 @@ public class PublicOrderPricingHelper
         string? rewardRequestName = null)
     {
         var result = new PublicOrderPricingResult();
+
+        var businessExists = await _context.Businesses
+            .AsNoTracking()
+            .AnyAsync(b => b.Id == businessId && b.IsActive);
+
+        if (!businessExists)
+        {
+            result.Errors.Add("İşletme bulunamadı veya aktif değil.");
+            return result;
+        }
 
         var groupedItems = requestedItems
             .Where(i => i.Quantity > 0)
@@ -73,19 +84,28 @@ public class PublicOrderPricingHelper
         result.Total = result.Subtotal;
 
         var now = DateTime.UtcNow;
-        var activeCampaign = await _context.Campaigns
+        var eligibleCampaigns = await _context.Campaigns
             .AsNoTracking()
             .Where(c => c.BusinessId == businessId
                 && c.IsActive
+                && c.IsAutoApply
+                && c.DiscountValue > 0
                 && c.StartDate <= now
                 && (c.EndDate == null || c.EndDate >= now))
-            .OrderByDescending(c => c.StartDate)
-            .FirstOrDefaultAsync();
+            .ToListAsync();
 
-        if (activeCampaign is not null)
+        var bestCampaign = SelectBestCampaign(eligibleCampaigns, result.Subtotal);
+
+        if (bestCampaign is not null)
         {
-            result.AppliedCampaignName = activeCampaign.Title;
-            result.CampaignMessage = $"Aktif fırsat: {activeCampaign.Title}. Kampanya avantajı işletme onayında uygulanır.";
+            var discount = CampaignDiscountHelper.CalculateDiscountAmount(bestCampaign, result.Subtotal);
+            result.DiscountAmount = discount;
+            result.Total = Math.Max(0m, result.Subtotal - discount);
+            result.AppliedCampaignId = bestCampaign.Id;
+            result.AppliedCampaignName = bestCampaign.Title;
+            result.AppliedCampaignDescription = bestCampaign.Description;
+            result.DiscountTypeText = CampaignDiscountHelper.GetDiscountTypeLabel(bestCampaign.DiscountType);
+            result.CampaignMessage = CampaignDiscountHelper.BuildAppliedCampaignMessage(bestCampaign, discount);
         }
 
         var loyaltyRule = await GetActiveLoyaltyRuleAsync(businessId);
@@ -115,6 +135,44 @@ public class PublicOrderPricingHelper
 
         result.IsValid = true;
         return result;
+    }
+
+    internal static Campaign? SelectBestCampaign(IEnumerable<Campaign> campaigns, decimal subtotal)
+    {
+        Campaign? best = null;
+        decimal bestDiscount = 0m;
+
+        foreach (var campaign in campaigns)
+        {
+            if (!CampaignDiscountHelper.MeetsMinimumOrder(campaign, subtotal))
+            {
+                continue;
+            }
+
+            var discount = CampaignDiscountHelper.CalculateDiscountAmount(campaign, subtotal);
+            if (discount <= 0)
+            {
+                continue;
+            }
+
+            if (best is null
+                || discount > bestDiscount
+                || (discount == bestDiscount && campaign.Priority > best.Priority)
+                || (discount == bestDiscount
+                    && campaign.Priority == best.Priority
+                    && campaign.EndDate.HasValue
+                    && (!best.EndDate.HasValue || campaign.EndDate.Value < best.EndDate.Value))
+                || (discount == bestDiscount
+                    && campaign.Priority == best.Priority
+                    && Nullable.Equals(campaign.EndDate, best.EndDate)
+                    && campaign.Id < best.Id))
+            {
+                best = campaign;
+                bestDiscount = discount;
+            }
+        }
+
+        return best;
     }
 
     public async Task<LoyaltyRule?> GetActiveLoyaltyRuleAsync(int businessId)

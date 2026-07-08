@@ -178,7 +178,13 @@ public static class DbSeeder
             Title = "Açılışa Özel %10 İndirim",
             Description = "Tüm kahvelerde geçerli açılış kampanyası",
             StartDate = DateTime.UtcNow,
-            EndDate = DateTime.UtcNow.AddMonths(1)
+            EndDate = DateTime.UtcNow.AddMonths(1),
+            DiscountType = CampaignDiscountType.Percentage,
+            DiscountValue = 10m,
+            MinimumOrderAmount = 100m,
+            IsPublicVisible = true,
+            IsAutoApply = true,
+            Priority = 1
         });
 
         await context.SaveChangesAsync();

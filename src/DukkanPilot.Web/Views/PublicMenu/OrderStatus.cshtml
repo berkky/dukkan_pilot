@@ -99,7 +99,24 @@
             </div>
         }
 
-        @if (!string.IsNullOrWhiteSpace(Model.CampaignInfoText))
+        @if (Model.IsConfirmationPage && Model.ShowDiscountBreakdown)
+        {
+            <div class="public-order-info-box">
+                <div class="public-order-info-label">Sipariş Özeti</div>
+                <div>Ara Toplam: @FormatAmount(Model.SubtotalAmount!.Value)</div>
+                <div>İndirim: -@FormatAmount(Model.DiscountAmount!.Value)</div>
+                <div class="fw-semibold">Toplam: @FormatAmount(Model.TotalAmount)</div>
+            </div>
+        }
+
+        @if (Model.IsConfirmationPage && !string.IsNullOrWhiteSpace(Model.CampaignInfoText))
+        {
+            <div class="public-order-info-box">
+                <div class="public-order-info-label">Kampanya</div>
+                <div>@Model.CampaignInfoText</div>
+            </div>
+        }
+        else if (!Model.IsConfirmationPage && !string.IsNullOrWhiteSpace(Model.CampaignInfoText))
         {
             <div class="public-order-info-box">
                 <div class="public-order-info-label">Kampanya Bilgisi</div>
@@ -140,6 +157,17 @@
                     <span class="order-status-meta-label">Toplam Tutar</span>
                     <span class="order-status-meta-value order-status-meta-total" id="order-status-total">@FormatAmount(Model.TotalAmount)</span>
                 </div>
+                @if (Model.ShowDiscountBreakdown)
+                {
+                    <div class="order-status-meta-item">
+                        <span class="order-status-meta-label">Ara Toplam</span>
+                        <span class="order-status-meta-value">@FormatAmount(Model.SubtotalAmount!.Value)</span>
+                    </div>
+                    <div class="order-status-meta-item">
+                        <span class="order-status-meta-label">İndirim</span>
+                        <span class="order-status-meta-value text-success">-@FormatAmount(Model.DiscountAmount!.Value)</span>
+                    </div>
+                }
             </div>
 
             <hr class="order-status-divider" />

@@ -15,6 +15,9 @@ public class PublicMenuController : Controller
 {
     private const string RewardRequestPrefix = "Ödül talebi:";
     private const string CampaignInfoPrefix = "Kampanya:";
+    private const string SubtotalPrefix = "Ara toplam:";
+    private const string DiscountPrefix = "İndirim:";
+    private const string TotalPrefix = "Toplam:";
 
     private readonly AppDbContext _context;
     private readonly PublicOrderTrackingTokenHelper _trackingTokenHelper;
@@ -52,19 +55,32 @@ public class PublicMenuController : Controller
             .AsNoTracking()
             .Where(c => c.BusinessId == business.Id
                 && c.IsActive
+                && c.IsPublicVisible
                 && c.StartDate <= now
                 && (c.EndDate == null || c.EndDate >= now))
-            .OrderByDescending(c => c.StartDate)
-            .Select(c => new PublicMenuCampaignViewModel
-            {
-                Id = c.Id,
-                Title = c.Title,
-                Description = c.Description,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                ImageUrl = c.ImageUrl
-            })
+            .OrderByDescending(c => c.Priority)
+            .ThenByDescending(c => c.StartDate)
             .ToListAsync();
+
+        var campaignViewModels = campaigns.Select(c => new PublicMenuCampaignViewModel
+        {
+            Id = c.Id,
+            Title = c.Title,
+            Description = c.Description,
+            StartDate = c.StartDate,
+            EndDate = c.EndDate,
+            ImageUrl = c.ImageUrl,
+            DiscountTypeText = CampaignDiscountHelper.GetDiscountTypeLabel(c.DiscountType),
+            DiscountValueText = CampaignDiscountHelper.GetDiscountValueText(c.DiscountType, c.DiscountValue),
+            DiscountValue = c.DiscountValue,
+            MinimumOrderAmount = c.MinimumOrderAmount,
+            MaximumDiscountAmount = c.MaximumDiscountAmount,
+            IsAutoApply = c.IsAutoApply,
+            IsPublicVisible = c.IsPublicVisible,
+            CampaignBadgeText = CampaignDiscountHelper.GetCampaignBadgeText(c.DiscountType, c.DiscountValue),
+            CampaignDescriptionText = c.Description,
+            MinimumOrderText = CampaignDiscountHelper.GetMinimumOrderText(c.MinimumOrderAmount)
+        }).ToList();
 
         var rewards = await _context.Rewards
             .AsNoTracking()
@@ -123,7 +139,7 @@ public class PublicMenuController : Controller
             ThemeColor = themeColor,
             Currency = currency,
             WhatsAppNumber = whatsAppNumber,
-            Campaigns = campaigns,
+            Campaigns = campaignViewModels,
             Rewards = rewards,
             Categories = categories
         };
@@ -168,6 +184,7 @@ public class PublicMenuController : Controller
             Total = pricing.Total,
             CampaignMessage = pricing.CampaignMessage,
             AppliedCampaignName = pricing.AppliedCampaignName,
+            DiscountTypeText = pricing.DiscountTypeText,
             EarnedPointsPreview = pricing.EarnedPointsPreview,
             LoyaltyPreviewMessage = pricing.LoyaltyPreviewMessage
         });
@@ -408,16 +425,18 @@ public class PublicMenuController : Controller
             }
         }
 
+        var subtotal = messageLines.Sum(i => i.Quantity * i.UnitPrice);
+        var discountAmount = subtotal > order.TotalAmount ? subtotal - order.TotalAmount : 0m;
+
         string? whatsAppUrl = null;
         if (whatsAppNumber is not null)
         {
-            var subtotal = messageLines.Sum(i => i.Quantity * i.UnitPrice);
             var message = BuildWhatsAppMessage(
                 business.Name,
                 order.OrderNumber,
                 messageLines,
                 subtotal,
-                0m,
+                discountAmount,
                 order.TotalAmount,
                 currency,
                 order.CustomerName,
@@ -437,6 +456,8 @@ public class PublicMenuController : Controller
             OrderNumber = order.OrderNumber,
             CustomerName = order.CustomerName,
             CreatedAt = order.CreatedAt,
+            SubtotalAmount = subtotal,
+            DiscountAmount = discountAmount,
             TotalAmount = order.TotalAmount,
             Currency = currency,
             Status = order.Status,
@@ -485,9 +506,24 @@ public class PublicMenuController : Controller
             parts.Add($"{RewardRequestPrefix} {pricing.RewardRequestName.Trim()}");
         }
 
-        if (!string.IsNullOrWhiteSpace(pricing.CampaignMessage))
+        if (!string.IsNullOrWhiteSpace(pricing.AppliedCampaignName))
         {
-            parts.Add($"{CampaignInfoPrefix} {pricing.CampaignMessage.Trim()}");
+            parts.Add($"{CampaignInfoPrefix} {pricing.AppliedCampaignName.Trim()}");
+        }
+
+        if (pricing.Subtotal > 0)
+        {
+            parts.Add($"{SubtotalPrefix} {pricing.Subtotal:N2}");
+        }
+
+        if (pricing.DiscountAmount > 0)
+        {
+            parts.Add($"{DiscountPrefix} {pricing.DiscountAmount:N2}");
+        }
+
+        if (pricing.Total >= 0)
+        {
+            parts.Add($"{TotalPrefix} {pricing.Total:N2}");
         }
 
         if (parts.Count == 0)
@@ -544,7 +580,10 @@ public class PublicMenuController : Controller
         var customerParts = notes.Split(" | ", StringSplitOptions.TrimEntries)
             .Where(part =>
                 !part.StartsWith(RewardRequestPrefix, StringComparison.OrdinalIgnoreCase) &&
-                !part.StartsWith(CampaignInfoPrefix, StringComparison.OrdinalIgnoreCase))
+                !part.StartsWith(CampaignInfoPrefix, StringComparison.OrdinalIgnoreCase) &&
+                !part.StartsWith(SubtotalPrefix, StringComparison.OrdinalIgnoreCase) &&
+                !part.StartsWith(DiscountPrefix, StringComparison.OrdinalIgnoreCase) &&
+                !part.StartsWith(TotalPrefix, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         return customerParts.Count > 0 ? string.Join(" | ", customerParts) : null;

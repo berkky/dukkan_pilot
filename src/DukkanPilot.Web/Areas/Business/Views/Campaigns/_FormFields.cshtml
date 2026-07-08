@@ -1,36 +1,88 @@
-@model CampaignFormViewModel
-
-<div class="row g-3">
-    <div class="col-12">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger small"></span>
-    </div>
-    <div class="col-12">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Description" class="text-danger small"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="StartDate" class="form-label"></label>
-        <input asp-for="StartDate" class="form-control" type="date" />
-        <span asp-validation-for="StartDate" class="text-danger small"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="EndDate" class="form-label"></label>
-        <input asp-for="EndDate" class="form-control" type="date" />
-        <span asp-validation-for="EndDate" class="text-danger small"></span>
-    </div>
-    <div class="col-12">
-        <div class="form-check">
-            <input asp-for="IsActive" class="form-check-input" />
-            <label asp-for="IsActive" class="form-check-label"></label>
-        </div>
-    </div>
-    <div class="col-12">
-        <button type="button" class="btn btn-outline-secondary" disabled title="Yakında">
-            AI ile Kampanya Metni Üret — Yakında
-        </button>
-    </div>
-</div>
-
+@model CampaignFormViewModel
+@using DukkanPilot.Core.Enums
+@{
+    var discountTypeItems = Html.GetEnumSelectList<CampaignDiscountType>()
+        .Where(i => i.Value != CampaignDiscountType.None.ToString("D"));
+}
+
+<div class="row g-3">    <div class="col-12">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="StartDate" class="form-label"></label>
+        <input asp-for="StartDate" class="form-control" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="EndDate" class="form-label"></label>
+        <input asp-for="EndDate" class="form-control" type="date" />
+        <span asp-validation-for="EndDate" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12">
+        <hr class="my-1" />
+        <h3 class="h6 mb-0">İndirim Ayarları</h3>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="DiscountType" class="form-label"></label>
+        <select asp-for="DiscountType" class="form-select" asp-items="discountTypeItems"></select>
+        <div class="form-text">Yüzde indirimde 10 yazarsanız %10 indirim uygulanır.</div>
+        <span asp-validation-for="DiscountType" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="DiscountValue" class="form-label"></label>
+        <input asp-for="DiscountValue" class="form-control" type="number" step="0.01" min="0" />
+        <span asp-validation-for="DiscountValue" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MinimumOrderAmount" class="form-label"></label>
+        <input asp-for="MinimumOrderAmount" class="form-control" type="number" step="0.01" min="0" />
+        <div class="form-text">Boş bırakılırsa her sepette geçerlidir.</div>
+        <span asp-validation-for="MinimumOrderAmount" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MaximumDiscountAmount" class="form-label"></label>
+        <input asp-for="MaximumDiscountAmount" class="form-control" type="number" step="0.01" min="0" />
+        <div class="form-text">Yalnızca yüzde indirimde üst limit olarak uygulanır.</div>
+        <span asp-validation-for="MaximumDiscountAmount" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Priority" class="form-label"></label>
+        <input asp-for="Priority" class="form-control" type="number" step="1" />
+        <div class="form-text">Eşit indirimde yüksek öncelik kazanır.</div>
+        <span asp-validation-for="Priority" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check mt-4">
+            <input asp-for="IsPublicVisible" class="form-check-input" />
+            <label asp-for="IsPublicVisible" class="form-check-label"></label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check mt-4">
+            <input asp-for="IsAutoApply" class="form-check-input" />
+            <label asp-for="IsAutoApply" class="form-check-label"></label>
+        </div>
+        <div class="form-text">Kapalıysa kampanya yalnızca public menüde duyuru olarak görünür.</div>
+    </div>
+
+    <div class="col-12">
+        <div class="form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+    </div>
+    <div class="col-12">
+        <button type="button" class="btn btn-outline-secondary" disabled title="Yakında">
+            AI ile Kampanya Metni Üret — Yakında
+        </button>
+    </div>
+</div>

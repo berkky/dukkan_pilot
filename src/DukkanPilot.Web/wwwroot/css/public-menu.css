@@ -925,6 +925,23 @@ body:has(#cartOffcanvas.show) #cart-bar {
     border: 1px solid color-mix(in srgb, var(--menu-theme, #2563eb) 30%, transparent);
 }
 
+.public-campaign-badge-auto {
+    background: color-mix(in srgb, var(--menu-theme, #2563eb) 20%, #fff);
+}
+
+.public-campaign-discount-badge {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--menu-theme, #2563eb);
+    margin-bottom: 0.35rem;
+}
+
+.cart-applied-campaign {
+    color: var(--menu-theme, #2563eb);
+    margin-top: 0.25rem;
+}
+
 .public-reward-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

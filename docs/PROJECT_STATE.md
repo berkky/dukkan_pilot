@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 25A aşaması (Public Sipariş Deneyimi Premium / Kampanya + Sadakat Akıllı Sepet) tamamlandı.
+> Son güncelleme: 25B aşaması (Gerçek Kampanya Motoru / Kontrollü Migration) tamamlandı.
 
 ---
 
@@ -449,6 +449,24 @@ DukkanPilot.sln
 - Public sepet, confirmation token, tracking polling ve Business/Admin akışları korundu
 - Migration / Identity / SignalR / yeni NuGet dependency yok
 
+### 25B aşaması — Gerçek Kampanya Motoru / Kontrollü Migration
+- **Campaign entity kontrollü genişletildi:** `CampaignDiscountType` enum, `DiscountValue`, `MinimumOrderAmount`, `MaximumDiscountAmount`, `IsPublicVisible`, `IsAutoApply`, `Priority`
+- **Migration:** `AddCampaignDiscountFields` (`20260707235034_AddCampaignDiscountFields`) — yalnızca `Campaigns` tablosuna alan eklendi
+- **Campaign create/edit formları:** indirim tipi/değeri, min sepet, max indirim, public görünürlük, otomatik uygulama, öncelik + validasyon
+- **Campaign listesi/detay:** indirim, auto apply, public visible, öncelik bilgileri
+- **`CampaignDiscountHelper`:** indirim hesaplama, badge/metin üretimi
+- **`PublicOrderPricingHelper`:** gerçek kampanya indirim motoru — uygun `IsAutoApply` kampanyalar arasından en yüksek indirim seçilir; eşitlikte `Priority`, sonra bitiş tarihi
+- **Server-side doğrulama:** client fiyat/indirim/campaignId güvenilmez; DB fiyatları kullanılır
+- **`Order.TotalAmount`:** server-side indirimli toplam; `OrderItem.UnitPrice` DB fiyatı
+- **Public sepet/preview-order:** ara toplam, indirim, toplam, kampanya mesajı
+- **WhatsApp mesajı:** ara toplam, indirim, toplam, kampanya adı
+- **Confirmation/tracking:** confirmation'da indirim özeti; tracking'de kalemler toplamı vs `TotalAmount` farkından indirim gösterimi; kampanya adı yalnızca `Order.Notes`'tan güvenli okunur
+- **Reports/Dashboard ciro:** indirimli `Order.TotalAmount` üzerinden doğal çalışır
+- **9C Completed sadakat puanı kazanımı** bozulmadı
+- **Seed (yeni kurulum):** demo kampanya %10, min 100₺, auto apply
+- Identity yok; SignalR yok; yeni NuGet dependency yok
+- **25B-FIX:** `DiscountType` için `HasDefaultValue` Fluent API kaldırıldı (entity default `Percentage`); `CampaignDiscountType.None = 0` sentinel eklendi; model/snapshot uyumu sağlandı, `PendingModelChanges` giderildi
+
 ---
 
 ## 6. Veritabanı
@@ -457,7 +475,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate` (`20260706150101_InitialCreate`) |
+| Migration | `InitialCreate` (`20260706150101_InitialCreate`), `AddCampaignDiscountFields` (`20260707235034_AddCampaignDiscountFields`) |
 
 ### Seed verisi
 
@@ -510,7 +528,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-25A tamamlandı — Public premium menü deneyimi, kampanya/ödül vitrini, akıllı sepet ve server-side fiyat doğrulaması eklendi.
+25B tamamlandı — gerçek kampanya indirim motoru, kontrollü Campaign migration ve server-side fiyat/indirim doğrulaması eklendi.
 
 ---
 

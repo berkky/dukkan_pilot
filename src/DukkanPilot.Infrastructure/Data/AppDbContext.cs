@@ -294,6 +294,13 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.DiscountType).HasConversion<int>();
+            entity.Property(e => e.DiscountValue).HasPrecision(18, 2);
+            entity.Property(e => e.MinimumOrderAmount).HasPrecision(18, 2);
+            entity.Property(e => e.MaximumDiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.IsPublicVisible).HasDefaultValue(true);
+            entity.Property(e => e.IsAutoApply).HasDefaultValue(false);
+            entity.Property(e => e.Priority).HasDefaultValue(0);
 
             entity.HasOne(e => e.Business)
                 .WithMany(b => b.Campaigns)

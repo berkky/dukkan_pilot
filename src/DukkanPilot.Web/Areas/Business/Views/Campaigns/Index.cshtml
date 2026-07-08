@@ -1,76 +1,104 @@
-@model IEnumerable<CampaignListViewModel>
-@using System.Globalization
-@{
-    ViewData["Title"] = "Kampanyalar";
-    ViewData["Subtitle"] = "Kampanya yönetimi";
-    var culture = CultureInfo.GetCultureInfo("tr-TR");
-}
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="h4 mb-1">Kampanyalar</h2>
-        <p class="text-muted mb-0">Demo Kafe kampanyaları</p>
-    </div>
-    <a asp-action="Create" class="btn btn-primary">+ Yeni Kampanya</a>
-</div>
-
-<div class="panel-card">
-    <div class="panel-card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Id</th>
-                        <th>Başlık</th>
-                        <th>Başlangıç</th>
-                        <th>Bitiş</th>
-                        <th>Durum</th>
-                        <th>Yayın</th>
-                        <th class="text-end">İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Henüz kampanya yok.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Id</td>
-                            <td class="fw-semibold">@item.Title</td>
-                            <td>@item.StartDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</td>
-                            <td>@(item.EndDate.HasValue ? item.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</td>
-                            <td>
-                                @if (item.IsActive)
-                                {
-                                    <span class="badge bg-success">Aktif</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Pasif</span>
-                                }
-                            </td>
-                            <td>
-                                <span class="badge @CampaignDisplayHelper.GetPublishedBadgeClass(item.IsPublished)">
-                                    @CampaignDisplayHelper.GetPublishedLabel(item.IsPublished)
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Pasif Yap</a>
-                            </td>
-                        </tr>
-                    }
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
+@model IEnumerable<CampaignListViewModel>
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = "Kampanyalar";
+    ViewData["Subtitle"] = "Kampanya yönetimi";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4 mb-1">Kampanyalar</h2>
+        <p class="text-muted mb-0">Demo Kafe kampanyaları</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">+ Yeni Kampanya</a>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Başlık</th>
+                        <th>İndirim</th>
+                        <th>Min. Sepet</th>
+                        <th>Başlangıç</th>
+                        <th>Bitiş</th>
+                        <th>Otomatik</th>
+                        <th>Public</th>
+                        <th>Öncelik</th>
+                        <th>Durum</th>
+                        <th>Yayın</th>
+                        <th class="text-end">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="12" class="text-center text-muted py-4">Henüz kampanya yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td class="fw-semibold">@item.Title</td>
+                            <td>@CampaignDiscountHelper.GetDiscountValueText(item.DiscountType, item.DiscountValue)</td>
+                            <td>@(item.MinimumOrderAmount.HasValue ? item.MinimumOrderAmount.Value.ToString("N0", culture) + " ₺" : "-")</td>
+                            <td>@item.StartDate.ToLocalTime().ToString("dd.MM.yyyy", culture)</td>
+                            <td>@(item.EndDate.HasValue ? item.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy", culture) : "-")</td>
+                            <td>
+                                @if (item.IsAutoApply)
+                                {
+                                    <span class="badge bg-primary">Otomatik</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border">Manuel</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsPublicVisible)
+                                {
+                                    <span class="badge bg-info text-dark">Görünür</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Gizli</span>
+                                }
+                            </td>
+                            <td>@item.Priority</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Pasif</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @CampaignDisplayHelper.GetPublishedBadgeClass(item.IsPublished)">
+                                    @CampaignDisplayHelper.GetPublishedLabel(item.IsPublished)
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Pasif Yap</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,3 +1,5 @@
+using DukkanPilot.Core.Enums;
+
 namespace DukkanPilot.Web.Areas.Business.Models;
 
 public class CampaignListViewModel
@@ -8,4 +10,10 @@ public class CampaignListViewModel
     public DateTime? EndDate { get; set; }
     public bool IsActive { get; set; }
     public bool IsPublished { get; set; }
+    public CampaignDiscountType DiscountType { get; set; }
+    public decimal DiscountValue { get; set; }
+    public decimal? MinimumOrderAmount { get; set; }
+    public bool IsAutoApply { get; set; }
+    public bool IsPublicVisible { get; set; }
+    public int Priority { get; set; }
 }

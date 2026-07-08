@@ -75,13 +75,28 @@
                             {
                                 <p class="public-campaign-desc">@campaign.Description</p>
                             }
+                            @if (campaign.DiscountValue > 0)
+                            {
+                                <div class="public-campaign-discount-badge">@campaign.CampaignBadgeText</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(campaign.MinimumOrderText))
+                            {
+                                <div class="public-campaign-meta">@campaign.MinimumOrderText</div>
+                            }
                             @if (campaign.EndDate.HasValue)
                             {
                                 <div class="public-campaign-meta">
                                     @campaign.EndDate.Value.ToLocalTime().ToString("dd.MM.yyyy") tarihine kadar
                                 </div>
                             }
-                            <span class="badge public-campaign-badge">Sepette bilgilendirilir</span>
+                            @if (campaign.IsAutoApply)
+                            {
+                                <span class="badge public-campaign-badge public-campaign-badge-auto">Sepette otomatik uygulanır</span>
+                            }
+                            else
+                            {
+                                <span class="badge public-campaign-badge">İşletme onayında değerlendirilebilir</span>
+                            }
                         </div>
                     </article>
                 }
@@ -240,6 +255,7 @@
                 <span id="cart-discount">@Model.FormatPrice(0)</span>
             </div>
             <div id="cart-campaign-message" class="cart-campaign-message small text-muted" hidden></div>
+            <div id="cart-applied-campaign" class="cart-applied-campaign small fw-semibold" hidden></div>
             <div id="cart-loyalty-preview" class="cart-loyalty-preview" hidden>
                 <span class="cart-loyalty-icon" aria-hidden="true">★</span>
                 <span id="cart-loyalty-text"></span>

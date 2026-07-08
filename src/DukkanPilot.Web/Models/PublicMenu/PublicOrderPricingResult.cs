@@ -12,7 +12,13 @@ public class PublicOrderPricingResult
 
     public decimal Total { get; set; }
 
+    public int? AppliedCampaignId { get; set; }
+
     public string? AppliedCampaignName { get; set; }
+
+    public string? AppliedCampaignDescription { get; set; }
+
+    public string? DiscountTypeText { get; set; }
 
     public string? CampaignMessage { get; set; }
 
@@ -49,6 +55,8 @@ public class PublicOrderPreviewResponse
     public string? CampaignMessage { get; set; }
 
     public string? AppliedCampaignName { get; set; }
+
+    public string? DiscountTypeText { get; set; }
 
     public int? EarnedPointsPreview { get; set; }
 

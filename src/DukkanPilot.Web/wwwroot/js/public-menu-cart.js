@@ -25,6 +25,7 @@
     const cartDiscountRowEl = document.getElementById('cart-discount-row');
     const cartDiscountEl = document.getElementById('cart-discount');
     const cartCampaignMessageEl = document.getElementById('cart-campaign-message');
+    const cartAppliedCampaignEl = document.getElementById('cart-applied-campaign');
     const cartLoyaltyPreviewEl = document.getElementById('cart-loyalty-preview');
     const cartLoyaltyTextEl = document.getElementById('cart-loyalty-text');
     const cartClearBtn = document.getElementById('cart-clear-btn');
@@ -173,6 +174,16 @@
             } else {
                 cartCampaignMessageEl.textContent = '';
                 cartCampaignMessageEl.hidden = true;
+            }
+        }
+
+        if (cartAppliedCampaignEl) {
+            if (pricing && pricing.appliedCampaignName) {
+                cartAppliedCampaignEl.textContent = 'Uygulanan kampanya: ' + pricing.appliedCampaignName;
+                cartAppliedCampaignEl.hidden = false;
+            } else {
+                cartAppliedCampaignEl.textContent = '';
+                cartAppliedCampaignEl.hidden = true;
             }
         }
 

@@ -21,6 +21,12 @@ public class PublicOrderStatusViewModel
 
     public DateTime CreatedAt { get; set; }
 
+    public decimal? SubtotalAmount { get; set; }
+
+    public decimal? DiscountAmount { get; set; }
+
+    public bool ShowDiscountBreakdown => DiscountAmount.HasValue && DiscountAmount.Value > 0;
+
     public decimal TotalAmount { get; set; }
 
     public string Currency { get; set; } = "TRY";

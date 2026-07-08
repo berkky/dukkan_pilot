@@ -1,3 +1,5 @@
+using DukkanPilot.Core.Enums;
+
 namespace DukkanPilot.Web.Areas.Business.Models;
 
 public class CampaignDetailsViewModel
@@ -11,4 +13,11 @@ public class CampaignDetailsViewModel
     public bool IsPublished { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public CampaignDiscountType DiscountType { get; set; }
+    public decimal DiscountValue { get; set; }
+    public decimal? MinimumOrderAmount { get; set; }
+    public decimal? MaximumDiscountAmount { get; set; }
+    public bool IsPublicVisible { get; set; }
+    public bool IsAutoApply { get; set; }
+    public int Priority { get; set; }
 }

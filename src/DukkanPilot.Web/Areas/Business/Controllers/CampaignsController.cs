@@ -47,7 +47,13 @@ public class CampaignsController : BusinessBaseController
                 IsActive = c.IsActive,
                 IsPublished = c.IsActive
                     && c.StartDate <= now
-                    && (c.EndDate == null || c.EndDate >= now)
+                    && (c.EndDate == null || c.EndDate >= now),
+                DiscountType = c.DiscountType,
+                DiscountValue = c.DiscountValue,
+                MinimumOrderAmount = c.MinimumOrderAmount,
+                IsAutoApply = c.IsAutoApply,
+                IsPublicVisible = c.IsPublicVisible,
+                Priority = c.Priority
             })
             .ToListAsync();
 
@@ -105,7 +111,14 @@ public class CampaignsController : BusinessBaseController
             Description = TrimToNull(model.Description),
             StartDate = ToStartOfUtcDay(model.StartDate),
             EndDate = ToEndOfUtcDay(model.EndDate),
-            IsActive = model.IsActive
+            IsActive = model.IsActive,
+            DiscountType = model.DiscountType,
+            DiscountValue = model.DiscountValue,
+            MinimumOrderAmount = model.MinimumOrderAmount,
+            MaximumDiscountAmount = model.MaximumDiscountAmount,
+            IsPublicVisible = model.IsPublicVisible,
+            IsAutoApply = model.IsAutoApply,
+            Priority = model.Priority
         };
 
         _context.Campaigns.Add(campaign);
@@ -183,6 +196,13 @@ public class CampaignsController : BusinessBaseController
         campaign.StartDate = ToStartOfUtcDay(model.StartDate);
         campaign.EndDate = ToEndOfUtcDay(model.EndDate);
         campaign.IsActive = model.IsActive;
+        campaign.DiscountType = model.DiscountType;
+        campaign.DiscountValue = model.DiscountValue;
+        campaign.MinimumOrderAmount = model.MinimumOrderAmount;
+        campaign.MaximumDiscountAmount = model.MaximumDiscountAmount;
+        campaign.IsPublicVisible = model.IsPublicVisible;
+        campaign.IsAutoApply = model.IsAutoApply;
+        campaign.Priority = model.Priority;
         campaign.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -265,7 +285,14 @@ public class CampaignsController : BusinessBaseController
             Description = campaign.Description,
             StartDate = campaign.StartDate.Date,
             EndDate = (campaign.EndDate ?? campaign.StartDate).Date,
-            IsActive = campaign.IsActive
+            IsActive = campaign.IsActive,
+            DiscountType = campaign.DiscountType,
+            DiscountValue = campaign.DiscountValue,
+            MinimumOrderAmount = campaign.MinimumOrderAmount,
+            MaximumDiscountAmount = campaign.MaximumDiscountAmount,
+            IsPublicVisible = campaign.IsPublicVisible,
+            IsAutoApply = campaign.IsAutoApply,
+            Priority = campaign.Priority
         };
     }
 
@@ -296,7 +323,14 @@ public class CampaignsController : BusinessBaseController
             IsActive = campaign.IsActive,
             IsPublished = CampaignDisplayHelper.IsPublished(campaign.IsActive, campaign.StartDate, campaign.EndDate),
             CreatedAt = campaign.CreatedAt,
-            UpdatedAt = campaign.UpdatedAt
+            UpdatedAt = campaign.UpdatedAt,
+            DiscountType = campaign.DiscountType,
+            DiscountValue = campaign.DiscountValue,
+            MinimumOrderAmount = campaign.MinimumOrderAmount,
+            MaximumDiscountAmount = campaign.MaximumDiscountAmount,
+            IsPublicVisible = campaign.IsPublicVisible,
+            IsAutoApply = campaign.IsAutoApply,
+            Priority = campaign.Priority
         };
     }
 
