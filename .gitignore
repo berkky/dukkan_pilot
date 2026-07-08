@@ -490,3 +490,12 @@ $RECYCLE.BIN/
 # DukkanPilot release output (also covered by artifacts/)
 artifacts/publish/
 
+# DukkanPilot DB backup / SQL artifacts (also covered by artifacts/)
+artifacts/db-backups/
+artifacts/sql/
+artifacts/db-restore-data/
+*.bak
+*.trn
+*.diff.bak
+*.sqlbak
+

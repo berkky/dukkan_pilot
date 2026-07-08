@@ -1,7 +1,7 @@
 # DukkanPilot — Deployment Checklist
 
 Bu liste production kurulum adımlarını kapsar. Secret değerleri repoya yazmayın.
-İlgili dokümanlar: `PRODUCTION_CONFIGURATION.md`, `IIS_DEPLOYMENT_GUIDE.md`, `Kestrel_SERVICE_GUIDE.md`, `RELEASE_CHECKLIST.md`, `SMOKE_TEST_CHECKLIST.md`.
+İlgili dokümanlar: `PRODUCTION_CONFIGURATION.md`, `IIS_DEPLOYMENT_GUIDE.md`, `Kestrel_SERVICE_GUIDE.md`, `RELEASE_CHECKLIST.md`, `SMOKE_TEST_CHECKLIST.md`, `DATABASE_BACKUP_AND_RECOVERY.md`, `MIGRATION_RUNBOOK.md`, `INCIDENT_RESPONSE_RUNBOOK.md`, `OPERATIONAL_SECURITY_CHECKLIST.md`, `FIRST_RELEASE_OPERATIONS.md`.
 
 ## 1. Ön koşullar
 
@@ -46,6 +46,23 @@ Alternatif: connection string’i environment variable ile verin: `ConnectionStr
 
 ## 4. Veritabanı / migration
 
+**Release / migration öncesi mutlaka backup** — `docs/DATABASE_BACKUP_AND_RECOVERY.md`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\db-backup.ps1 `
+  -ServerInstance "YOUR_SQL_SERVER" -DatabaseName "DukkanPilotDb"
+```
+
+İdempotent SQL üretimi (DB’ye uygulanmaz):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\db-generate-migration-script.ps1
+```
+
+Durum: `.\scripts\db-migration-status.ps1`  
+Runbook: `docs/MIGRATION_RUNBOOK.md`  
+Haftalık restore testi önerisi: `.\scripts\db-restore-test.ps1` (test DB; production DB üzerine yazmaz).
+
 - Development’ta uygulama `MigrateAsync` + idempotent `DbSeeder` çalıştırır.
 - **Production’da migrate/seed otomatik kapalıdır.** Migration’ı bilinçli uygulayın:
 
@@ -57,6 +74,10 @@ veya publish öncesi CI/CD’de aynı komut + Production connection string.
 
 - EF model/entity değişikliği olmadan yeni migration üretmeyin.
 - Seed destructive değildir; ancak **demo admin / owner şifrelerini Production’da mutlaka değiştirin**.
+- Operasyon güvenliği: `docs/OPERATIONAL_SECURITY_CHECKLIST.md`
+- Olay müdahalesi: `docs/INCIDENT_RESPONSE_RUNBOOK.md`
+- İlk müşteri: `docs/FIRST_RELEASE_OPERATIONS.md`
+- Admin izleme (salt okunur): `/Admin/Operations`
 
 ## 5. Production environment variables
 

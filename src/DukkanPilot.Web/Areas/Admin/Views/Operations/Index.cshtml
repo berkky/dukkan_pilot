@@ -1,0 +1,153 @@
+@model AdminOperationsViewModel
+@{
+    ViewData["Title"] = "Operasyon Merkezi";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Operasyon Merkezi</h2>
+        <p class="text-muted mb-0">Release, migration ve backup durumunu tek ekrandan izleyin.</p>
+    </div>
+    <span class="badge bg-secondary align-self-center">Salt okunur</span>
+</div>
+
+<div class="alert alert-warning small" role="alert">
+    Bu ekran işlem çalıştırmaz; sadece operasyon durumunu gösterir. Backup, migration veya restore için <code>scripts/</code> altındaki PowerShell scriptlerini kullanın.
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Environment</div>
+            <div class="stat-value fs-5">@Model.EnvironmentName</div>
+            <small class="text-muted">@Model.MachineName</small>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Assembly</div>
+            <div class="stat-value fs-5">@Model.AssemblyVersion</div>
+            <small class="text-muted">UTC @Model.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")</small>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Database</div>
+            <div class="stat-value fs-5 @(Model.DatabaseCanConnect ? "text-success" : "text-danger")">
+                @(Model.DatabaseCanConnect ? "Bağlantı OK" : "Bağlantı yok")
+            </div>
+            <small class="text-muted">@Model.DatabaseStatusMessage</small>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card h-100">
+            <div class="stat-label">Migrations</div>
+            <div class="stat-value fs-5">@Model.AppliedMigrationCount uygulandı</div>
+            <small class="@(Model.PendingMigrationCount > 0 ? "text-warning" : "text-muted")">
+                @Model.PendingMigrationCount bekleyen
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Veritabanı migration özeti</h3></div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-5">Son uygulanan</dt>
+                    <dd class="col-sm-7"><code class="small">@(Model.LastAppliedMigration ?? "—")</code></dd>
+                    <dt class="col-sm-5">Bekleyen sayısı</dt>
+                    <dd class="col-sm-7">@Model.PendingMigrationCount</dd>
+                </dl>
+                @if (Model.PendingMigrationNames.Count > 0)
+                {
+                    <p class="small fw-semibold mt-3 mb-1">Bekleyen migration adları</p>
+                    <ul class="small mb-0">
+                        @foreach (var name in Model.PendingMigrationNames)
+                        {
+                            <li><code>@name</code></li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="small text-muted mb-0 mt-3">Bekleyen migration yok (veya DB erişilemiyor).</p>
+                }
+                <p class="small text-muted mt-3 mb-0">Connection string, şifre ve secret bu ekranda gösterilmez.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Release safety dosyaları</h3></div>
+            <div class="panel-card-body">
+                <ul class="list-unstyled small mb-0">
+                    <li class="mb-1">@(Model.HasProductionExample ? "✅" : "❌") appsettings.Production.example.json</li>
+                    <li class="mb-1">@(Model.HasDeploymentChecklist ? "✅" : "❌") DEPLOYMENT_CHECKLIST.md</li>
+                    <li class="mb-1">@(Model.HasReleaseChecklist ? "✅" : "❌") RELEASE_CHECKLIST.md</li>
+                    <li class="mb-1">@(Model.HasSmokeChecklist ? "✅" : "❌") SMOKE_TEST_CHECKLIST.md</li>
+                    <li class="mb-1">@(Model.HasBackupDocs ? "✅" : "❌") DATABASE_BACKUP_AND_RECOVERY.md</li>
+                    <li class="mb-1">@(Model.HasMigrationRunbook ? "✅" : "❌") MIGRATION_RUNBOOK.md</li>
+                    <li class="mb-1">@(Model.HasIncidentRunbook ? "✅" : "❌") INCIDENT_RESPONSE_RUNBOOK.md</li>
+                    <li class="mb-1">@(Model.HasOperationalSecurityChecklist ? "✅" : "❌") OPERATIONAL_SECURITY_CHECKLIST.md</li>
+                    <li>@(Model.HasFirstReleaseOpsDocs ? "✅" : "❌") FIRST_RELEASE_OPERATIONS.md</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Operasyon checklist</h3></div>
+    <div class="panel-card-body">
+        <div class="row g-3">
+            @foreach (var item in Model.OperationalChecklist)
+            {
+                <div class="col-md-6 col-xl">
+                    <div class="border rounded p-3 h-100">
+                        <div class="fw-semibold small mb-1">@(item.IsReadyHint ? "📋" : "⚠️") @item.Title</div>
+                        <p class="small text-muted mb-0">@item.Description</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <p class="small text-muted mb-0 mt-3">İşaretler otomatik “tamamlandı” sayılmaz; operatör checklist’i manuel doğrular.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Hızlı bağlantılar</h3></div>
+            <div class="panel-card-body d-flex flex-wrap gap-2">
+                <a href="/health" class="btn btn-sm btn-outline-success" target="_blank" rel="noopener">/health</a>
+                <a href="/Admin/AuditLogs" class="btn btn-sm btn-outline-dark">Aktivite Logları</a>
+                <a href="/Admin/Notifications" class="btn btn-sm btn-outline-warning">Bildirimler</a>
+                <a href="/Admin/SalesCenter" class="btn btn-sm btn-outline-primary">Satış Merkezi</a>
+                <a href="/Admin/Businesses" class="btn btn-sm btn-outline-secondary">İşletmeler</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Doküman referansları (repo yolu)</h3></div>
+            <div class="panel-card-body">
+                <ul class="small mb-0">
+                    @foreach (var doc in Model.DocLinks)
+                    {
+                        <li><code>@doc.Path</code> — @doc.Title</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-2">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Script kullanımı (örnek)</h3></div>
+    <div class="panel-card-body">
+        <pre class="bg-light border rounded p-3 small mb-0" style="white-space: pre-wrap;">@string.Join("\n", Model.ScriptHints)</pre>
+    </div>
+</div>

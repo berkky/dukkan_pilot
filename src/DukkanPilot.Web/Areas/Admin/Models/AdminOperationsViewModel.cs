@@ -1,0 +1,43 @@
+namespace DukkanPilot.Web.Areas.Admin.Models;
+
+public class AdminOperationsViewModel
+{
+    public string EnvironmentName { get; set; } = string.Empty;
+    public string MachineName { get; set; } = string.Empty;
+    public string AssemblyVersion { get; set; } = string.Empty;
+    public DateTime UtcNow { get; set; }
+
+    public bool DatabaseCanConnect { get; set; }
+    public int AppliedMigrationCount { get; set; }
+    public int PendingMigrationCount { get; set; }
+    public string? LastAppliedMigration { get; set; }
+    public List<string> PendingMigrationNames { get; set; } = new();
+    public string? DatabaseStatusMessage { get; set; }
+
+    public bool HasProductionExample { get; set; }
+    public bool HasDeploymentChecklist { get; set; }
+    public bool HasReleaseChecklist { get; set; }
+    public bool HasSmokeChecklist { get; set; }
+    public bool HasBackupDocs { get; set; }
+    public bool HasMigrationRunbook { get; set; }
+    public bool HasIncidentRunbook { get; set; }
+    public bool HasOperationalSecurityChecklist { get; set; }
+    public bool HasFirstReleaseOpsDocs { get; set; }
+
+    public List<OpsChecklistItemViewModel> OperationalChecklist { get; set; } = new();
+    public List<OpsDocLinkViewModel> DocLinks { get; set; } = new();
+    public List<string> ScriptHints { get; set; } = new();
+}
+
+public class OpsChecklistItemViewModel
+{
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool IsReadyHint { get; set; }
+}
+
+public class OpsDocLinkViewModel
+{
+    public string Title { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
+}

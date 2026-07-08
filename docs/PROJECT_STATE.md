@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 29A aşaması (Deployment / Publish / Release Package) tamamlandı.
+> Son güncelleme: 29B aşaması (Backup / Database Safety / Operational Recovery) tamamlandı.
 
 ---
 
@@ -564,6 +564,14 @@ DukkanPilot.sln
 - Migration yok; Entity/DbContext değişmedi; Program.cs dokunulmadı; Identity/SignalR/NuGet yok
 - Public/Business/Admin/Account/Audit/Notification/Demo akışları bozulmadı
 
+### 29B aşaması — Backup / Database Safety / Operational Recovery
+- **Scripts:** `db-backup.ps1`, `db-verify-backup.ps1`, `db-restore-test.ps1` (test DB; DukkanPilotDb Force olmadan reddedilir), `db-generate-migration-script.ps1` (idempotent SQL), `db-migration-status.ps1`
+- **Admin:** `/Admin/Operations` salt okunur Operasyon Merkezi (env, DB connect, migration counts, docs checklist, script hints; secret yok); sidebar + Dashboard CTA
+- **Docs:** `DATABASE_BACKUP_AND_RECOVERY.md`, `MIGRATION_RUNBOOK.md`, `INCIDENT_RESPONSE_RUNBOOK.md`, `OPERATIONAL_SECURITY_CHECKLIST.md`, `FIRST_RELEASE_OPERATIONS.md`; DEPLOYMENT/RELEASE checklist 29B linkleri
+- **gitignore:** `artifacts/db-backups/`, `artifacts/sql/`, `artifacts/db-restore-data/`, `*.bak`, `*.trn`, `*.diff.bak`, `*.sqlbak`
+- Migration yok; Entity/DbContext değişmedi; Program.cs dokunulmadı; Identity/SignalR/NuGet yok
+- Public/Business/Admin/Account/Audit/Notification/Demo/Deployment akışları bozulmadı
+
 ---
 
 ## 6. Veritabanı
@@ -628,6 +636,8 @@ Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 28B tamamlandı — Landing Demo/Pricing satış polish; /Business/DemoCenter; /Admin/SalesCenter; demo-kafe seed enrich; satış docs.
 
 29A tamamlandı — Publish/check/smoke scripts; production example config; IIS/Kestrel/release/smoke/deployment docs.
+
+29B tamamlandı — DB backup/verify/restore-test scripts; idempotent migration SQL; Admin Operations Center; backup/migration/incident/ops security/first-release docs.
 
 ---
 
@@ -756,3 +766,14 @@ Tarayıcı: `https://localhost:7136` veya `http://localhost:5139`
 | `docs/IIS_DEPLOYMENT_GUIDE.md` | IIS kurulum |
 | `docs/Kestrel_SERVICE_GUIDE.md` | Kestrel / service |
 | `src/DukkanPilot.Web/appsettings.Production.example.json` | Production şablon (secret yok) |
+| `scripts/db-backup.ps1` | SQL FULL backup + VERIFYONLY |
+| `scripts/db-verify-backup.ps1` | Mevcut .bak verify |
+| `scripts/db-restore-test.ps1` | Test DB restore (production üzerine yazmaz) |
+| `scripts/db-generate-migration-script.ps1` | Idempotent migration SQL |
+| `scripts/db-migration-status.ps1` | Migration list + pending model |
+| `docs/DATABASE_BACKUP_AND_RECOVERY.md` | Backup/restore stratejisi |
+| `docs/MIGRATION_RUNBOOK.md` | Migration uygulama/rollback |
+| `docs/INCIDENT_RESPONSE_RUNBOOK.md` | Olay müdahalesi |
+| `docs/OPERATIONAL_SECURITY_CHECKLIST.md` | Ops güvenlik checklist |
+| `docs/FIRST_RELEASE_OPERATIONS.md` | İlk canlı kurulum |
+| `/Admin/Operations` | Salt okunur operasyon durumu |

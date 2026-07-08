@@ -49,7 +49,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl 
 
 | URL | Rol | Beklenen | Not |
 |-----|-----|----------|-----|
-| `/Admin/Dashboard` | SuperAdmin | 200 | |
+| `/Admin/Dashboard` | SuperAdmin | 200 | Operations CTA |
+| `/Admin/Operations` | SuperAdmin | 200 | Salt okunur; secret yok; auth yok → 302 |
 | `/Admin/SalesCenter` | SuperAdmin | 200 | |
 | `/Admin/Businesses` | SuperAdmin | 200 | |
 | `/Admin/AuditLogs` | SuperAdmin | 200 | |

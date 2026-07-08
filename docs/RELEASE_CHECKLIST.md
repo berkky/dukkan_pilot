@@ -7,11 +7,19 @@
 - [ ] `powershell -File .\scripts\check-release.ps1` PASS
 - [ ] `dotnet ef migrations has-pending-model-changes` → no changes
 - [ ] Migration listesi beklenen set ile uyumlu (`AddNotifications` son migrations dahil)
+- [ ] `powershell -File .\scripts\db-migration-status.ps1` PASS
+- [ ] `db-backup.ps1` çalıştı mı? (veya SSMS FULL backup)
+- [ ] `db-verify-backup.ps1` geçti mi?
+- [ ] `db-generate-migration-script.ps1` üretildi mi? (değişiklik varsa)
+- [ ] Migration script review edildi mi?
+- [ ] Rollback/restore planı var mı? (`DATABASE_BACKUP_AND_RECOVERY.md`)
+- [ ] Smoke test listesi hazır mı? (`SMOKE_TEST_CHECKLIST.md` + `run-smoke-tests.ps1`)
 - [ ] `appsettings.Production.example.json` güncel; gerçek secret yok
 - [ ] `appsettings.Production.json` / `.env` / connection string **commitlenmemiş**
 - [ ] Demo/Owner/Admin şifreleri public landing/demo sayfasında yok
 - [ ] `docs/PROJECT_STATE.md` checkpoint güncel
 - [ ] Değişen özellikler için smoke maddeleri biliniyor
+- [ ] `/Admin/Operations` release safety dosyaları yeşil (SuperAdmin)
 
 ## Release üretimi
 
@@ -57,4 +65,6 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 
 - Seed otomatik Production’da çalışmaz.
 - Secret rotation: demo hesaplar production’da değiştirilmeli.
-- Backup prosedürü detayı 29B.
+- Backup / restore: `DATABASE_BACKUP_AND_RECOVERY.md`
+- Incident: `INCIDENT_RESPONSE_RUNBOOK.md`
+- Ops security: `OPERATIONAL_SECURITY_CHECKLIST.md`
