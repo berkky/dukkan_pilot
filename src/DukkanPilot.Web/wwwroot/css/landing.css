@@ -1,0 +1,321 @@
+/* DukkanPilot public SaaS landing */
+
+.landing-body {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.landing-header {
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid #e2e8f0;
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.landing-header .navbar {
+    background: transparent;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.landing-header .navbar-brand {
+    color: #0f172a;
+}
+
+.landing-header .nav-link {
+    color: #475569;
+    font-weight: 500;
+}
+
+.landing-header .nav-link:hover,
+.landing-header .nav-link.active {
+    color: #1d4ed8;
+}
+
+.landing-header .navbar-toggler {
+    border-color: #cbd5e1;
+}
+
+.landing-header .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(15, 23, 42, 0.75)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.landing-hero {
+    background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.35), transparent 40%),
+        linear-gradient(145deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
+}
+
+.landing-hero-lead {
+    color: rgba(226, 232, 240, 0.9);
+    max-width: 38rem;
+}
+
+.landing-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.4rem 0.85rem;
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.landing-pill-dark {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.landing-trust-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #e2e8f0;
+    font-size: 0.8rem;
+}
+
+.landing-hero-panel {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(10px);
+}
+
+.landing-hero-list li {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.landing-hero-list li:last-child {
+    border-bottom: none;
+}
+
+.landing-page-hero {
+    background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+}
+
+.landing-band {
+    background: #eff6ff;
+}
+
+.landing-section-card,
+.landing-feature-card,
+.landing-step-card,
+.landing-price-card,
+.landing-demo-card,
+.landing-feature-detail,
+.landing-final-cta,
+.landing-proof-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.landing-section-card {
+    padding: 1.25rem;
+}
+
+.landing-section-card-accent {
+    border-color: #bfdbfe;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.landing-mini-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.9rem;
+    font-size: 0.92rem;
+    font-weight: 500;
+    min-height: 100%;
+}
+
+.landing-step-card {
+    padding: 1.25rem;
+}
+
+.landing-step-num {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.landing-feature-card {
+    padding: 1.15rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.landing-feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+}
+
+.landing-demo-card {
+    padding: 1.5rem;
+    background: linear-gradient(160deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.landing-code {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.landing-price-card {
+    padding: 1.25rem;
+}
+
+.landing-price-card-lg {
+    padding: 1.5rem;
+}
+
+.landing-price-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.35rem;
+}
+
+.landing-price-amount {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    line-height: 1.1;
+}
+
+.landing-price-amount small {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-left: 0.25rem;
+}
+
+.landing-price-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.landing-price-list li:last-child {
+    border-bottom: none;
+}
+
+.landing-proof-card {
+    padding: 1.25rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.landing-faq .accordion-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem !important;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.landing-faq .accordion-button {
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.landing-faq .accordion-button:not(.collapsed) {
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+.landing-final-cta {
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 60%, #f0fdf4 100%);
+}
+
+.landing-feature-detail {
+    padding: 1.35rem;
+}
+
+.landing-note {
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 0.75rem;
+}
+
+.landing-compare-table {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.landing-compare-table table {
+    margin-bottom: 0;
+}
+
+.landing-compare-table thead th {
+    background: #f8fafc;
+    font-size: 0.9rem;
+}
+
+.landing-demo-steps {
+    padding-left: 1.1rem;
+}
+
+.landing-demo-steps li {
+    margin-bottom: 0.9rem;
+}
+
+.landing-demo-steps li span {
+    display: block;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.landing-footer {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+.landing-footer .brand-mark {
+    background: #2563eb;
+}
+
+.landing-footer .text-muted {
+    color: #94a3b8 !important;
+}
+
+.landing-footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+}
+
+.landing-footer-links a:hover {
+    color: #fff;
+}
+
+.landing-footer-links li + li {
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 575.98px) {
+    .landing-hero .display-5 {
+        font-size: 2rem;
+    }
+
+    .landing-price-amount {
+        font-size: 1.45rem;
+    }
+}

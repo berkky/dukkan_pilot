@@ -1,114 +1,328 @@
-﻿@{
-    ViewData["Title"] = "Ana Sayfa";
+﻿@model LandingPageViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "QR Menü, WhatsApp Sipariş ve Sadakat";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var cta = Model.AuthCta;
 }
 
-<section class="hero-section text-white">
+<section class="landing-hero text-white">
     <div class="container py-5">
-        <div class="row align-items-center py-lg-5">
+        <div class="row align-items-center gy-4 py-lg-4">
             <div class="col-lg-7">
-                <span class="badge hero-badge mb-3">SaaS · QR Menü · WhatsApp Sipariş</span>
-                <h1 class="display-5 fw-bold mb-3">İşletmenizi dijitalleştirin, siparişleri kolaylaştırın</h1>
-                <p class="lead mb-4 text-white-50">
-                    DükkanPilot; kafe, restoran ve küçük esnaf işletmeleri için QR menü,
-                    WhatsApp sipariş, müşteri takibi ve sadakat sistemi sunar.
+                <span class="landing-pill mb-3">QR Menü · WhatsApp Sipariş · CRM</span>
+                <h1 class="display-5 fw-bold mb-3">QR Menü, WhatsApp Sipariş ve Sadakat Sistemi Tek Panelde</h1>
+                <p class="lead mb-4 landing-hero-lead">
+                    DukkanPilot ile işletmenizi dakikalar içinde dijital menüye taşıyın, siparişleri yönetin,
+                    müşterilerinizi takip edin ve kampanyalarınızı ölçün.
                 </p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a asp-area="Business" asp-controller="Dashboard" asp-action="Index" class="btn btn-light btn-lg">
-                        İşletme Paneline Git
-                    </a>
-                    <a href="/m/demo-kafe" class="btn btn-outline-light btn-lg">
-                        Demo Menü
-                    </a>
-                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-light btn-lg">
-                        Yönetim Paneli
-                    </a>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <a href="@cta.PrimaryUrl" class="btn btn-light btn-lg">@cta.PrimaryText</a>
+                    <a href="@Model.DemoMenuUrl" class="btn btn-outline-light btn-lg" target="_blank" rel="noopener">Demo Menüyü Gör</a>
+                    <a href="/Pricing" class="btn btn-outline-light btn-lg">Planları İncele</a>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="landing-trust-badge">Kurulumsuz QR menü</span>
+                    <span class="landing-trust-badge">WhatsApp sipariş</span>
+                    <span class="landing-trust-badge">Kampanya ve sadakat</span>
+                    <span class="landing-trust-badge">Raporlama ve CRM</span>
                 </div>
             </div>
-            <div class="col-lg-5 mt-5 mt-lg-0">
-                <div class="hero-card p-4">
-                    <h2 class="h5 mb-3">Neler sunuyoruz?</h2>
-                    <ul class="list-unstyled mb-0 hero-feature-list">
-                        <li>📱 Mobil uyumlu QR menü</li>
-                        <li>💬 WhatsApp ile hızlı sipariş</li>
-                        <li>⭐ Sadakat ve kampanya yönetimi</li>
-                        <li>📊 Basit ve anlaşılır raporlar</li>
+            <div class="col-lg-5">
+                <div class="landing-hero-panel p-4">
+                    <h2 class="h5 mb-3">Kimler için?</h2>
+                    <ul class="list-unstyled mb-0 landing-hero-list">
+                        <li>Kafe ve kahve dükkanları</li>
+                        <li>Restoran ve fast-casual işletmeler</li>
+                        <li>Tatlıcı, pastane ve içecek noktaları</li>
+                        <li>Küçük yiyecek işletmeleri</li>
                     </ul>
+                    <hr class="border-light opacity-25 my-3" />
+                    <p class="small mb-0 opacity-75">
+                        QR’ı masaya koyun, menüyü anında güncelleyin, siparişleri panelden takip edin.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section id="ozellikler" class="py-5">
+<section class="py-5">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="h3 fw-bold">Temel Modüller</h2>
-            <p class="text-muted">MVP sürümünde adım adım devreye alınacak özellikler</p>
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold">Problem ve çözüm</h2>
+            <p class="text-muted mb-0">Günlük operasyondaki sürtünmeleri azaltın.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card h-100 p-4">
-                    <div class="feature-icon mb-3">📋</div>
-                    <h3 class="h5">Menü Yönetimi</h3>
-                    <p class="text-muted mb-0">Kategori ve ürünlerinizi kolayca yönetin, anında güncelleyin.</p>
+            <div class="col-lg-6">
+                <div class="landing-section-card h-100">
+                    <h3 class="h5 mb-3">Problemler</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6"><div class="landing-mini-card">Kağıt menü güncellemek zor</div></div>
+                        <div class="col-md-6"><div class="landing-mini-card">WhatsApp siparişleri dağınık</div></div>
+                        <div class="col-md-6"><div class="landing-mini-card">Müşteri sadakati takip edilmiyor</div></div>
+                        <div class="col-md-6"><div class="landing-mini-card">Kampanyanın etkisi ölçülemiyor</div></div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card h-100 p-4">
-                    <div class="feature-icon mb-3">📱</div>
-                    <h3 class="h5">QR Menü</h3>
-                    <p class="text-muted mb-0">Müşterileriniz masadan QR okutarak menünüze ulaşsın.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card h-100 p-4">
-                    <div class="feature-icon mb-3">💬</div>
-                    <h3 class="h5">WhatsApp Sipariş</h3>
-                    <p class="text-muted mb-0">Sepet oluşturup tek tıkla WhatsApp üzerinden sipariş verin.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card h-100 p-4">
-                    <div class="feature-icon mb-3">👤</div>
-                    <h3 class="h5">Müşteri Takibi</h3>
-                    <p class="text-muted mb-0">Müşteri kartları ve sipariş geçmişi ile ilişkinizi güçlendirin.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card h-100 p-4">
-                    <div class="feature-icon mb-3">⭐</div>
-                    <h3 class="h5">Sadakat Sistemi</h3>
-                    <p class="text-muted mb-0">Puan ve ödül kurallarıyla müşterilerinizi geri kazanın.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card h-100 p-4">
-                    <div class="feature-icon mb-3">🤖</div>
-                    <h3 class="h5">AI Kampanya Asistanı</h3>
-                    <p class="text-muted mb-0">İlerleyen sürümlerde yapay zeka destekli kampanya metinleri.</p>
+            <div class="col-lg-6">
+                <div class="landing-section-card h-100 landing-section-card-accent">
+                    <h3 class="h5 mb-3">DukkanPilot çözümü</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6"><div class="landing-mini-card">QR menüyü anında güncelle</div></div>
+                        <div class="col-md-6"><div class="landing-mini-card">Siparişleri panelden takip et</div></div>
+                        <div class="col-md-6"><div class="landing-mini-card">Müşteri CRM ve sadakat kullan</div></div>
+                        <div class="col-md-6"><div class="landing-mini-card">Kampanya performansını raporla</div></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="cta-section py-5">
+<section class="py-5 landing-band">
     <div class="container">
-        <div class="cta-card text-center p-5">
-            <h2 class="h4 mb-3">Demo panelleri hazır</h2>
-            <p class="text-muted mb-4">
-                Proje iskeleti oluşturuldu. İşletme ve yönetim panellerini inceleyerek devam edebilirsiniz.
-            </p>
-            <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="/m/demo-kafe" class="btn btn-success">
-                    Demo QR Menü
-                </a>
-                <a asp-area="Business" asp-controller="Dashboard" asp-action="Index" class="btn btn-primary">
-                    İşletme Dashboard
-                </a>
-                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-primary">
-                    Admin Dashboard
-                </a>
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold">Nasıl çalışır?</h2>
+            <p class="text-muted mb-0">Dört adımda yayına çıkın.</p>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6 col-xl-3">
+                <div class="landing-step-card h-100">
+                    <div class="landing-step-num">1</div>
+                    <h3 class="h6">İşletmeni oluştur</h3>
+                    <p class="small text-muted mb-0">Kayıt olun, işletme profilinizi ve WhatsApp numaranızı ayarlayın.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="landing-step-card h-100">
+                    <div class="landing-step-num">2</div>
+                    <h3 class="h6">Menü ve ürünlerini ekle</h3>
+                    <p class="small text-muted mb-0">Kategori/ürün ekleyin veya CSV ile toplu içe aktarın.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="landing-step-card h-100">
+                    <div class="landing-step-num">3</div>
+                    <h3 class="h6">QR afişini yazdır</h3>
+                    <p class="small text-muted mb-0">Public menü linkinizi QR olarak masalara koyun.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="landing-step-card h-100">
+                    <div class="landing-step-num">4</div>
+                    <h3 class="h6">Sipariş ve müşteri takip et</h3>
+                    <p class="small text-muted mb-0">Mutfak modu, CRM, kampanya ve raporlarla büyütün.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+            <div>
+                <h2 class="h3 fw-bold mb-1">Özellik modülleri</h2>
+                <p class="text-muted mb-0">İşletmeyi yayına çıkaran hazır ürün yetenekleri.</p>
+            </div>
+            <a href="/Features" class="btn btn-outline-primary btn-sm">Tüm özellikler</a>
+        </div>
+        <div class="row g-3">
+            @{
+                var modules = new (string Title, string Text)[]
+                {
+                    ("QR Menü", "Mobil öncelikli public menü; anında güncellenir."),
+                    ("WhatsApp Sipariş", "Sepetten wa.me mesajına güvenli geçiş."),
+                    ("Canlı Sipariş Takibi", "Bekleyen siparişleri panelden izleyin."),
+                    ("Mutfak Modu", "Tablet dostu operasyon ekranı."),
+                    ("Kampanya Motoru", "Otomatik indirim ve performans takibi."),
+                    ("Sadakat / Ödül", "Puan kazanımı ve ödül kullanımı."),
+                    ("Müşteri CRM", "Segmentler, içgörüler ve WhatsApp iletişim."),
+                    ("Raporlama", "Satış, ürün, müşteri ve kampanya raporları."),
+                    ("Go-Live Merkezi", "Kurulum checklist’i ile yayına hazırlık.")
+                };
+            }
+            @foreach (var module in modules)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-feature-card h-100">
+                        <h3 class="h6">@module.Title</h3>
+                        <p class="small text-muted mb-0">@module.Text</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5 landing-band">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <h2 class="h3 fw-bold">Demo ile 2 dakikada deneyin</h2>
+                <p class="text-muted">
+                    Demo Kafe menüsünü açın; sepet, kampanya indirimi ve sipariş takip akışını canlı deneyin.
+                    Panel demosu için giriş yapın veya kendi işletmenizi oluşturun.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="@Model.DemoMenuUrl" class="btn btn-success" target="_blank" rel="noopener">Demo QR Menüyü Aç</a>
+                    <a href="/Account/Login" class="btn btn-outline-primary">İşletme Paneli İçin Giriş Yap</a>
+                    <a href="/Account/Register" class="btn btn-outline-secondary">Kendi Menünü Oluştur</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="landing-demo-card">
+                    <div class="fw-semibold mb-1">Demo Kafe</div>
+                    <p class="small text-muted mb-3">Public menü · login gerekmez</p>
+                    <code class="landing-code d-block mb-3">/m/demo-kafe</code>
+                    <a href="/Demo" class="btn btn-sm btn-primary">Demo rehberini gör</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+            <div>
+                <h2 class="h3 fw-bold mb-1">Plan özeti</h2>
+                <p class="text-muted mb-0">
+                    @(Model.PlansFromDatabase ? "Aktif planlar abonelik tablosundan okunur." : "Planlar güvenli fallback ile gösterilir.")
+                </p>
+            </div>
+            <a href="/Pricing" class="btn btn-outline-primary btn-sm">Karşılaştırmayı gör</a>
+        </div>
+        <div class="row g-3">
+            @foreach (var plan in Model.Plans)
+            {
+                <div class="col-md-4">
+                    <div class="landing-price-card h-100">
+                        <div class="landing-price-name">@plan.Name</div>
+                        <div class="landing-price-amount">
+                            @if (plan.Price <= 0)
+                            {
+                                <span>Ücretsiz</span>
+                            }
+                            else
+                            {
+                                <span>@plan.Price.ToString("N0", culture) ₺</span><small>/ay</small>
+                            }
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(plan.Description))
+                        {
+                            <p class="small text-muted">@plan.Description</p>
+                        }
+                        <ul class="list-unstyled small mb-3">
+                            <li>Ürün: <strong>@plan.ProductLimitText</strong></li>
+                            <li>Kampanya: <strong>@plan.CampaignLimitText</strong></li>
+                            <li>Personel: <strong>@plan.StaffLimitText</strong></li>
+                        </ul>
+                        <a href="@cta.PrimaryUrl" class="btn btn-primary w-100">@(cta.IsAuthenticated ? cta.PrimaryText : "Başla")</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5 landing-band">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold">Doğrulanabilir ürün gücü</h2>
+            <p class="text-muted mb-0">Uydurma müşteri yorumu yok — ürün yetenekleri gerçek.</p>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4"><div class="landing-proof-card">MVP hazır</div></div>
+            <div class="col-md-4"><div class="landing-proof-card">QR menü, sipariş ve CRM altyapısı</div></div>
+            <div class="col-md-4"><div class="landing-proof-card">Küçük işletmeler için hızlı kurulum</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold">Sık sorulan sorular</h2>
+        </div>
+        <div class="landing-faq accordion" id="landingFaq">
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">DukkanPilot nedir?</button>
+                </h3>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Kafe ve küçük yiyecek işletmeleri için QR menü, WhatsApp sipariş, sadakat, kampanya, CRM ve raporlama sunan abonelik tabanlı SaaS’tır.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">QR menüyü nasıl paylaşırım?</button>
+                </h3>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Public menü linkinizi (`/m/{slug}`) kopyalayın veya yazdırılabilir QR afişini masalara yerleştirin.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">WhatsApp sipariş nasıl çalışır?</button>
+                </h3>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Müşteri sepeti doldurur; sipariş sisteme kaydolur ve wa.me üzerinden işletmeye okunabilir mesaj gider. Gerçek WhatsApp Business API gönderimi yoktur.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">Ürünleri CSV ile yükleyebilir miyim?</button>
+                </h3>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Evet. İşletme panelinde ürün CSV şablonu indirip toplu içe aktarma yapabilirsiniz.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">Kampanya indirimi otomatik uygulanır mı?</button>
+                </h3>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Evet. Otomatik uygulama açık ve koşulları uygun kampanyalar sunucu tarafında seçilir; client fiyatına güvenilmez.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">Sadakat sistemi nasıl çalışır?</button>
+                </h3>
+                <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Sipariş tamamlandığında (Completed) aktif kurala göre puan kazanılır. Ödüller panelden kullanılır.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">Kredi kartı / online ödeme var mı?</button>
+                </h3>
+                <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Şu aşamada online ödeme entegrasyonu yok; siparişler WhatsApp ve işletme paneli üzerinden yönetilir.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">Demo görebilir miyim?</button>
+                </h3>
+                <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#landingFaq">
+                    <div class="accordion-body">Evet. <a href="/m/demo-kafe">/m/demo-kafe</a> adresinden demoyu açabilir veya <a href="/Demo">Demo</a> rehberini izleyebilirsiniz.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="landing-final-cta text-center p-4 p-md-5">
+            <h2 class="h3 fw-bold mb-2">İşletmeni bugün dijitale taşı</h2>
+            <p class="text-muted mb-4">Go-Live Merkezi adım adım yayına hazırlar; demo menüyle önce deneyin.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="@cta.PrimaryUrl" class="btn btn-primary btn-lg">@cta.PrimaryText</a>
+                <a href="@Model.DemoMenuUrl" class="btn btn-outline-primary btn-lg" target="_blank" rel="noopener">Demo Menüyü Gör</a>
             </div>
         </div>
     </div>

@@ -1,0 +1,155 @@
+@model PricingPageViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Fiyatlar";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var cta = Model.AuthCta;
+}
+
+<section class="landing-page-hero py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <span class="landing-pill landing-pill-dark mb-3">Planlar</span>
+                <h1 class="display-6 fw-bold mb-3">İşletmenize uygun planı seçin</h1>
+                <p class="text-muted mb-0">
+                    Limitler ürün, kampanya, personel, ödül ve QR kullanımı için uygulanır.
+                    @(Model.PlansFromDatabase ? "Fiyatlar aktif abonelik planlarından gelir." : "DB’de aktif plan yok; güvenli fallback gösteriliyor.")
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            @foreach (var plan in Model.Plans)
+            {
+                <div class="col-md-6 col-xl-4">
+                    <div class="landing-price-card landing-price-card-lg h-100">
+                        <div class="landing-price-name">@plan.Name</div>
+                        <div class="landing-price-amount mb-2">
+                            @if (plan.Price <= 0)
+                            {
+                                <span>Ücretsiz</span>
+                            }
+                            else
+                            {
+                                <span>@plan.Price.ToString("N0", culture) ₺</span><small>/ay</small>
+                            }
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(plan.Description))
+                        {
+                            <p class="text-muted small">@plan.Description</p>
+                        }
+                        <ul class="list-unstyled small landing-price-list mb-4">
+                            <li><span>Ürün limiti</span><strong>@plan.ProductLimitText</strong></li>
+                            <li><span>Kategori limiti</span><strong>@plan.CategoryLimitText</strong></li>
+                            <li><span>Personel limiti</span><strong>@plan.StaffLimitText</strong></li>
+                            <li><span>Kampanya limiti</span><strong>@plan.CampaignLimitText</strong></li>
+                            <li><span>Ödül limiti</span><strong>@plan.RewardLimitText</strong></li>
+                            <li><span>QR kod limiti</span><strong>@plan.QrCodeLimitText</strong></li>
+                        </ul>
+                        <a href="@cta.PrimaryUrl" class="btn btn-primary w-100">@(cta.IsAuthenticated ? cta.PrimaryText : "Ücretsiz Başla")</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5 landing-band">
+    <div class="container">
+        <h2 class="h4 fw-bold mb-3">Özellik karşılaştırması</h2>
+        <p class="text-muted small mb-4">
+            Aşağıdaki yetenekler ürünün içinde yer alır. Plan farkı çoğunlukla kullanım limitlerindedir;
+            bazı modüller abonelik geçerliliğine bağlıdır.
+        </p>
+        <div class="table-responsive landing-compare-table">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Yetenek</th>
+                        @foreach (var plan in Model.Plans)
+                        {
+                            <th class="text-center">@plan.Name</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ürün limiti</td>
+                        @foreach (var plan in Model.Plans)
+                        {
+                            <td class="text-center">@plan.ProductLimitText</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Kampanya limiti</td>
+                        @foreach (var plan in Model.Plans)
+                        {
+                            <td class="text-center">@plan.CampaignLimitText</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Personel limiti</td>
+                        @foreach (var plan in Model.Plans)
+                        {
+                            <td class="text-center">@plan.StaffLimitText</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>QR menü</td>
+                        @foreach (var _ in Model.Plans)
+                        {
+                            <td class="text-center">Limit dahilinde</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Raporlama</td>
+                        @foreach (var _ in Model.Plans)
+                        {
+                            <td class="text-center">Dahil*</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>CRM</td>
+                        @foreach (var _ in Model.Plans)
+                        {
+                            <td class="text-center">Dahil*</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Kampanya motoru</td>
+                        @foreach (var _ in Model.Plans)
+                        {
+                            <td class="text-center">Limit dahilinde</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Go-Live Merkezi</td>
+                        @foreach (var _ in Model.Plans)
+                        {
+                            <td class="text-center">Dahil</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="small text-muted mt-3 mb-0">* Geçerli abonelikte işletme paneli modülleri kullanılabilir.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="landing-final-cta text-center p-4">
+            <h2 class="h4 fw-bold mb-2">Hazır mısınız?</h2>
+            <p class="text-muted mb-3">Kayıt olun, Go-Live Merkezi ile menünüzü yayına alın.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="@cta.PrimaryUrl" class="btn btn-primary">@cta.PrimaryText</a>
+                <a href="/Demo" class="btn btn-outline-primary">Demo’yu İncele</a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] ?? "QR Menü + WhatsApp Sipariş") - DükkanPilot</title>
+    <meta name="description" content="@(ViewData["MetaDescription"] as string ?? "DükkanPilot ile QR menü, WhatsApp sipariş, sadakat ve kampanya yönetimini tek panelden yürütün.")" />
+    <meta property="og:title" content="@(ViewData["Title"] ?? "QR Menü + WhatsApp Sipariş") - DükkanPilot" />
+    <meta property="og:description" content="@(ViewData["MetaDescription"] as string ?? "DükkanPilot ile QR menü, WhatsApp sipariş, sadakat ve kampanya yönetimini tek panelden yürütün.")" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/landing.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="landing-body">
+    <header class="landing-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">DP</span> DükkanPilot
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav"
+                        aria-controls="landingNav" aria-expanded="false" aria-label="Menüyü aç">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="landingNav">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewData["ActiveNav"] as string) == "features" ? "active" : "")" href="/Features">Özellikler</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewData["ActiveNav"] as string) == "pricing" ? "active" : "")" href="/Pricing">Fiyatlar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewData["ActiveNav"] as string) == "demo" ? "active" : "")" href="/Demo">Demo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Account/Login">Giriş Yap</a>
+                        </li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-primary btn-sm px-3" href="/Account/Register">Ücretsiz Başla</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="landing-footer">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="fw-bold mb-2"><span class="brand-mark">DP</span> DükkanPilot</div>
+                    <p class="text-muted small mb-0">
+                        QR menü + WhatsApp sipariş + sadakat + kampanya + CRM. Küçük yiyecek işletmeleri için hızlı kurulum.
+                    </p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fw-semibold mb-2">Ürün</div>
+                    <ul class="list-unstyled small mb-0 landing-footer-links">
+                        <li><a href="/Features">Özellikler</a></li>
+                        <li><a href="/Pricing">Fiyatlar</a></li>
+                        <li><a href="/Demo">Demo</a></li>
+                        <li><a href="/m/demo-kafe">Demo QR Menü</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="fw-semibold mb-2">Hesap</div>
+                    <ul class="list-unstyled small mb-0 landing-footer-links">
+                        <li><a href="/Account/Register">Ücretsiz Kayıt</a></li>
+                        <li><a href="/Account/Login">Giriş Yap</a></li>
+                        <li><a href="/Account/ForgotPassword">Şifre Sıfırlama</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4" />
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2 small text-muted">
+                <span>&copy; @DateTime.Now.Year DükkanPilot. Tüm hakları saklıdır.</span>
+                <span>MVP SaaS — online ödeme entegrasyonu bu aşamada yoktur.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

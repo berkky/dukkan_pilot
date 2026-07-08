@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Özellikler";
+    var cta = ViewBag.AuthCta as LandingAuthCtaViewModel ?? new LandingAuthCtaViewModel();
+}
+
+<section class="landing-page-hero py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <span class="landing-pill landing-pill-dark mb-3">Özellikler</span>
+                <h1 class="display-6 fw-bold mb-3">İşletmeyi yayına çıkaran araç seti</h1>
+                <p class="text-muted mb-0">
+                    QR menüden siparişe, kampanyadan CRM’e kadar operasyonunuz tek panelde.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        @{
+            var features = new (string Title, string Benefit, string Detail, string CtaText, string CtaUrl)[]
+            {
+                ("QR Menü", "Masadan menüye saniyeler içinde.", "Mobil uyumlu public menü, logo/tema kişiselleştirme ve yazdırılabilir QR afiş.", "Demo Menüyü Gör", "/m/demo-kafe"),
+                ("Sipariş Yönetimi", "WhatsApp siparişlerini merkezi takip edin.", "Sepet kaydı, sipariş listesi, durum güncelleme ve canlı özet.", "Ücretsiz Başla", cta.PrimaryUrl),
+                ("Mutfak Modu", "Operasyonu tablette hızlandırın.", "Bekleyen / hazırlanan kolonları ve büyük dokunmatik aksiyonlar.", "Giriş Yap", "/Account/Login"),
+                ("Kampanya Motoru", "İndirimi otomatik uygulayın, etkiyi ölçün.", "Yüzde/tutar indirim, min sepet, otomatik uygulama ve performans raporları.", "Planları İncele", "/Pricing"),
+                ("Sadakat ve Ödül", "Müşteriyi geri getirin.", "Sipariş tamamlanınca puan, ödül kullanımı ve hareket geçmişi.", "Kayıt Ol", "/Account/Register"),
+                ("Müşteri CRM", "Değerli müşteriyi görün.", "Segmentler, içgörüler, CSV export ve WhatsApp iletişim kısayolları.", "Özellikleri Keşfet", "/Features"),
+                ("Raporlama", "Ciro ve ürün performansını okuyun.", "Dönem filtreleri, satış/ürün/müşteri raporları ve kampanya etkisi.", "Demo Rehberi", "/Demo"),
+                ("Go-Live Merkezi", "Ne yapacağını bilmeden yayına çıkmayın.", "Kurulum checklist’i, yayına hazır skor ve eksik adım CTA’ları.", "Ücretsiz Başla", cta.PrimaryUrl)
+            };
+        }
+
+        <div class="row g-4">
+            @foreach (var feature in features)
+            {
+                <div class="col-md-6">
+                    <div class="landing-feature-detail h-100">
+                        <h2 class="h5">@feature.Title</h2>
+                        <p class="fw-semibold text-primary mb-2">@feature.Benefit</p>
+                        <p class="text-muted small">@feature.Detail</p>
+                        <a href="@feature.CtaUrl" class="btn btn-sm btn-outline-primary"
+                           target="@(feature.CtaUrl.StartsWith("/m/") ? "_blank" : null)"
+                           rel="noopener">@feature.CtaText</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="landing-note mt-4 p-3">
+            <strong>Abonelik yönetimi hazır.</strong>
+            <span class="text-muted small"> Planlar ve işletme abonelikleri SaaS altyapısı üzerinden yönetilir; public satışta teknik admin detaylarına girilmez.</span>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 landing-band">
+    <div class="container text-center">
+        <h2 class="h4 fw-bold mb-3">Hemen deneyin</h2>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="@cta.PrimaryUrl" class="btn btn-primary">@cta.PrimaryText</a>
+            <a href="/m/demo-kafe" class="btn btn-outline-primary" target="_blank" rel="noopener">Demo Menüyü Aç</a>
+            <a href="/Pricing" class="btn btn-outline-secondary">Fiyatları Gör</a>
+        </div>
+    </div>
+</section>

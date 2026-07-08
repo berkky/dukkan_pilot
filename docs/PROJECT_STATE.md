@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 26A aşaması (İşletme Kurulum Sihirbazı / Go-Live Merkezi) tamamlandı.
+> Son güncelleme: 26B aşaması (SaaS Satış Sitesi / Landing + Pricing + Demo Funnel) tamamlandı.
 
 ---
 
@@ -494,6 +494,16 @@ DukkanPilot.sln
 - Tenant filtresi `BusinessId` claim üzerinden korundu; Public sepet/order/confirmation/tracking’e dokunulmadı
 - Migration yok; Identity yok; SignalR yok; yeni NuGet dependency yok
 
+### 26B aşaması — SaaS Satış Sitesi / Landing Page + Pricing + Demo Funnel
+- **Landing:** `GET /` — hero, problem/çözüm, nasıl çalışır, özellikler, demo, plan özeti, ürün rozetleri, FAQ, final CTA
+- **Pricing:** `GET /Pricing` — `SubscriptionPlan` aktif planları + `BusinessPlanLimitHelper` limit metinleri; boşsa güvenli fallback
+- **Features:** `GET /Features` — QR, sipariş, mutfak, kampanya, sadakat, CRM, rapor, Go-Live
+- **Demo:** `GET /Demo` — `/m/demo-kafe` funnel rehberi; panel şifreleri public’te yok
+- **Layout/nav/footer:** `_LandingLayout` (Home) + public `_Layout` (Account) satış navigasyonu; Business/Admin/PublicMenu layout’ları bozulmadı
+- **CTA:** Register / Login / Demo menü / Pricing; auth-aware panele yönlendirme
+- Business/Admin/Public menu/order/kampanya/sadakat akışına dokunulmadı
+- Migration yok; Identity yok; SignalR yok; yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -555,7 +565,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-26A tamamlandı — Go-Live Merkezi (kurulum checklist, yayına hazır skor, Dashboard/MenuStudio entegrasyonu) eklendi.
+26B tamamlandı — SaaS landing / Pricing / Features / Demo funnel eklendi.
 
 ---
 
@@ -573,7 +583,10 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 
 | URL | Açıklama |
 |-----|----------|
-| `/` | Ana sayfa |
+| `/` | SaaS landing (satış ana sayfa) |
+| `/Features` | Özellikler |
+| `/Pricing` | Plan / fiyat karşılaştırma |
+| `/Demo` | Demo funnel rehberi |
 | `/Admin/Dashboard` | Admin özet |
 | `/Admin/Businesses` | İşletme listesi |
 | `/Admin/Businesses/Details/{id}` | İşletme operasyon kontrol merkezi |
