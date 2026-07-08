@@ -180,7 +180,22 @@ $required = @(
     "docs\HELP_CENTER_CONTENT_MAP.md",
     "docs\BUSINESS_USER_TRAINING_GUIDE.md",
     "docs\STAFF_TRAINING_CHEATSHEET.md",
-    "docs\ADMIN_SUPPORT_KNOWLEDGE_BASE.md"
+    "docs\ADMIN_SUPPORT_KNOWLEDGE_BASE.md",
+    "src\DukkanPilot.Core\Entities\SupportTicket.cs",
+    "src\DukkanPilot.Core\Entities\SupportTicketMessage.cs",
+    "src\DukkanPilot.Web\Services\SupportTicketService.cs",
+    "src\DukkanPilot.Web\Helpers\SupportTicketDisplayHelper.cs",
+    "src\DukkanPilot.Web\Areas\Business\Controllers\SupportController.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Controllers\SupportController.cs",
+    "src\DukkanPilot.Web\Areas\Business\Views\Support\Index.cshtml",
+    "src\DukkanPilot.Web\Areas\Business\Views\Support\Create.cshtml",
+    "src\DukkanPilot.Web\Areas\Business\Views\Support\Details.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Support\Index.cshtml",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Support\Details.cshtml",
+    "docs\SUPPORT_CENTER_RUNBOOK.md",
+    "docs\SUPPORT_TICKET_DATA_MAP.md",
+    "docs\SUPPORT_UAT_SCRIPT.md",
+    "docs\FEEDBACK_MANAGEMENT_PLAYBOOK.md"
 )
 
 foreach ($rel in $required) {

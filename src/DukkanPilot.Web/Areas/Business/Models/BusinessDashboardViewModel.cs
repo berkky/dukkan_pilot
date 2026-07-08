@@ -23,5 +23,6 @@ public class BusinessDashboardViewModel
     public DukkanPilot.Web.Models.Onboarding.CustomerOnboardingDashboardCard? OnboardingStatus { get; set; }
     public DukkanPilot.Web.Models.Success.CustomerSuccessDashboardCard? SuccessStatus { get; set; }
     public DashboardNotificationCardViewModel Notifications { get; set; } = new();
+    public DashboardSupportCardViewModel Support { get; set; } = new();
     public bool IsBusinessOwner { get; set; }
 }

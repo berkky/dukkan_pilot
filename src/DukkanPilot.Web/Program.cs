@@ -44,6 +44,7 @@ builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ISalesRequestService, SalesRequestService>();
 builder.Services.AddScoped<IBillingOperationsService, BillingOperationsService>();
+builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<RequireActiveSubscriptionFilter>();
 
 builder.Services.AddAntiforgery(options =>

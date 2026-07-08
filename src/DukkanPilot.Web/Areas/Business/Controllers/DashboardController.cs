@@ -17,6 +17,7 @@ public class DashboardController : BusinessBaseController
     private readonly CustomerOnboardingHelper _onboardingHelper;
     private readonly CustomerSuccessHealthHelper _successHelper;
     private readonly INotificationService _notifications;
+    private readonly ISupportTicketService _supportTickets;
 
     public DashboardController(
         AppDbContext context,
@@ -25,7 +26,8 @@ public class DashboardController : BusinessBaseController
         GoLiveHelper goLiveHelper,
         CustomerOnboardingHelper onboardingHelper,
         CustomerSuccessHealthHelper successHelper,
-        INotificationService notifications)
+        INotificationService notifications,
+        ISupportTicketService supportTickets)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
@@ -34,6 +36,7 @@ public class DashboardController : BusinessBaseController
         _onboardingHelper = onboardingHelper;
         _successHelper = successHelper;
         _notifications = notifications;
+        _supportTickets = supportTickets;
     }
 
     public async Task<IActionResult> Index()
@@ -103,6 +106,8 @@ public class DashboardController : BusinessBaseController
             .Select(g => new { Name = g.Key, Count = g.Count() })
             .OrderByDescending(g => g.Count)
             .FirstOrDefaultAsync();
+
+        var supportSummary = await _supportTickets.GetBusinessTicketSummaryAsync(businessId);
 
         var model = new BusinessDashboardViewModel
         {
@@ -188,6 +193,14 @@ public class DashboardController : BusinessBaseController
             OnboardingStatus = await _onboardingHelper.BuildDashboardCardAsync(businessId),
             SuccessStatus = await _successHelper.BuildDashboardCardAsync(businessId),
             Notifications = await BuildNotificationCardAsync(businessId),
+            Support = new DashboardSupportCardViewModel
+            {
+                OpenCount = supportSummary.OpenCount,
+                UrgentOrHighCount = supportSummary.UrgentOrHighCount,
+                LatestTicketId = supportSummary.LatestTicket?.Id,
+                LatestTicketNumber = supportSummary.LatestTicket?.TicketNumber,
+                LatestTicketStatus = supportSummary.LatestTicket?.Status
+            },
             IsBusinessOwner = User.IsInRole(nameof(UserRole.BusinessOwner))
         };
 

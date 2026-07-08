@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: **34B — Vertical Demo Packs** tamamlandı (34B-FIX housekeeping uygulandı).
+> Son güncelleme: **35A — Support / Ticket / Feedback Center** tamamlandı.
 
 ---
 
@@ -678,6 +678,21 @@ DukkanPilot.sln
 - Business sidebar: sabit `demo-kafe` metni kaldırıldı → `/DemoPacks` “Sektör demoları” linki
 - Migration yok; Entity/DbContext değişmedi
 
+### 35A — Support / Ticket / Feedback Center
+- Entity: `SupportTicket`, `SupportTicketMessage` (yalnızca yeni tablolar)
+- Migration: `AddSupportTicketCenter` — `SupportTickets` + `SupportTicketMessages`
+- Service: `ISupportTicketService` / `SupportTicketService` — create, message, status, assign, close; audit + notification fail-safe
+- Helper: `SupportTicketDisplayHelper` — status/priority/category labels, open/closed sets
+- Business: `/Business/Support` (Index/Create/Details, Owner+Staff, subscription gate dışında)
+- Admin: `/Admin/Support` (Index/Details, SuperAdmin, reply/internal note/status/priority/assign)
+- Feedback: `Category=FeatureRequest`, `Source=Feedback`; public anonymous ticket yok
+- Notification types: NewSupportTicket, SupportTicketUpdated, SupportTicketReplied, SupportTicketStatusChanged, SupportTicketResolved
+- Audit: Support.TicketCreated, BusinessMessageAdded, AdminReplyAdded, InternalNoteAdded, StatusChanged, PriorityChanged, Assigned, Closed
+- Entegrasyon: Dashboard, CustomerSuccess, Operations, Quality, Help Center makaleleri
+- Docs: SUPPORT_CENTER_RUNBOOK, SUPPORT_TICKET_DATA_MAP, SUPPORT_UAT_SCRIPT, FEEDBACK_MANAGEMENT_PLAYBOOK
+- Smoke: 47/47 PASS (Support auth redirects dahil)
+- Identity/SignalR/NuGet/mail/chat/background job/upload yok
+
 ---
 
 ## 6. Veritabanı
@@ -686,7 +701,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`), `AddManualBillingOperations` (`20260708170630`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`), `AddManualBillingOperations` (`20260708170630`), `AddSupportTicketCenter` (`20260708213904`) |
 
 ### Seed verisi
 
@@ -737,13 +752,9 @@ DukkanPilot.sln
 
 ## 9. Sıradaki aşama
 
-**Son tamamlanan checkpoint:** 34B — Vertical Demo Packs (+ 34B-FIX housekeeping)
+**Son tamamlanan checkpoint:** 35A — Support / Ticket / Feedback Center
 
-**Sıradaki aşama:** **35A — Support / Ticket / Feedback Center**
-
-- Business/Admin/public ticket oluşturma ve durum takibi (planlanan)
-- Mevcut Help Center, SalesRequests, Notifications ve Audit akışlarıyla entegrasyon
-- Migration/entity yalnızca 35A kapsamında planlanacak; bu FIX aşamasında yok
+**Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36A+).
 
 ---
 
@@ -768,6 +779,8 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/DemoPacks` · `/Demo/Packs` | Sektör demo galerisi (vertical demo packs) |
 | `/RoiCalculator` · `/ValueCalculator` | Değer hesaplayıcı (public) |
 | `/Help` | Yardım merkezi (public) |
+| `/Business/Support` | Destek Merkezi (işletme) |
+| `/Admin/Support` | Destek talepleri (SuperAdmin) |
 | `/health` | Sistem durumu JSON |
 | `/robots.txt` | Arama motoru yönergeleri |
 | `/sitemap.xml` | Public sayfa sitemap |

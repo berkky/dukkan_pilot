@@ -33,6 +33,10 @@ public class AdminDashboardViewModel
     public decimal BillingOpenAmount { get; set; }
     public int BillingOverdueCount { get; set; }
     public decimal BillingPaidThisMonth { get; set; }
+
+    public int NewSupportTicketCount { get; set; }
+    public int OpenSupportUrgentCount { get; set; }
+    public int WaitingAdminSupportCount { get; set; }
 }
 
 public class AdminPlatformKpiViewModel

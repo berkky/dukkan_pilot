@@ -138,7 +138,8 @@ public static class HelpContentHelper
         Link("Plan Talebi", "/Sales/RequestPlan", "📋"),
         Link("Güven Merkezi", "/Trust", "🛡️"),
         Link("Fiyatlar", "/Pricing", "💳"),
-        Link("Değer Hesapla", "/RoiCalculator", "📈")
+        Link("Değer Hesapla", "/RoiCalculator", "📈"),
+        Link("Yardım & Destek", "/Help/yardim-ve-destek", "🆘")
     };
 
     private static IReadOnlyList<HelpQuickLinkViewModel> BusinessQuickLinks() => new[]
@@ -150,7 +151,8 @@ public static class HelpContentHelper
         Link("Siparişler / Mutfak", "/Business/Orders", "🍳"),
         Link("Tahsilat Kayıtları", "/Business/Billing/Invoices", "🧾"),
         Link("İşletme Sağlığı", "/Business/Success", "💚"),
-        Link("Değer Senaryosu", "/Business/ValueCalculator", "📈")
+        Link("Değer Senaryosu", "/Business/ValueCalculator", "📈"),
+        Link("Destek Merkezi", "/Business/Support", "🎫")
     };
 
     private static IReadOnlyList<HelpQuickLinkViewModel> AdminQuickLinks() => new[]
@@ -162,6 +164,7 @@ public static class HelpContentHelper
         Link("Kurulum Takibi", "/Admin/Onboarding", "🧭"),
         Link("Operasyon Merkezi", "/Admin/Operations", "🛠️"),
         Link("Kalite Merkezi", "/Admin/Quality", "✅"),
+        Link("Destek Talepleri", "/Admin/Support", "🎫"),
         Link("Değer Hesaplayıcı", "/Admin/ValueCalculator", "📈")
     };
 
@@ -617,6 +620,30 @@ public static class HelpContentHelper
             "audit notification izleme",
             new[] { L("Audit Log", "/Admin/AuditLogs"), L("Bildirimler", "/Admin/Notifications") },
             related: new[] { "manuel-tahsilat" }),
+
+        A(ScopePublic, "yardim-ve-destek", "Başlangıç", "Yardım ve destek",
+            "Self-service yardım ve destek kanalları.",
+            4, "Başlangıç",
+            new[] { "Önce Yardım Merkezi makalelerini okuyun.", "Demo ve plan talepleri için satış formlarını kullanın.", "Kayıtlı işletme kullanıcıları panel içinden destek talebi açabilir.", "Anonim destek talebi veya public ticket yok." },
+            "yardım destek ticket",
+            new[] { L("Yardım Merkezi", "/Help"), L("Demo Talebi", "/Sales/RequestDemo", true), L("Plan Talebi", "/Sales/RequestPlan", true) },
+            related: new[] { "nedir", "demo-nasil-denenir" }),
+
+        A(ScopeBusiness, "destek-talebi-acma", "Destek & Incident", "Destek talebi açma",
+            "Panel içi destek talebi oluşturma.",
+            5, "Başlangıç",
+            new[] { "Önce ilgili Yardım makalesini kontrol edin.", "Destek Merkezi → Yeni Destek Talebi.", "Kategori, öncelik ve ilgili ekranı seçin.", "Şifre/kart/IBAN paylaşmayın.", "Yanıtları Destek Merkezi detayından takip edin." },
+            "destek ticket support",
+            new[] { L("Destek Merkezi", "/Business/Support"), L("Yeni Talep", "/Business/Support/Create") },
+            related: new[] { "ilk-kurulum", "siparis-mutfak" }),
+
+        A(ScopeAdmin, "destek-talepleri-yonetimi", "Destek & Incident", "Destek talepleri yönetimi",
+            "Admin support operasyonları.",
+            6, "Orta",
+            new[] { "Admin → Destek Talepleri listesini izleyin.", "Acil/yüksek öncelikli taleplere öncelik verin.", "Herkese açık yanıt ve iç notları ayırın.", "Durum değişikliklerinde audit ve bildirim oluşur.", "E-posta/chat entegrasyonu yok; panel içi takip." },
+            "support ticket admin",
+            new[] { L("Destek Talepleri", "/Admin/Support"), L("Customer Success", "/Admin/CustomerSuccess") },
+            related: new[] { "incident-response", "customer-success" }),
 
         A(ScopeAdmin, "legal-readiness", "Legal & Güven", "Legal readiness",
             "Yasal sayfa ve güven hazırlığı.",

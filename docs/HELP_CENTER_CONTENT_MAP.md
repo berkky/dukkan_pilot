@@ -69,6 +69,8 @@ SuperAdmin only. Read-only.
 
 Business/Admin ekranlarında `_HelpCard` üzerinden `HelpGuideUrl` ile makale linki verilir.
 
-## Gelecek (35A)
+## 35A — Support ticket entegrasyonu (tamamlandı)
 
-Support ticket sistemi eklendiğinde Help Center makalelerinden ticket oluşturma CTA eklenebilir; bu aşamada ticket yok.
+- Business makale: `destek-talebi-acma` → `/Business/Support/Create`
+- Admin makale: `destek-talepleri-yonetimi` → `/Admin/Support`
+- Public makale: `yardim-ve-destek` (anonim ticket yok; Sales/Help yönlendirme)

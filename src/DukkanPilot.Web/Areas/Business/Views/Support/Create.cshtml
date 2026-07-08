@@ -1,0 +1,71 @@
+@model BusinessSupportCreateViewModel
+@using DukkanPilot.Web.Models.Shared
+@{
+    ViewData["Title"] = Model.IsFeatureRequest ? "Özellik İsteği" : "Yeni Destek Talebi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@ViewData["Title"]</h2>
+        <p class="text-muted mb-0">Sorununuzu mümkün olduğunca net anlatın.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+</div>
+
+<div class="alert alert-warning small">
+    <strong>Güvenlik:</strong> Lütfen şifre, kart bilgisi, IBAN veya hassas kişisel veri paylaşmayın.
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="panel-card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Category" class="form-label"></label>
+                        <select asp-for="Category" asp-items="Model.CategoryOptions" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Priority" class="form-label"></label>
+                        <select asp-for="Priority" asp-items="Model.PriorityOptions" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="RelatedEntityName" class="form-label">İlgili ekran (opsiyonel)</label>
+                        <select asp-for="RelatedEntityName" asp-items="Model.RelatedScreenOptions" class="form-select">
+                            <option value="">Seçiniz</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Subject" class="form-label"></label>
+                        <input asp-for="Subject" class="form-control" maxlength="300" />
+                        <span asp-validation-for="Subject" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Message" class="form-label"></label>
+                        <textarea asp-for="Message" class="form-control" rows="6" maxlength="4000"></textarea>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Talebi Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        @await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+        {
+            Title = "Önce Yardım Merkezi",
+            Description = "Menü, sipariş, kampanya ve tahsilat konularında hazır rehberler mevcut.",
+            HelpGuideUrl = "/Business/HelpCenter/Article/destek-talebi-acma",
+            HelpGuideText = "Destek talebi rehberi",
+            ActionText = "Yardım Merkezi",
+            ActionUrl = "/Business/HelpCenter"
+        })
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

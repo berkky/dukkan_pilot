@@ -64,4 +64,5 @@ public class AdminCustomerSuccessDetailsViewModel
     public List<AdminOnboardingRelatedSalesRequestViewModel> RelatedSalesRequests { get; set; } = new();
     public List<AdminOnboardingActivityItemViewModel> RecentAudits { get; set; } = new();
     public List<AdminOnboardingActivityItemViewModel> RecentNotifications { get; set; } = new();
+    public List<AdminSupportTicketRowViewModel> OpenSupportTickets { get; set; } = new();
 }

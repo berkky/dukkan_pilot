@@ -1,0 +1,82 @@
+@model BusinessSupportDetailsViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = Model.TicketNumber;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@Model.TicketNumber</h2>
+        <p class="text-muted mb-0">@Model.Subject</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+        <a href="/Business/HelpCenter/Article/destek-talebi-acma" class="btn btn-outline-primary btn-sm">Yardım</a>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-body">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge @SupportTicketDisplayHelper.GetStatusBadgeClass(Model.Status)">@SupportTicketDisplayHelper.GetStatusLabel(Model.Status)</span>
+            <span class="badge @SupportTicketDisplayHelper.GetPriorityBadgeClass(Model.Priority)">@SupportTicketDisplayHelper.GetPriorityLabel(Model.Priority)</span>
+            <span class="badge bg-light text-dark">@SupportTicketDisplayHelper.GetCategoryLabel(Model.Category)</span>
+        </div>
+        <div class="small text-muted">
+            Oluşturulma: @Model.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+            @if (!string.IsNullOrWhiteSpace(Model.RelatedEntityName))
+            {
+                <span> · İlgili: @SupportTicketDisplayHelper.GetRelatedScreenLabel(Model.RelatedEntityName)</span>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.ResolutionSummary))
+        {
+            <div class="alert alert-success small mt-3 mb-0">@Model.ResolutionSummary</div>
+        }
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Mesaj geçmişi</h3></div>
+    <div class="panel-card-body">
+        @foreach (var msg in Model.Messages)
+        {
+            <div class="border rounded p-3 mb-3 @(msg.SenderRole == "Admin" ? "border-primary bg-light" : "")">
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                    <span>@(msg.SenderName ?? (msg.SenderRole == "Admin" ? "DukkanPilot Destek" : "Siz"))</span>
+                    <span>@msg.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</span>
+                </div>
+                <div class="mb-0" style="white-space: pre-wrap;">@msg.Message</div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.CanReply)
+{
+    <div class="panel-card mb-4">
+        <div class="panel-card-header"><h3 class="h6 mb-0">Yanıt ekle</h3></div>
+        <div class="panel-card-body">
+            <form asp-action="AddMessage" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReplyForm.TicketId" />
+                <div class="mb-3">
+                    <textarea asp-for="ReplyForm.Message" class="form-control" rows="4" maxlength="4000" placeholder="Ek bilgi veya yanıtınız..."></textarea>
+                    <span asp-validation-for="ReplyForm.Message" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Gönder</button>
+            </form>
+        </div>
+    </div>
+
+    <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Talebi kapatmak istediğinize emin misiniz?');">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-danger btn-sm">Talebi Kapat</button>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

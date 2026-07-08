@@ -78,7 +78,9 @@ public class OperationsController : AdminBaseController
                 new OpsDocLinkViewModel { Title = "Health score", Path = "docs/CUSTOMER_SUCCESS_HEALTH_SCORE.md" },
                 new OpsDocLinkViewModel { Title = "Retention playbook", Path = "docs/RETENTION_PLAYBOOK.md" },
                 new OpsDocLinkViewModel { Title = "Upgrade opportunity", Path = "docs/UPGRADE_OPPORTUNITY_PLAYBOOK.md" },
-                new OpsDocLinkViewModel { Title = "Churn risk runbook", Path = "docs/CHURN_RISK_RUNBOOK.md" }
+                new OpsDocLinkViewModel { Title = "Churn risk runbook", Path = "docs/CHURN_RISK_RUNBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Support center runbook", Path = "docs/SUPPORT_CENTER_RUNBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Support UAT", Path = "docs/SUPPORT_UAT_SCRIPT.md" }
             ],
             ScriptHints =
             [
@@ -216,6 +218,13 @@ public class OperationsController : AdminBaseController
                 Title = "No public demo passwords",
                 Description = "Landing /Demo sifre gostermemeli; Login'deki demo hesaplar ayrik.",
                 IsReadyHint = true
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Support center ready",
+                Description = "SUPPORT_CENTER_RUNBOOK + /Admin/Support + business ticket akışı.",
+                IsReadyHint = FileExists("docs", "SUPPORT_CENTER_RUNBOOK.md")
+                    && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "SupportController.cs")
             },
             new OpsChecklistItemViewModel
             {

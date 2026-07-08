@@ -1,0 +1,141 @@
+@model BusinessSupportListViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@using DukkanPilot.Web.Models.Shared
+@{
+    ViewData["Title"] = "Destek Merkezi";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+    <div>
+        <h2 class="h4 mb-1">Destek Merkezi</h2>
+        <p class="text-muted mb-0">Sorun, talep ve geri bildirimlerinizi buradan takip edin.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/Business/HelpCenter" class="btn btn-outline-primary btn-sm">Yardım Merkezi</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">Yeni Destek Talebi</a>
+        <a asp-action="Create" asp-route-category="FeatureRequest" class="btn btn-outline-secondary btn-sm">Özellik İsteği</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="panel-card h-100"><div class="panel-card-body text-center">
+            <div class="display-6 fw-bold">@Model.Summary.OpenCount</div>
+            <div class="small text-muted">Açık talepler</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="panel-card h-100"><div class="panel-card-body text-center">
+            <div class="display-6 fw-bold">@Model.Summary.WaitingCustomerCount</div>
+            <div class="small text-muted">Yanıtınız bekleniyor</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="panel-card h-100"><div class="panel-card-body text-center">
+            <div class="display-6 fw-bold">@Model.Summary.ResolvedOrClosedCount</div>
+            <div class="small text-muted">Çözüldü / Kapatıldı</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="panel-card h-100"><div class="panel-card-body text-center">
+            <div class="display-6 fw-bold text-danger">@Model.Summary.UrgentOrHighCount</div>
+            <div class="small text-muted">Acil / Yüksek</div>
+        </div></div>
+    </div>
+</div>
+
+<form method="get" class="panel-card mb-4">
+    <div class="panel-card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small">Durum</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var s in SupportTicketDisplayHelper.AllowedStatuses)
+                    {
+                        <option value="@s" selected="@(Model.Status == s)">@SupportTicketDisplayHelper.GetStatusLabel(s)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Kategori</label>
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var c in SupportTicketDisplayHelper.AllowedCategories)
+                    {
+                        <option value="@c" selected="@(Model.Category == c)">@SupportTicketDisplayHelper.GetCategoryLabel(c)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Öncelik</label>
+                <select name="priority" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var p in SupportTicketDisplayHelper.AllowedPriorities)
+                    {
+                        <option value="@p" selected="@(Model.Priority == p)">@SupportTicketDisplayHelper.GetPriorityLabel(p)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Ara</label>
+                <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm" placeholder="Talep no veya konu" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Filtrele</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (!Model.Items.Any())
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Title = "Henüz destek talebiniz yok",
+        Description = "Önce Yardım Merkezi makalelerine göz atın; sorun devam ederse destek talebi açın.",
+        Icon = "🎫",
+        PrimaryActionText = "Destek Talebi Aç",
+        PrimaryActionUrl = "/Business/Support/Create",
+        SecondaryActionText = "Yardım Merkezi",
+        SecondaryActionUrl = "/Business/HelpCenter"
+    })
+}
+else
+{
+    <div class="panel-card">
+        <div class="panel-card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Talep No</th>
+                            <th>Konu</th>
+                            <th>Kategori</th>
+                            <th>Öncelik</th>
+                            <th>Durum</th>
+                            <th>Son mesaj</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold small">@item.TicketNumber</td>
+                            <td>@item.Subject</td>
+                            <td class="small">@SupportTicketDisplayHelper.GetCategoryLabel(item.Category)</td>
+                            <td><span class="badge @SupportTicketDisplayHelper.GetPriorityBadgeClass(item.Priority)">@SupportTicketDisplayHelper.GetPriorityLabel(item.Priority)</span></td>
+                            <td><span class="badge @SupportTicketDisplayHelper.GetStatusBadgeClass(item.Status)">@SupportTicketDisplayHelper.GetStatusLabel(item.Status)</span></td>
+                            <td class="small text-muted">@SupportTicketDisplayHelper.GetLastMessageText(item.LastMessageAtUtc, item.LastMessageByRole)</td>
+                            <td><a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Detay</a></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

@@ -53,6 +53,7 @@ public class QualityController : AdminBaseController
                 new QualityQuickLinkViewModel { Title = "Onboarding", Url = "/Admin/Onboarding", ButtonClass = "btn-outline-primary" },
                 new QualityQuickLinkViewModel { Title = "SalesCenter", Url = "/Admin/SalesCenter", ButtonClass = "btn-outline-primary" },
                 new QualityQuickLinkViewModel { Title = "SalesRequests", Url = "/Admin/SalesRequests", ButtonClass = "btn-outline-secondary" },
+                new QualityQuickLinkViewModel { Title = "Support", Url = "/Admin/Support", ButtonClass = "btn-outline-secondary" },
                 new QualityQuickLinkViewModel { Title = "Billing", Url = "/Admin/Billing", ButtonClass = "btn-outline-warning" },
                 new QualityQuickLinkViewModel { Title = "Landing Demo", Url = "/Demo", ButtonClass = "btn-outline-primary" },
                 new QualityQuickLinkViewModel { Title = "Public Menu", Url = "/m/demo-kafe", ButtonClass = "btn-outline-success" }
@@ -80,6 +81,7 @@ public class QualityController : AdminBaseController
             new QualityChecklistItemViewModel { Title = "Auth redirect geçti mi?", Description = "Business/Admin protected routes 302 dönmeli" },
             new QualityChecklistItemViewModel { Title = "Security headers kontrol edildi mi?", Description = "nosniff / frame / referrer / permissions policy" },
             new QualityChecklistItemViewModel { Title = "SEO endpoints kontrol edildi mi?", Description = "robots + sitemap; private URL yok" },
+            new QualityChecklistItemViewModel { Title = "Support UAT tamamlandı mı?", Description = "Business ticket create, admin reply, internal note gizliliği, audit/notification" },
             new QualityChecklistItemViewModel { Title = "Public menu mobile polish gözden geçirildi mi?", Description = "/m/demo-kafe: hero, kategori scroll, sepet bar, form, confirmation, tracking" },
             new QualityChecklistItemViewModel { Title = "Sales form manuel test edildi mi?", Description = "RequestDemo/RequestPlan + Privacy/KVKK" },
             new QualityChecklistItemViewModel { Title = "Public order manuel test edildi mi?", Description = "Public menu → WhatsApp order → confirmation/tracking" },

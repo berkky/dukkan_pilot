@@ -103,6 +103,20 @@
                         <li><a href="/Admin/SalesRequests/Details/@r.Id">#@r.Id</a> · @r.Status · @r.RequestType</li>
                     }
                 </ul>
+                <div class="small text-muted mb-2">Açık destek talepleri</div>
+                <ul class="small">
+                    @if (!Model.OpenSupportTickets.Any())
+                    {
+                        <li class="text-muted">Açık destek talebi yok.</li>
+                    }
+                    else
+                    {
+                        @foreach (var t in Model.OpenSupportTickets)
+                        {
+                            <li><a href="/Admin/Support/Details/@t.Id">@t.TicketNumber</a> · @t.Priority · @t.Status</li>
+                        }
+                    }
+                </ul>
                 <div class="small text-muted mb-2">Recent audit</div>
                 <ul class="small">
                     @foreach (var a in Model.RecentAudits.Take(5))

@@ -1,0 +1,133 @@
+@model AdminSupportDetailsViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = Model.TicketNumber;
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">@Model.TicketNumber</h2>
+        <p class="text-muted mb-0">@Model.BusinessName · @Model.Subject</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="panel-card mb-4">
+            <div class="panel-card-body">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    <span class="badge @SupportTicketDisplayHelper.GetStatusBadgeClass(Model.Status)">@SupportTicketDisplayHelper.GetStatusLabel(Model.Status)</span>
+                    <span class="badge @SupportTicketDisplayHelper.GetPriorityBadgeClass(Model.Priority)">@SupportTicketDisplayHelper.GetPriorityLabel(Model.Priority)</span>
+                    <span class="badge bg-light text-dark">@SupportTicketDisplayHelper.GetCategoryLabel(Model.Category)</span>
+                    <span class="badge bg-light text-dark">@SupportTicketDisplayHelper.GetSourceLabel(Model.Source)</span>
+                </div>
+                <div class="small text-muted mb-0">
+                    Oluşturan: @(Model.CreatedByUserName ?? Model.CreatedByUserEmail ?? "—") ·
+                    @Model.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Mesaj zaman çizelgesi</h3></div>
+            <div class="panel-card-body">
+                @foreach (var msg in Model.Messages)
+                {
+                    var css = msg.IsInternal ? "border-warning bg-warning-subtle" : msg.SenderRole == "Admin" ? "border-primary" : "border-secondary";
+                    <div class="border rounded p-3 mb-3 @css">
+                        <div class="d-flex justify-content-between small text-muted mb-2">
+                            <span>
+                                @(msg.SenderName ?? msg.SenderRole)
+                                @if (msg.IsInternal) { <span class="badge bg-warning text-dark ms-1">İç not</span> }
+                            </span>
+                            <span>@msg.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</span>
+                        </div>
+                        <div style="white-space: pre-wrap;">@msg.Message</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Herkese açık yanıt</h3></div>
+            <div class="panel-card-body">
+                <form asp-action="AddReply" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <textarea asp-for="ReplyForm.Message" class="form-control mb-2" rows="4"></textarea>
+                    <button type="submit" class="btn btn-primary btn-sm">Yanıt Gönder</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">İç not (işletme görmez)</h3></div>
+            <div class="panel-card-body">
+                <form asp-action="AddInternalNote" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <textarea asp-for="InternalNoteForm.Message" class="form-control mb-2" rows="3"></textarea>
+                    <button type="submit" class="btn btn-outline-warning btn-sm">İç Not Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel-card mb-3">
+            <div class="panel-card-header"><h3 class="h6 mb-0">İşletme</h3></div>
+            <div class="panel-card-body small">
+                <div class="fw-semibold">@Model.BusinessName</div>
+                <div class="text-muted mb-2"><code>/m/@Model.BusinessSlug</code></div>
+                <div class="d-flex flex-wrap gap-1">
+                    <a href="/Admin/Businesses/Details/@Model.BusinessId" class="btn btn-sm btn-outline-secondary">İşletme</a>
+                    <a href="/Admin/Billing?businessId=@Model.BusinessId" class="btn btn-sm btn-outline-secondary">Billing</a>
+                    <a href="/Admin/CustomerSuccess/Details/@Model.BusinessId" class="btn btn-sm btn-outline-secondary">CS</a>
+                    <a href="/Admin/Operations" class="btn btn-sm btn-outline-secondary">Ops</a>
+                    <a href="/Admin/Quality" class="btn btn-sm btn-outline-secondary">QA</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card mb-3">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Durum</h3></div>
+            <div class="panel-card-body">
+                <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <select asp-for="StatusForm.Status" asp-items="Model.StatusOptions" class="form-select form-select-sm mb-2"></select>
+                    <input asp-for="StatusForm.ResolutionSummary" class="form-control form-control-sm mb-2" placeholder="Çözüm özeti (opsiyonel)" />
+                    <button type="submit" class="btn btn-sm btn-outline-primary w-100">Durumu Güncelle</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel-card mb-3">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Öncelik</h3></div>
+            <div class="panel-card-body">
+                <form asp-action="UpdatePriority" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <select asp-for="PriorityForm.Priority" asp-items="Model.PriorityOptions" class="form-select form-select-sm mb-2"></select>
+                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Önceliği Güncelle</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel-card mb-3">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Atama</h3></div>
+            <div class="panel-card-body">
+                <form asp-action="Assign" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="AssignForm.AssignedAdminEmail" class="form-control form-control-sm mb-2" />
+                    <button type="submit" class="btn btn-sm btn-outline-dark w-100">Bana Ata</button>
+                </form>
+            </div>
+        </div>
+
+        <form asp-action="Close" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="resolutionSummary" value="Admin tarafından kapatıldı." />
+            <button type="submit" class="btn btn-sm btn-danger w-100" onclick="return confirm('Kapatılsın mı?');">Talebi Kapat</button>
+        </form>
+    </div>
+</div>

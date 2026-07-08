@@ -208,12 +208,35 @@ public class CustomerSuccessController : AdminBaseController
             })
             .ToListAsync(cancellationToken);
 
+        var openStatuses = SupportTicketDisplayHelper.OpenStatuses;
+        var supportTickets = await _context.SupportTickets.AsNoTracking()
+            .Where(t => t.BusinessId == businessId && openStatuses.Contains(t.Status))
+            .OrderByDescending(t => t.Priority == "Urgent")
+            .ThenByDescending(t => t.Priority == "High")
+            .ThenByDescending(t => t.CreatedAtUtc)
+            .Take(10)
+            .Select(t => new AdminSupportTicketRowViewModel
+            {
+                Id = t.Id,
+                TicketNumber = t.TicketNumber,
+                BusinessId = t.BusinessId,
+                Subject = t.Subject,
+                Category = t.Category,
+                Priority = t.Priority,
+                Status = t.Status,
+                CreatedAtUtc = t.CreatedAtUtc,
+                LastMessageAtUtc = t.LastMessageAtUtc,
+                LastMessageByRole = t.LastMessageByRole
+            })
+            .ToListAsync(cancellationToken);
+
         return View(new AdminCustomerSuccessDetailsViewModel
         {
             Snapshot = snapshot,
             RelatedSalesRequests = related,
             RecentAudits = audits,
-            RecentNotifications = notifications
+            RecentNotifications = notifications,
+            OpenSupportTickets = supportTickets
         });
     }
 

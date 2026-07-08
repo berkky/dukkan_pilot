@@ -30,6 +30,8 @@ public class AppDbContext : DbContext
     public DbSet<SalesRequest> SalesRequests => Set<SalesRequest>();
     public DbSet<BillingInvoice> BillingInvoices => Set<BillingInvoice>();
     public DbSet<BillingPayment> BillingPayments => Set<BillingPayment>();
+    public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+    public DbSet<SupportTicketMessage> SupportTicketMessages => Set<SupportTicketMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +58,8 @@ public class AppDbContext : DbContext
         ConfigureSalesRequest(modelBuilder);
         ConfigureBillingInvoice(modelBuilder);
         ConfigureBillingPayment(modelBuilder);
+        ConfigureSupportTicket(modelBuilder);
+        ConfigureSupportTicketMessage(modelBuilder);
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)
@@ -469,6 +473,61 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.RequestType);
             entity.HasIndex(e => e.RequestedPlanId);
             entity.HasIndex(e => e.Priority);
+        });
+    }
+
+    private static void ConfigureSupportTicket(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SupportTicket>(entity =>
+        {
+            entity.ToTable("SupportTickets");
+
+            entity.Property(e => e.TicketNumber).HasMaxLength(30).IsRequired();
+            entity.Property(e => e.Subject).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.Category).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.Priority).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.Source).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.CreatedByUserEmail).HasMaxLength(256);
+            entity.Property(e => e.CreatedByUserName).HasMaxLength(200);
+            entity.Property(e => e.AssignedAdminEmail).HasMaxLength(256);
+            entity.Property(e => e.RelatedEntityName).HasMaxLength(80);
+            entity.Property(e => e.LastMessageByRole).HasMaxLength(20);
+            entity.Property(e => e.ResolutionSummary).HasMaxLength(2000);
+            entity.Property(e => e.AdminInternalNote).HasMaxLength(2000);
+            entity.Property(e => e.MetadataJson).HasColumnType("nvarchar(max)");
+
+            entity.HasIndex(e => e.TicketNumber).IsUnique();
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.BusinessId, e.Status });
+            entity.HasIndex(e => new { e.Status, e.Priority });
+            entity.HasIndex(e => e.AssignedAdminUserId);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.LastMessageAtUtc);
+        });
+    }
+
+    private static void ConfigureSupportTicketMessage(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SupportTicketMessage>(entity =>
+        {
+            entity.ToTable("SupportTicketMessages");
+
+            entity.Property(e => e.SenderEmail).HasMaxLength(256);
+            entity.Property(e => e.SenderName).HasMaxLength(200);
+            entity.Property(e => e.SenderRole).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.Message).HasMaxLength(4000).IsRequired();
+            entity.Property(e => e.MetadataJson).HasColumnType("nvarchar(max)");
+
+            entity.HasIndex(e => new { e.SupportTicketId, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
+            entity.HasIndex(e => e.SenderRole);
+            entity.HasIndex(e => e.IsInternal);
+
+            entity.HasOne(e => e.SupportTicket)
+                .WithMany(t => t.Messages)
+                .HasForeignKey(e => e.SupportTicketId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

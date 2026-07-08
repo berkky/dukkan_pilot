@@ -20,6 +20,7 @@ public class DashboardController : AdminBaseController
     private readonly CustomerOnboardingHelper _onboardingHelper;
     private readonly CustomerSuccessHealthHelper _successHelper;
     private readonly IBillingOperationsService _billing;
+    private readonly ISupportTicketService _supportTickets;
 
     public DashboardController(
         AppDbContext context,
@@ -27,7 +28,8 @@ public class DashboardController : AdminBaseController
         ISalesRequestService salesRequests,
         CustomerOnboardingHelper onboardingHelper,
         CustomerSuccessHealthHelper successHelper,
-        IBillingOperationsService billing)
+        IBillingOperationsService billing,
+        ISupportTicketService supportTickets)
     {
         _context = context;
         _notifications = notifications;
@@ -35,6 +37,7 @@ public class DashboardController : AdminBaseController
         _onboardingHelper = onboardingHelper;
         _successHelper = successHelper;
         _billing = billing;
+        _supportTickets = supportTickets;
     }
 
     [HttpGet("")]
@@ -175,6 +178,11 @@ public class DashboardController : AdminBaseController
         model.BillingOpenAmount = billingSummary.OpenAmount;
         model.BillingOverdueCount = billingSummary.OverdueCount;
         model.BillingPaidThisMonth = billingSummary.PaidThisMonth;
+
+        var supportSummary = await _supportTickets.GetAdminTicketSummaryAsync();
+        model.NewSupportTicketCount = supportSummary.NewCount;
+        model.OpenSupportUrgentCount = supportSummary.UrgentOrHighCount;
+        model.WaitingAdminSupportCount = supportSummary.WaitingAdminCount;
 
         return View(model);
     }

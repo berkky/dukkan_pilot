@@ -235,6 +235,23 @@ public class CustomerSuccessHealthHelper
         if (overdueInvoiceCount > 0) riskPenalty += 10;
         else if (openInvoiceAmount > 0) riskPenalty += 4;
 
+        var openSupportTickets = await _context.SupportTickets.AsNoTracking()
+            .CountAsync(t => t.BusinessId == businessId
+                && SupportTicketDisplayHelper.OpenStatuses.Contains(t.Status), cancellationToken);
+        var urgentSupportTickets = await _context.SupportTickets.AsNoTracking()
+            .CountAsync(t => t.BusinessId == businessId
+                && SupportTicketDisplayHelper.OpenStatuses.Contains(t.Status)
+                && (t.Priority == "High" || t.Priority == "Urgent"), cancellationToken);
+
+        if (urgentSupportTickets > 0)
+        {
+            riskPenalty += 8;
+        }
+        else if (openSupportTickets > 0)
+        {
+            riskPenalty += 3;
+        }
+
         var rawScore = usageScore + menuScore + engagementScore + revenueScore + subscriptionScore + adoptionScore + growthBonus - riskPenalty;
         var score = Math.Clamp(rawScore, 0, 100);
 
@@ -294,6 +311,17 @@ public class CustomerSuccessHealthHelper
         {
             riskSignals.Add(CreateSignal("billing-open", "Açık tahsilat", openInvoiceAmount.ToString("N2"), false, "warning", "Ödenmemiş/kısmi tahsilat kaydı mevcut."));
             recommendations.Add(CreateRecommendation("Tahsilat kayıtlarını kontrol edin", "Ödenmemiş veya kısmi tahsilat kayıtlarınız var. Vade ve ödeme durumunu kontrol edin.", "warning", "/Business/Billing/Invoices", "Tahsilat Kayıtları", "billing", false));
+        }
+
+        if (urgentSupportTickets > 0)
+        {
+            riskSignals.Add(CreateSignal("support-urgent", "Acil destek talebi", urgentSupportTickets.ToString(), false, "critical", "Açık acil/yüksek öncelikli destek talebi var."));
+            recommendations.Add(CreateRecommendation("Destek talebinizi kontrol edin", "Acil destek talebiniz yanıt bekliyor olabilir.", "danger", "/Business/Support", "Destek Merkezi", "support", true));
+        }
+        else if (openSupportTickets > 0)
+        {
+            riskSignals.Add(CreateSignal("support-open", "Açık destek talebi", openSupportTickets.ToString(), false, "warning", "Çözülmemiş destek talebi mevcut."));
+            recommendations.Add(CreateRecommendation("Destek taleplerinizi takip edin", "Açık destek talebiniz var; yanıt veya ek bilgi gerekebilir.", "warning", "/Business/Support", "Destek Merkezi", "support", false));
         }
         if (!engagementRecent)
         {

@@ -70,7 +70,16 @@
 | Kurulum | Onboarding | Onboarding |
 | Sağlık | CustomerSuccess | Success |
 | Operasyon | Operations, Quality | GoLive, DemoCenter |
+| Destek | Support | Support |
 | Değer senaryosu | ValueCalculator | ValueCalculator |
+
+## Senaryo: Destek talebi (35A)
+
+1. Business: `/Business/Support/Create` — kategori, öncelik, konu, mesaj
+2. Admin: `/Admin/Support` — yanıt, iç not (işletme görmez), durum/öncelik
+3. Özellik isteği: `Category=FeatureRequest`, `Source=Feedback`
+4. Anonim public ticket yok — `/Help`, `/Sales/RequestDemo`
+5. Rehber: `docs/SUPPORT_CENTER_RUNBOOK.md`, Help `destek-talepleri-yonetimi`
 
 ## Senaryo: Müşteri “bana ne kazandırır?” diyor
 
