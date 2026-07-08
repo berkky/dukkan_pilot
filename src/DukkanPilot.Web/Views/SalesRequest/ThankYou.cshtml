@@ -1,0 +1,25 @@
+@{
+    Layout = "_LandingLayout";
+    ViewData["Title"] = "Talebiniz Alındı";
+    var wasDup = ViewBag.WasDuplicate as bool? == true;
+}
+
+<section class="py-5">
+    <div class="container text-center" style="max-width: 640px;">
+        <div class="display-6 mb-3">✅</div>
+        <h1 class="h2 mb-2">Talebiniz alındı</h1>
+        @if (wasDup)
+        {
+            <p class="text-muted">Son 24 saat içinde benzer bir açık talebiniz bulunduğu için mevcut kaydınız üzerinden devam edilecektir.</p>
+        }
+        else
+        {
+            <p class="text-muted">En kısa sürede sizinle iletişime geçilecektir. Online ödeme bu aşamada yoktur.</p>
+        }
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+            <a class="btn btn-primary" href="/m/demo-kafe">Demo QR Menüyü Gör</a>
+            <a class="btn btn-outline-primary" href="/Account/Register">Ücretsiz Kayıt Ol</a>
+            <a class="btn btn-outline-secondary" href="/">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+</section>

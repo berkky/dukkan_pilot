@@ -17,6 +17,8 @@ Bu liste hukuki danışmanlık değildir. Canlı satış / canlı müşteri veri
 - [ ] Backup / Audit / Notification’da hassas veri minimizasyonu gözden geçirildi
 - [ ] Public Demo sayfasında panel şifresi yok
 - [ ] Cookie notice çalışıyor (zorunlu bilgilendirme; consent-management iddiası yok)
+- [ ] Public sales form (`/Sales/RequestDemo`, `/Sales/RequestPlan`) Privacy/KVKK checkbox + link kontrolü
+- [ ] SalesRequest data map gözden geçirildi (`SALES_REQUEST_DATA_MAP.md`)
 - [ ] Avukat / KVKK uzmanı onayı alındı (tarih/not)
 
 ## Repo dokümanları

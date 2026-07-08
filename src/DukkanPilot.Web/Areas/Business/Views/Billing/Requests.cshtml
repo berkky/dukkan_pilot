@@ -1,0 +1,57 @@
+@model BusinessSalesRequestListViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = "Satış Taleplerim";
+    ViewData["Subtitle"] = "Plan ve yükseltme talepleri";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Satış Taleplerim</h2>
+        <p class="text-muted mb-0">Plan yükseltme ve abonelik taleplerinizin durumu</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Billing'e Dön</a>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tarih</th>
+                        <th>Tip</th>
+                        <th>Plan</th>
+                        <th>Durum</th>
+                        <th>Öncelik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Henüz satış talebiniz yok.</td></tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.Id</td>
+                            <td class="small">@item.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                            <td class="small">@SalesRequestDisplayHelper.GetRequestTypeLabel(item.RequestType)</td>
+                            <td class="small">
+                                <div>@(item.CurrentPlanName ?? "-") → <strong>@(item.RequestedPlanName ?? "-")</strong></div>
+                            </td>
+                            <td><span class="badge @SalesRequestDisplayHelper.GetStatusBadgeClass(item.Status)">@SalesRequestDisplayHelper.GetStatusLabel(item.Status)</span></td>
+                            <td><span class="badge @SalesRequestDisplayHelper.GetPriorityBadgeClass(item.Priority)">@SalesRequestDisplayHelper.GetPriorityLabel(item.Priority)</span></td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

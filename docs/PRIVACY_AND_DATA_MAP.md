@@ -13,6 +13,7 @@ Taslak operasyon haritası. Hukuki sınıflandırma (sorumlu/işleyen) sözleşm
 | Campaigns | Business panel | Owner/Staff | İndirim motoru |
 | AuditLogs | DB + Admin/Business listeler | Yetkili roller | İzlenebilirlik |
 | Notifications | DB + paneller | Yetkili roller | Uyarılar |
+| SalesRequests | `/Sales/*`, Billing upgrade | SuperAdmin; Owner (kendi) | Demo/plan satış pipeline |
 | Backups (`.bak`) | `artifacts/db-backups` / sunucu | Ops ekibi | Felaket kurtarma |
 
 ## Tutma

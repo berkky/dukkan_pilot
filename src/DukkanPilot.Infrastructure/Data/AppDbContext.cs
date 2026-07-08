@@ -27,6 +27,7 @@ public class AppDbContext : DbContext
     public DbSet<QrCode> QrCodes => Set<QrCode>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<SalesRequest> SalesRequests => Set<SalesRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -50,6 +51,7 @@ public class AppDbContext : DbContext
         ConfigureQrCode(modelBuilder);
         ConfigureAuditLog(modelBuilder);
         ConfigureNotification(modelBuilder);
+        ConfigureSalesRequest(modelBuilder);
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)
@@ -376,6 +378,39 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.Type);
             entity.HasIndex(e => e.Severity);
             entity.HasIndex(e => new { e.EntityName, e.EntityId });
+        });
+    }
+
+    private static void ConfigureSalesRequest(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SalesRequest>(entity =>
+        {
+            entity.ToTable("SalesRequests");
+
+            entity.Property(e => e.Source).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.RequestType).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.Priority).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.ContactName).HasMaxLength(120);
+            entity.Property(e => e.BusinessName).HasMaxLength(200);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(40);
+            entity.Property(e => e.RequestedPlanName).HasMaxLength(100);
+            entity.Property(e => e.CurrentPlanName).HasMaxLength(100);
+            entity.Property(e => e.Message).HasMaxLength(2000);
+            entity.Property(e => e.AdminNotes).HasMaxLength(2000);
+            entity.Property(e => e.ClosedReason).HasMaxLength(500);
+            entity.Property(e => e.IpAddress).HasMaxLength(64);
+            entity.Property(e => e.UserAgent).HasMaxLength(400);
+            entity.Property(e => e.MetadataJson).HasMaxLength(4000);
+
+            entity.HasIndex(e => new { e.Status, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.Email, e.CreatedAtUtc });
+            entity.HasIndex(e => e.Source);
+            entity.HasIndex(e => e.RequestType);
+            entity.HasIndex(e => e.RequestedPlanId);
+            entity.HasIndex(e => e.Priority);
         });
     }
 }

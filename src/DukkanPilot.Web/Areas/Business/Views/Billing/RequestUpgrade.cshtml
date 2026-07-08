@@ -38,8 +38,16 @@
         </dl>
 
         <div class="alert alert-info small">
-            Bu işlem planınızı otomatik değiştirmez. Talep onaylandığında hazır metin oluşturulur; admin panelinden manuel plan güncellemesi yapılmalıdır.
+            Bu işlem planınızı otomatik değiştirmez. Talep kaydedilir; ekip manuel olarak plan güncellemesi yapar.
         </div>
+
+        <p class="small text-muted mb-3">
+            Talebinizi göndererek
+            <a href="/Privacy" target="_blank" rel="noopener">Gizlilik Politikası</a>,
+            <a href="/Kvkk" target="_blank" rel="noopener">KVKK Aydınlatma</a> ve
+            <a href="/Terms" target="_blank" rel="noopener">Kullanım Şartları</a>
+            metinlerini okuduğunuzu kabul etmiş sayılırsınız.
+        </p>
 
         <form asp-action="RequestUpgrade" asp-route-planId="@Model.RequestedPlanId" method="post">
             <input type="hidden" asp-for="BusinessId" />

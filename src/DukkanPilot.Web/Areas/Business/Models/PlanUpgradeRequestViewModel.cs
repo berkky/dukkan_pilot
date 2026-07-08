@@ -21,4 +21,6 @@ public class PlanUpgradeRequestViewModel
     public DateTime RequestedAtUtc { get; set; }
 
     public string RequestMessage { get; set; } = string.Empty;
+
+    public int? SalesRequestId { get; set; }
 }

@@ -1,0 +1,130 @@
+@model AdminSalesRequestDetailViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = $"Satış Talebi #{Model.Id}";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Satış Talebi #@Model.Id</h2>
+        <p class="text-muted mb-0">
+            <span class="badge @SalesRequestDisplayHelper.GetStatusBadgeClass(Model.Status)">@SalesRequestDisplayHelper.GetStatusLabel(Model.Status)</span>
+            <span class="badge @SalesRequestDisplayHelper.GetPriorityBadgeClass(Model.Priority) ms-1">@SalesRequestDisplayHelper.GetPriorityLabel(Model.Priority)</span>
+        </p>
+    </div>
+    <a href="/Admin/SalesRequests" class="btn btn-outline-secondary btn-sm">Listeye Dön</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="panel-card mb-4">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Talep Bilgileri</h3></div>
+            <div class="panel-card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Oluşturulma</dt>
+                    <dd class="col-sm-8">@Model.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</dd>
+
+                    <dt class="col-sm-4">Kaynak</dt>
+                    <dd class="col-sm-8">@SalesRequestDisplayHelper.GetSourceLabel(Model.Source)</dd>
+
+                    <dt class="col-sm-4">Talep tipi</dt>
+                    <dd class="col-sm-8">@SalesRequestDisplayHelper.GetRequestTypeLabel(Model.RequestType)</dd>
+
+                    <dt class="col-sm-4">İşletme</dt>
+                    <dd class="col-sm-8">
+                        @(Model.BusinessName ?? "-")
+                        @if (Model.BusinessId.HasValue)
+                        {
+                            <a class="ms-1 small" href="/Admin/Businesses/Details/@Model.BusinessId">#@Model.BusinessId</a>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">İletişim</dt>
+                    <dd class="col-sm-8">
+                        <div>@(Model.ContactName ?? "-")</div>
+                        <div class="small text-muted">@(Model.Email ?? "-") · @(Model.Phone ?? "-")</div>
+                    </dd>
+
+                    <dt class="col-sm-4">Mevcut plan</dt>
+                    <dd class="col-sm-8">@(Model.CurrentPlanName ?? "-")</dd>
+
+                    <dt class="col-sm-4">İstenen plan</dt>
+                    <dd class="col-sm-8 fw-semibold">@(Model.RequestedPlanName ?? "-")</dd>
+
+                    <dt class="col-sm-4">Mesaj</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Message) ? "-" : Model.Message)</dd>
+
+                    <dt class="col-sm-4">Son iletişim</dt>
+                    <dd class="col-sm-8">@(Model.LastContactedAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture) ?? "-")</dd>
+
+                    <dt class="col-sm-4">Kapanış</dt>
+                    <dd class="col-sm-8">
+                        @(Model.ClosedAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture) ?? "-")
+                        @if (!string.IsNullOrWhiteSpace(Model.ClosedReason))
+                        {
+                            <div class="small text-muted">@Model.ClosedReason</div>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Onaylar</dt>
+                    <dd class="col-sm-8 small">
+                        Privacy: @(Model.PrivacyNoticeAcknowledged ? "Evet" : "Hayır") ·
+                        KVKK: @(Model.KvkkNoticeAcknowledged ? "Evet" : "Hayır")
+                    </dd>
+
+                    <dt class="col-sm-4">IP / UA</dt>
+                    <dd class="col-sm-8 small text-muted text-break">
+                        @(Model.IpAddress ?? "-")
+                        <div>@(Model.UserAgent ?? "-")</div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Durum Güncelle</h3></div>
+            <div class="panel-card-body">
+                <form method="post" action="/Admin/SalesRequests/UpdateStatus/@Model.Id">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Update.Status">Durum</label>
+                        <select asp-for="Update.Status" name="Status" class="form-select">
+                            @foreach (var s in SalesRequestDisplayHelper.AllowedStatuses)
+                            {
+                                if (Model.Update.Status == s) { <option value="@s" selected>@SalesRequestDisplayHelper.GetStatusLabel(s)</option> }
+                                else { <option value="@s">@SalesRequestDisplayHelper.GetStatusLabel(s)</option> }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Update.Priority">Öncelik</label>
+                        <select asp-for="Update.Priority" name="Priority" class="form-select">
+                            @foreach (var p in SalesRequestDisplayHelper.AllowedPriorities)
+                            {
+                                if (Model.Update.Priority == p) { <option value="@p" selected>@SalesRequestDisplayHelper.GetPriorityLabel(p)</option> }
+                                else { <option value="@p">@SalesRequestDisplayHelper.GetPriorityLabel(p)</option> }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Update.AdminNotes">Admin notu</label>
+                        <textarea asp-for="Update.AdminNotes" name="AdminNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Update.ClosedReason">Kapanış nedeni</label>
+                        <input asp-for="Update.ClosedReason" name="ClosedReason" class="form-control" />
+                        <div class="form-text">Won / Lost / Cancelled için önerilir.</div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="MarkContactedNow" value="true" id="markContacted" />
+                        <label class="form-check-label" for="markContacted">Şimdi iletişime geçildi işaretle</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

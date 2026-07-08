@@ -18,20 +18,25 @@
     </div>
     <div class="panel-card-body">
         <div class="alert alert-success small">
-            Plan yükseltme talebi oluşturuldu. Aşağıdaki metni kopyalayıp yöneticiye iletebilirsiniz.
+            Plan yükseltme talebiniz kaydedildi.
+            @if (Model.SalesRequestId.HasValue)
+            {
+                <span>Talep no: <strong>#@Model.SalesRequestId</strong>.</span>
+            }
+            Durumu <a asp-action="Requests">Satış Taleplerim</a> ekranından izleyebilirsiniz.
         </div>
 
-        <label for="requestMessage" class="form-label">Hazır talep metni</label>
+        <label for="requestMessage" class="form-label">Talep özeti</label>
         <textarea id="requestMessage" class="form-control font-monospace" rows="10" readonly>@Model.RequestMessage</textarea>
 
         <div class="d-flex flex-wrap gap-2 mt-3">
             <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyRequestMessage()">Metni Kopyala</button>
-            <a asp-action="Index" class="btn btn-primary btn-sm">Billing'e Dön</a>
+            <a asp-action="Requests" class="btn btn-primary btn-sm">Satış Taleplerim</a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Billing'e Dön</a>
         </div>
 
         <p class="text-muted small mt-3 mb-0">
-            Bu aşamada talep veritabanına kaydedilmez; plan otomatik değişmez. Admin,
-            <code>/Admin/Businesses/Subscription/{businessId}</code> ekranından aboneliği manuel günceller.
+            Plan otomatik değişmez. Ekip talebinizi inceleyip aboneliği manuel günceller.
         </p>
     </div>
 </div>

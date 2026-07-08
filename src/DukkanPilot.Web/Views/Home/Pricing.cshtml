@@ -62,7 +62,11 @@
                         </ul>
                         <div class="d-grid gap-2">
                             <a href="@cta.PrimaryUrl" class="btn btn-primary">@(cta.IsAuthenticated ? cta.PrimaryText : "Bu planla başla")</a>
-                            <a href="/Demo" class="btn btn-outline-secondary btn-sm">Demo talep et / Gör</a>
+                            @if (plan.PlanId.HasValue)
+                            {
+                                <a href="/Sales/RequestPlan?planId=@plan.PlanId" class="btn btn-outline-primary btn-sm">Bu plan için talep oluştur</a>
+                            }
+                            <a href="/Sales/RequestDemo" class="btn btn-outline-secondary btn-sm">Demo talep et</a>
                         </div>
                         <p class="small text-muted mt-2 mb-0">Ödeme entegrasyonu yok; plan yükseltme talebi panelden iletilebilir.</p>
                     </div>

@@ -1,0 +1,180 @@
+@model AdminSalesRequestListViewModel
+@using System.Globalization
+@using DukkanPilot.Web.Helpers
+@{
+    ViewData["Title"] = "Satış Talepleri";
+    var culture = CultureInfo.GetCultureInfo("tr-TR");
+    var sources = new[] { "PublicPricing", "PublicDemo", "PublicContact", "BusinessBilling", "AdminCreated" };
+    var requestTypes = new[] { "DemoRequest", "PlanRequest", "UpgradeRequest", "ContactRequest", "TrialRequest" };
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Satış Talepleri</h2>
+        <p class="text-muted mb-0">Demo, plan ve yükseltme taleplerini buradan yönetin.</p>
+    </div>
+    <a href="/Admin/SalesCenter" class="btn btn-outline-secondary btn-sm">Satış Merkezi</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl">
+        <a href="/Admin/SalesRequests?status=New" class="text-decoration-none">
+            <div class="stat-card h-100">
+                <div class="stat-label">Yeni</div>
+                <div class="stat-value text-primary">@Model.Summary.NewCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <a href="/Admin/SalesRequests?status=Contacted" class="text-decoration-none">
+            <div class="stat-card h-100">
+                <div class="stat-label">İletişime geçildi</div>
+                <div class="stat-value">@Model.Summary.ContactedCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <a href="/Admin/SalesRequests?status=Qualified" class="text-decoration-none">
+            <div class="stat-card h-100">
+                <div class="stat-label">Nitelikli</div>
+                <div class="stat-value text-success">@Model.Summary.QualifiedCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100">
+            <div class="stat-label">Açık</div>
+            <div class="stat-value">@Model.Summary.OpenCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100">
+            <div class="stat-label">Son 7 gün</div>
+            <div class="stat-value">@Model.Summary.Last7DaysCount</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100 py-3">
+            <div class="stat-label small">Kazanıldı / Kaybedildi</div>
+            <div class="stat-value fs-5">@Model.Summary.WonCount / @Model.Summary.LostCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small">Durum</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var s in SalesRequestDisplayHelper.AllowedStatuses)
+                    {
+                        if (Model.Status == s) { <option value="@s" selected>@SalesRequestDisplayHelper.GetStatusLabel(s)</option> }
+                        else { <option value="@s">@SalesRequestDisplayHelper.GetStatusLabel(s)</option> }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Talep tipi</label>
+                <select name="requestType" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var t in requestTypes)
+                    {
+                        if (Model.RequestType == t) { <option value="@t" selected>@SalesRequestDisplayHelper.GetRequestTypeLabel(t)</option> }
+                        else { <option value="@t">@SalesRequestDisplayHelper.GetRequestTypeLabel(t)</option> }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Kaynak</label>
+                <select name="source" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var src in sources)
+                    {
+                        if (Model.Source == src) { <option value="@src" selected>@SalesRequestDisplayHelper.GetSourceLabel(src)</option> }
+                        else { <option value="@src">@SalesRequestDisplayHelper.GetSourceLabel(src)</option> }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Öncelik</label>
+                <select name="priority" class="form-select form-select-sm">
+                    <option value="">Tümü</option>
+                    @foreach (var p in SalesRequestDisplayHelper.AllowedPriorities)
+                    {
+                        if (Model.Priority == p) { <option value="@p" selected>@SalesRequestDisplayHelper.GetPriorityLabel(p)</option> }
+                        else { <option value="@p">@SalesRequestDisplayHelper.GetPriorityLabel(p)</option> }
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">Plan Id</label>
+                <input type="number" name="planId" value="@Model.PlanId" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Ara</label>
+                <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm" placeholder="Ad, e-posta..." />
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Filtrele</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-header d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0">Talepler</h3>
+        <span class="text-muted small">@Model.Items.Count kayıt</span>
+    </div>
+    <div class="panel-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tarih</th>
+                        <th>Kaynak / Tip</th>
+                        <th>İletişim</th>
+                        <th>Plan</th>
+                        <th>Durum</th>
+                        <th>Öncelik</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">Kayıt bulunamadı.</td></tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.Id</td>
+                            <td class="small">@item.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>
+                            <td>
+                                <div class="small">@SalesRequestDisplayHelper.GetSourceLabel(item.Source)</div>
+                                <div class="text-muted small">@SalesRequestDisplayHelper.GetRequestTypeLabel(item.RequestType)</div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold small">@(item.BusinessName ?? "-")</div>
+                                <div class="small">@(item.ContactName ?? "-")</div>
+                                <div class="text-muted small">@(item.Email ?? "-")</div>
+                            </td>
+                            <td class="small">@(item.RequestedPlanName ?? "-")</td>
+                            <td><span class="badge @SalesRequestDisplayHelper.GetStatusBadgeClass(item.Status)">@SalesRequestDisplayHelper.GetStatusLabel(item.Status)</span></td>
+                            <td><span class="badge @SalesRequestDisplayHelper.GetPriorityBadgeClass(item.Priority)">@SalesRequestDisplayHelper.GetPriorityLabel(item.Priority)</span></td>
+                            <td class="text-end">
+                                <a href="/Admin/SalesRequests/Details/@item.Id" class="btn btn-sm btn-outline-secondary">Detay</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 30A aşaması (Legal / KVKK / Privacy / Trust Center) tamamlandı.
+> Son güncelleme: 30B aşaması (Abonelik Satış Talep Akışı / Lead-to-Subscription Pipeline) tamamlandı.
 
 ---
 
@@ -583,6 +583,16 @@ DukkanPilot.sln
 - Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet yok; Program.cs dokunulmadı
 - Public/Business/Admin/Account/Audit/Notification/Demo/Deployment/Operations akışları bozulmadı
 
+### 30B aşaması — Abonelik Satış Talep Akışı / Lead-to-Subscription Pipeline
+- **Entity/Migration:** `SalesRequest` + `AddSalesRequests` (`20260708180000`) — yalnızca `SalesRequests` tablosu
+- **Service:** `ISalesRequestService` / `SalesRequestService` — public/business create, status update, duplicate azaltma, fail-safe notification/audit
+- **Public:** `/Sales/RequestDemo`, `/Sales/RequestPlan`, `/Sales/ThankYou`; Privacy/KVKK checkbox; Pricing/Demo/Index/Trust CTA
+- **Business:** Billing RequestUpgrade → SalesRequest; `/Business/Billing/Requests` Owner-only
+- **Admin:** `/Admin/SalesRequests` list/detail/status; sidebar + Dashboard KPI + SalesCenter link
+- **Docs:** `SALES_PIPELINE_RUNBOOK.md`, `SALES_REQUEST_DATA_MAP.md`
+- Identity/SignalR/ödeme/NuGet yok; mevcut Business/Order/Campaign entity’leri değişmedi
+- Public/Business/Admin/Account/Audit/Notification/Demo/Legal/Operations akışları bozulmadı
+
 ---
 
 ## 6. Veritabanı
@@ -591,7 +601,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`) |
 
 ### Seed verisi
 
@@ -651,6 +661,8 @@ Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 29B tamamlandı — DB backup/verify/restore-test scripts; idempotent migration SQL; Admin Operations Center; backup/migration/incident/ops security/first-release docs.
 
 30A tamamlandı — Legal/Trust pages; cookie notice; footer/account/business/admin legal polish; legal docs; sitemap.
+
+30B tamamlandı — SalesRequest entity/migration; public demo/plan forms; Business Billing pipeline; Admin SalesRequests; notifications/audit; sales pipeline docs.
 
 ---
 

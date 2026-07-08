@@ -105,12 +105,16 @@ Test-Url "/Kvkk" @(200) "Legal"
 Test-Url "/Cookies" @(200) "Legal"
 Test-Url "/DataProcessing" @(200) "Legal"
 Test-Url "/Trust" @(200) "Trust Center"
+Test-Url "/Sales/RequestDemo" @(200) "Sales form"
+Test-Url "/Sales/RequestPlan" @(200) "Sales form"
 
 Test-Url "/Business/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "/Admin/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "/Business/DemoCenter" @(302, 301) "Auth redirect"
 Test-Url "/Admin/SalesCenter" @(302, 301) "Auth redirect"
 Test-Url "/Admin/Operations" @(302, 301) "Auth redirect"
+Test-Url "/Business/Billing/Requests" @(302, 301) "Auth redirect"
+Test-Url "/Admin/SalesRequests" @(302, 301) "Auth redirect"
 
 $results | Format-Table -AutoSize Path, Status, Expected, Result, Note
 

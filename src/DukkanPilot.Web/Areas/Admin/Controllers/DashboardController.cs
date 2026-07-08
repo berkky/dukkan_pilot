@@ -16,11 +16,16 @@ public class DashboardController : AdminBaseController
 {
     private readonly AppDbContext _context;
     private readonly INotificationService _notifications;
+    private readonly ISalesRequestService _salesRequests;
 
-    public DashboardController(AppDbContext context, INotificationService notifications)
+    public DashboardController(
+        AppDbContext context,
+        INotificationService notifications,
+        ISalesRequestService salesRequests)
     {
         _context = context;
         _notifications = notifications;
+        _salesRequests = salesRequests;
     }
 
     [HttpGet("")]
@@ -144,6 +149,10 @@ public class DashboardController : AdminBaseController
                 .ToList(),
             CriticalNotifications = await BuildCriticalNotificationsAsync()
         };
+
+        var salesSummary = await _salesRequests.GetAdminSummaryAsync();
+        model.NewSalesRequestCount = salesSummary.NewCount;
+        model.OpenSalesRequestCount = salesSummary.OpenCount;
 
         return View(model);
     }

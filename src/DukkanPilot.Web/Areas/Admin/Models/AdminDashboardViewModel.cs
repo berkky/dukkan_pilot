@@ -17,6 +17,10 @@ public class AdminDashboardViewModel
     public List<AdminBusinessActivityViewModel> RecentBusinesses { get; set; } = [];
 
     public List<NotificationRowViewModel> CriticalNotifications { get; set; } = [];
+
+    public int NewSalesRequestCount { get; set; }
+
+    public int OpenSalesRequestCount { get; set; }
 }
 
 public class AdminPlatformKpiViewModel

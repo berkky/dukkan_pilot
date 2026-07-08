@@ -26,6 +26,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 - Starter: tek şube günlük operasyon
 - Pro: yüksek ürün/kampanya kullanımı  
 Plan yükseltme talebi paneldendir; ödeme gateway yok.
+Satış akışı: **Talep oluştur → Admin SalesRequests takip → manuel abonelik güncellemesi** (`docs/SALES_PIPELINE_RUNBOOK.md`).
 
 ## Demo cümleleri
 - “Menüyü telefonla açın, sepete 100₺ koyun; indirim otomatik gelsin.”

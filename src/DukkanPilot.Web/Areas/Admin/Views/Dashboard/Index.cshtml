@@ -16,6 +16,25 @@
     <p class="text-muted mb-0">Platform genelindeki işletme, abonelik ve kullanım durumunu takip edin.</p>
 </div>
 
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-4">
+        <a href="/Admin/SalesRequests?status=New" class="text-decoration-none">
+            <div class="panel-card h-100 border-primary mb-0">
+                <div class="panel-card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small mb-1">Satış Talepleri</div>
+                            <div class="h4 mb-1 text-primary">@Model.NewSalesRequestCount yeni</div>
+                            <div class="small text-muted">@Model.OpenSalesRequestCount açık talep</div>
+                        </div>
+                        <span class="fs-4">📨</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
 @if (Model.CriticalNotifications.Count > 0)
 {
     <div class="panel-card mb-4 border-warning">
@@ -243,6 +262,7 @@
                 <a href="/Admin/Operations" class="btn btn-primary">Operasyon Merkezi</a>
                 <p class="small text-muted mb-0">Release, migration ve backup kontrolü için Operasyon Merkezi</p>
                 <a href="/Admin/SalesCenter" class="btn btn-outline-primary">Satış ve Demo Merkezi</a>
+                <a href="/Admin/SalesRequests" class="btn btn-outline-primary">Satış Talepleri</a>
                 <a href="/Admin/Businesses" class="btn btn-outline-primary">İşletmeler</a>
                 <a href="/Admin/Notifications" class="btn btn-outline-warning">Bildirimler</a>
                 <a href="/Admin/AuditLogs" class="btn btn-outline-dark">Aktivite Logları</a>

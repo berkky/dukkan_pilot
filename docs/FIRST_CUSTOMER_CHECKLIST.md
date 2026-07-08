@@ -15,6 +15,8 @@
 - [ ] Go-Live skoru kontrol (`/Business/GoLive`)
 - [ ] Personel ekle (Owner)
 - [ ] Demo Merkezi checklist yeşil (`/Business/DemoCenter`)
+- [ ] Plan/talep ihtiyacı varsa `/Business/Billing` veya public `/Sales/RequestPlan`
+- [ ] Admin satış taleplerini `/Admin/SalesRequests` ile takip
 
 ## Müşteriye eğitim (30 dk)
 1. Public menü + sepet

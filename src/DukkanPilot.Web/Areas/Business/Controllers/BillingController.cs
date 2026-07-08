@@ -16,21 +16,18 @@ public class BillingController : BusinessBaseController
     private readonly AppDbContext _context;
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
-    private readonly IAuditLogService _auditLog;
-    private readonly INotificationService _notifications;
+    private readonly ISalesRequestService _salesRequests;
 
     public BillingController(
         AppDbContext context,
         BusinessSubscriptionStatusHelper subscriptionStatusHelper,
         BusinessPlanLimitHelper planLimitHelper,
-        IAuditLogService auditLog,
-        INotificationService notifications)
+        ISalesRequestService salesRequests)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
         _planLimitHelper = planLimitHelper;
-        _auditLog = auditLog;
-        _notifications = notifications;
+        _salesRequests = salesRequests;
     }
 
     [HttpGet("")]
@@ -61,6 +58,39 @@ public class BillingController : BusinessBaseController
             AvailablePlans = activePlans
                 .Select(p => _planLimitHelper.MapToAvailablePlan(p, currentPlanId))
                 .ToList()
+        };
+
+        return View(model);
+    }
+
+    [HttpGet("Requests")]
+    [Authorize(Roles = nameof(UserRole.BusinessOwner))]
+    public async Task<IActionResult> Requests(CancellationToken cancellationToken)
+    {
+        ViewData["ActiveMenu"] = "billing-requests";
+
+        var forbidResult = GetCurrentBusinessIdOrForbid(out var businessId);
+        if (forbidResult is not null)
+        {
+            return forbidResult;
+        }
+
+        var items = await _salesRequests.GetBusinessRequestsAsync(businessId, cancellationToken);
+        var model = new BusinessSalesRequestListViewModel
+        {
+            Items = items.Select(r => new BusinessSalesRequestRowViewModel
+            {
+                Id = r.Id,
+                CreatedAtUtc = r.CreatedAtUtc,
+                RequestType = r.RequestType,
+                Status = r.Status,
+                Priority = r.Priority,
+                CurrentPlanName = r.CurrentPlanName,
+                RequestedPlanName = r.RequestedPlanName,
+                Message = r.Message,
+                UpdatedAtUtc = r.UpdatedAtUtc,
+                ClosedAtUtc = r.ClosedAtUtc
+            }).ToList()
         };
 
         return View(model);
@@ -97,7 +127,7 @@ public class BillingController : BusinessBaseController
     [HttpPost("RequestUpgrade/{planId:int}")]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = nameof(UserRole.BusinessOwner))]
-    public async Task<IActionResult> RequestUpgrade(int planId, PlanUpgradeRequestViewModel model)
+    public async Task<IActionResult> RequestUpgrade(int planId, PlanUpgradeRequestViewModel model, CancellationToken cancellationToken)
     {
         ViewData["ActiveMenu"] = "billing";
 
@@ -125,40 +155,28 @@ public class BillingController : BusinessBaseController
             return RedirectToAction(nameof(Index));
         }
 
-        builtModel.RequestMessage = BuildRequestMessage(builtModel);
+        var result = await _salesRequests.CreateBusinessPlanRequestAsync(new BusinessSalesRequestCreateInput
+        {
+            BusinessId = businessId,
+            BusinessName = builtModel.BusinessName,
+            ContactName = CurrentUserEmail ?? builtModel.BusinessName,
+            Email = builtModel.OwnerEmail,
+            CurrentPlanId = currentPlanId,
+            CurrentPlanName = builtModel.CurrentPlanName,
+            RequestedPlanId = builtModel.RequestedPlanId,
+            RequestedPlanName = builtModel.RequestedPlanName,
+            Message = builtModel.RequestMessage
+        }, cancellationToken);
+
+        if (result.WasDuplicate)
+        {
+            TempData["Error"] = "Bu plan için açık talebiniz var";
+            return RedirectToAction(nameof(Requests));
+        }
+
+        builtModel.RequestMessage = BuildRequestMessage(builtModel, result.Request.Id);
         TempData["UpgradeRequestMessage"] = builtModel.RequestMessage;
-
-        await _auditLog.LogBusinessAsync(
-            businessId,
-            "Subscription.UpgradeRequested",
-            "BusinessSubscription",
-            planId,
-            $"Plan yükseltme talebi oluşturuldu: {builtModel.CurrentPlanName} → {builtModel.RequestedPlanName}",
-            new { requestedPlanId = planId, requestedPlanName = builtModel.RequestedPlanName });
-
-        await _notifications.CreateBusinessAsync(
-            businessId,
-            "SubscriptionUpgradeRequested",
-            "Plan yükseltme talebi oluşturuldu",
-            $"{builtModel.CurrentPlanName} → {builtModel.RequestedPlanName} yükseltme talebi hazırlandı.",
-            "/Business/Billing",
-            "Info",
-            "BusinessSubscription",
-            planId,
-            new { requestedPlanId = planId, requestedPlanName = builtModel.RequestedPlanName },
-            allowDuplicate: true);
-
-        await _notifications.CreateAdminAsync(
-            "SubscriptionUpgradeRequested",
-            "Plan yükseltme talebi",
-            $"İşletme #{businessId} plan yükseltme talebi oluşturdu: {builtModel.CurrentPlanName} → {builtModel.RequestedPlanName}",
-            $"/Admin/Businesses/Details/{businessId}",
-            "Info",
-            "Business",
-            businessId,
-            new { requestedPlanId = planId },
-            businessId: businessId,
-            allowDuplicate: true);
+        TempData["SalesRequestId"] = result.Request.Id.ToString();
 
         return RedirectToAction(nameof(RequestUpgradeConfirmation));
     }
@@ -175,9 +193,14 @@ public class BillingController : BusinessBaseController
             return RedirectToAction(nameof(Index));
         }
 
+        int? salesRequestId = int.TryParse(TempData["SalesRequestId"]?.ToString(), out var parsedId)
+            ? parsedId
+            : null;
+
         return View(new PlanUpgradeRequestViewModel
         {
-            RequestMessage = message
+            RequestMessage = message,
+            SalesRequestId = salesRequestId
         });
     }
 
@@ -239,19 +262,20 @@ public class BillingController : BusinessBaseController
             .FirstOrDefaultAsync();
     }
 
-    private static string BuildRequestMessage(PlanUpgradeRequestViewModel model)
+    private static string BuildRequestMessage(PlanUpgradeRequestViewModel model, int salesRequestId)
     {
         var culture = CultureInfo.GetCultureInfo("tr-TR");
         var requestedAtLocal = model.RequestedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture);
 
         return $"""
             Plan yükseltme talebi:
+            Talep No: #{salesRequestId}
             İşletme: {model.BusinessName} ({model.BusinessSlug})
             Owner: {model.OwnerEmail}
             Mevcut Plan: {model.CurrentPlanName}
             İstenen Plan: {model.RequestedPlanName} ({model.RequestedPlanPrice:N2} ₺)
             Talep Tarihi: {requestedAtLocal}
-            Not: Admin panelinden /Admin/Businesses/Subscription/{model.BusinessId} ekranı üzerinden manuel güncelleme yapılmalıdır.
+            Not: Admin panelinden /Admin/SalesRequests/Details/{salesRequestId} veya /Admin/Businesses/Subscription/{model.BusinessId} üzerinden takip/güncelleme yapılır.
             """;
     }
 }

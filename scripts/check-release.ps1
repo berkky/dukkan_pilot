@@ -71,6 +71,8 @@ $required = @(
     "docs\PRIVACY_AND_DATA_MAP.md",
     "docs\COOKIE_AND_TRACKING_NOTES.md",
     "docs\TERMS_TEMPLATE_NOTES.md",
+    "docs\SALES_PIPELINE_RUNBOOK.md",
+    "docs\SALES_REQUEST_DATA_MAP.md",
     "scripts\publish-release.ps1",
     "scripts\run-smoke-tests.ps1",
     "scripts\db-backup.ps1",
@@ -82,7 +84,11 @@ $required = @(
     "src\DukkanPilot.Web\Views\Legal\Privacy.cshtml",
     "src\DukkanPilot.Web\Views\Legal\Trust.cshtml",
     "src\DukkanPilot.Web\Views\Shared\_CookieNotice.cshtml",
-    "src\DukkanPilot.Web\wwwroot\js\cookie-notice.js"
+    "src\DukkanPilot.Web\wwwroot\js\cookie-notice.js",
+    "src\DukkanPilot.Core\Entities\SalesRequest.cs",
+    "src\DukkanPilot.Web\Controllers\SalesRequestController.cs",
+    "src\DukkanPilot.Web\Services\SalesRequestService.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Controllers\SalesRequestsController.cs"
 )
 
 foreach ($rel in $required) {

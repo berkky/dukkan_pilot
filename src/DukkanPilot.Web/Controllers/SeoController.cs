@@ -39,6 +39,8 @@ public class SeoController : Controller
             ("/Features", "0.8", "weekly"),
             ("/Pricing", "0.8", "weekly"),
             ("/Demo", "0.7", "weekly"),
+            ("/Sales/RequestDemo", "0.6", "weekly"),
+            ("/Sales/RequestPlan", "0.6", "weekly"),
             ("/Trust", "0.7", "monthly"),
             ("/Privacy", "0.5", "monthly"),
             ("/Terms", "0.5", "monthly"),

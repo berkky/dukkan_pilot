@@ -1,0 +1,92 @@
+@model DukkanPilot.Web.Models.Sales.PublicSalesRequestFormViewModel
+@{
+    Layout = "_LandingLayout";
+    var isPlan = Model.FormMode == "Plan";
+    ViewData["Title"] = isPlan ? "Plan Talebi" : "Demo Talebi";
+}
+
+<section class="py-5">
+    <div class="container" style="max-width: 720px;">
+        <nav class="small mb-3"><a href="/">Ana Sayfa</a> · <a href="/Pricing">Fiyatlar</a> · Talep</nav>
+        <h1 class="h2 mb-2">@(isPlan ? "Plan talebi oluştur" : "Demo görüşmesi talep et")</h1>
+        <p class="text-muted mb-4">
+            Talebinizi yanıtlamak için paylaştığınız iletişim bilgileri kullanılacaktır.
+            Online ödeme bu aşamada yoktur; ekibimiz manuel olarak dönüş yapar.
+        </p>
+
+        @if (isPlan && !string.IsNullOrWhiteSpace(Model.RequestedPlanName))
+        {
+            <div class="alert alert-light border mb-4">
+                <strong>Seçilen plan:</strong> @Model.RequestedPlanName
+                @if (Model.RequestedPlanPrice is decimal price)
+                {
+                    <span class="text-muted">· @price.ToString("N2") ₺ / dönem</span>
+                }
+            </div>
+        }
+
+        <form method="post" class="card border-0 shadow-sm">
+            @Html.AntiForgeryToken()
+            <div class="card-body p-4">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                <input type="hidden" asp-for="FormMode" />
+                <input type="hidden" asp-for="RequestedPlanId" />
+                <input type="hidden" asp-for="RequestedPlanName" />
+                <input type="hidden" asp-for="RequestedPlanPrice" />
+
+                <div class="mb-3">
+                    <label asp-for="ContactName" class="form-label"></label>
+                    <input asp-for="ContactName" class="form-control" />
+                    <span asp-validation-for="ContactName" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="BusinessName" class="form-label"></label>
+                    <input asp-for="BusinessName" class="form-control" />
+                    <span asp-validation-for="BusinessName" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" type="email" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Message" class="form-label"></label>
+                    <textarea asp-for="Message" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Message" class="text-danger small"></span>
+                </div>
+
+                <div class="form-check mb-2">
+                    <input asp-for="PrivacyNoticeAcknowledged" class="form-check-input" />
+                    <label asp-for="PrivacyNoticeAcknowledged" class="form-check-label small">
+                        <a href="/Privacy" target="_blank" rel="noopener">Gizlilik Politikası</a> bağlantısını inceledim.
+                    </label>
+                    <div><span asp-validation-for="PrivacyNoticeAcknowledged" class="text-danger small"></span></div>
+                </div>
+                <div class="form-check mb-3">
+                    <input asp-for="KvkkNoticeAcknowledged" class="form-check-input" />
+                    <label asp-for="KvkkNoticeAcknowledged" class="form-check-label small">
+                        <a href="/Kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a> bağlantısını inceledim.
+                    </label>
+                    <div><span asp-validation-for="KvkkNoticeAcknowledged" class="text-danger small"></span></div>
+                </div>
+
+                <p class="small text-muted mb-3">
+                    Ayrıca <a href="/Terms" target="_blank" rel="noopener">Kullanım Şartları</a> ve
+                    <a href="/Trust" target="_blank" rel="noopener">Güven Merkezi</a> sayfalarını inceleyebilirsiniz.
+                    Bu form açık rıza yönetim paneli değildir.
+                </p>
+
+                <button type="submit" class="btn btn-primary w-100">Talebi Gönder</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
