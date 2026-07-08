@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: **35A — Support / Ticket / Feedback Center** tamamlandı.
+> Son güncelleme: **35B — Performance / Reliability Hardening** tamamlandı.
 
 ---
 
@@ -39,7 +39,7 @@ DukkanPilot.sln
 └── src/DukkanPilot.Infrastructure → AppDbContext, Migrations, Seed, Repositories*, Services*
 ```
 
-\* Repositories ve Services klasörleri hazır; henüz implementasyon yok.
+\* Repositories klasörü hazır; Services klasöründe seçili domain servisleri (`SupportTicketService`, `BillingOperationsService`, `SalesRequestService`, `AuditLogService`, `NotificationService`) ve çok sayıda read-only helper vardır. Genel mimari hâlâ MVC + doğrudan `AppDbContext` ağırlıklıdır; tam repository katmanı yoktur.
 
 ---
 
@@ -722,8 +722,8 @@ DukkanPilot.sln
 ## 7. Bilinçli olarak yapılmayanlar
 
 - ASP.NET Core Identity yok (cookie auth kullanılıyor)
-- Repository pattern implementasyonu yok
-- Service katmanı implementasyonu yok
+- Repository pattern implementasyonu yok (tam katman yok)
+- Service katmanı kısmi: kritik domain'ler için (`Support`, `Billing`, `Sales`, `Audit`, `Notification`); çoğu controller hâlâ doğrudan EF kullanır
 - AI (OpenAI) entegrasyonu yok
 - Ödeme entegrasyonu yok
 - WhatsApp Business API yok (sadece `wa.me` deep link)
@@ -740,7 +740,7 @@ DukkanPilot.sln
 - **Business panel** — BusinessOwner/Staff cookie auth; tenant `BusinessId` claim'inden okunur
 - **Personel yönetimi** — yalnızca BusinessOwner; Staff rolü erişemez
 - **Soft delete** — `IsActive = false`; pasif kayıtlar listede filtrelenmiyor
-- **Pagination yok** — tüm kayıtlar tek sayfada
+- **Pagination / liste limitleri** — Audit/Notification sayfalı; Orders/Customers/Admin Businesses ve mutfak kolonları varsayılan `Take` limitli; tam sayfalama UI yok
 - **File upload yok** — logo/görsel URL ile giriliyor
 - **Plan silme** — aktif abonelikte kullanılan plan için ilişki kontrolü yok
 - **Sipariş–müşteri eşleştirme** — WhatsApp siparişlerinde `CustomerId` null kalır; geçmiş telefon eşleşmesiyle gösterilir
@@ -750,9 +750,25 @@ DukkanPilot.sln
 
 ---
 
+### 35B — Performance / Reliability Hardening
+- Read-only sorgularda `AsNoTracking` yaygınlaştırıldı (onboarding helper, support/sales summary, vb.)
+- Admin Dashboard: platform KPI ve işletme sipariş istatistikleri DB-side aggregate; tüm `Orders` belleğe çekilmez
+- `SupportTicketService` / `SalesRequestService` özetleri `CountAsync` ile DB-side
+- Liste limitleri: Business Orders (100), Customers (100), Kitchen kolonları (50), Admin Businesses görünümü (100)
+- `DemoPackHelper` default pack listesi lazy cache
+- Script: `check-performance-smoke.ps1` — HTTP response time smoke (WARN/FAIL eşikleri)
+- `release-quality-gate.ps1` performance smoke adımı (`-SkipPerformanceSmoke`, `-PerformanceWarningMs`, `-PerformanceFailMs`)
+- Admin Operations: Performance & reliability checklist
+- Admin Quality: performance readiness kartları + QA maddeleri
+- Business GoLive: canlı öncesi hız kontrolü notu
+- Docs: `PERFORMANCE_HARDENING_GUIDE.md`, `RELIABILITY_RUNBOOK.md`, `PERFORMANCE_SMOKE_TESTS.md`
+- Migration yok; Entity/DbContext değişmedi; NuGet/cache/APM/Identity/SignalR yok
+
+---
+
 ## 9. Sıradaki aşama
 
-**Son tamamlanan checkpoint:** 35A — Support / Ticket / Feedback Center
+**Son tamamlanan checkpoint:** 35B — Performance / Reliability Hardening
 
 **Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36A+).
 

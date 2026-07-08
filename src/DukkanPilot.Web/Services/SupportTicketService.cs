@@ -566,22 +566,33 @@ public class SupportTicketService : ISupportTicketService
         int businessId,
         CancellationToken cancellationToken = default)
     {
-        var tickets = await _context.SupportTickets.AsNoTracking()
-            .Where(t => t.BusinessId == businessId)
-            .OrderByDescending(t => t.CreatedAtUtc)
-            .ToListAsync(cancellationToken);
-
-        var open = SupportTicketDisplayHelper.OpenStatuses;
-        var high = SupportTicketDisplayHelper.HighPriorityStatuses;
-        var closed = SupportTicketDisplayHelper.ClosedStatuses;
+        var ticketQuery = _context.SupportTickets.AsNoTracking()
+            .Where(t => t.BusinessId == businessId);
 
         return new BusinessSupportTicketSummary
         {
-            OpenCount = tickets.Count(t => open.Contains(t.Status)),
-            WaitingCustomerCount = tickets.Count(t => t.Status == "WaitingCustomer"),
-            ResolvedOrClosedCount = tickets.Count(t => closed.Contains(t.Status)),
-            UrgentOrHighCount = tickets.Count(t => open.Contains(t.Status) && high.Contains(t.Priority)),
-            LatestTicket = tickets.FirstOrDefault()
+            OpenCount = await ticketQuery.CountAsync(
+                t => t.Status == "New"
+                    || t.Status == "Open"
+                    || t.Status == "InProgress"
+                    || t.Status == "WaitingCustomer"
+                    || t.Status == "WaitingAdmin",
+                cancellationToken),
+            WaitingCustomerCount = await ticketQuery.CountAsync(t => t.Status == "WaitingCustomer", cancellationToken),
+            ResolvedOrClosedCount = await ticketQuery.CountAsync(
+                t => t.Status == "Resolved" || t.Status == "Closed" || t.Status == "Cancelled",
+                cancellationToken),
+            UrgentOrHighCount = await ticketQuery.CountAsync(
+                t => (t.Status == "New"
+                        || t.Status == "Open"
+                        || t.Status == "InProgress"
+                        || t.Status == "WaitingCustomer"
+                        || t.Status == "WaitingAdmin")
+                    && (t.Priority == "High" || t.Priority == "Urgent"),
+                cancellationToken),
+            LatestTicket = await ticketQuery
+                .OrderByDescending(t => t.CreatedAtUtc)
+                .FirstOrDefaultAsync(cancellationToken)
         };
     }
 
@@ -590,20 +601,28 @@ public class SupportTicketService : ISupportTicketService
     {
         var now = DateTime.UtcNow;
         var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-        var tickets = await _context.SupportTickets.AsNoTracking().ToListAsync(cancellationToken);
-        var open = SupportTicketDisplayHelper.OpenStatuses;
-        var high = SupportTicketDisplayHelper.HighPriorityStatuses;
+        var ticketQuery = _context.SupportTickets.AsNoTracking();
 
         return new AdminSupportTicketSummary
         {
-            NewCount = tickets.Count(t => t.Status == "New"),
-            OpenOrInProgressCount = tickets.Count(t => t.Status is "Open" or "InProgress"),
-            WaitingCustomerCount = tickets.Count(t => t.Status == "WaitingCustomer"),
-            WaitingAdminCount = tickets.Count(t => t.Status == "WaitingAdmin"),
-            UrgentOrHighCount = tickets.Count(t => open.Contains(t.Status) && high.Contains(t.Priority)),
-            ResolvedThisMonthCount = tickets.Count(t =>
-                (t.Status == "Resolved" || t.Status == "Closed")
-                && t.ClosedAtUtc >= monthStart)
+            NewCount = await ticketQuery.CountAsync(t => t.Status == "New", cancellationToken),
+            OpenOrInProgressCount = await ticketQuery.CountAsync(
+                t => t.Status == "Open" || t.Status == "InProgress",
+                cancellationToken),
+            WaitingCustomerCount = await ticketQuery.CountAsync(t => t.Status == "WaitingCustomer", cancellationToken),
+            WaitingAdminCount = await ticketQuery.CountAsync(t => t.Status == "WaitingAdmin", cancellationToken),
+            UrgentOrHighCount = await ticketQuery.CountAsync(
+                t => (t.Status == "New"
+                        || t.Status == "Open"
+                        || t.Status == "InProgress"
+                        || t.Status == "WaitingCustomer"
+                        || t.Status == "WaitingAdmin")
+                    && (t.Priority == "High" || t.Priority == "Urgent"),
+                cancellationToken),
+            ResolvedThisMonthCount = await ticketQuery.CountAsync(
+                t => (t.Status == "Resolved" || t.Status == "Closed")
+                    && t.ClosedAtUtc >= monthStart,
+                cancellationToken)
         };
     }
 

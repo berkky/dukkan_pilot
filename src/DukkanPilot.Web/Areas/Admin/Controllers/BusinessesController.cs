@@ -88,6 +88,7 @@ public class BusinessesController : AdminBaseController
         var filtered = FilterBusinesses(allBusinesses, search, statusFilter, subscriptionFilter, planFilter, now);
 
         var businesses = filtered
+            .Take(100)
             .Select(b =>
             {
                 var latest = AdminSaasQueryHelper.GetLatestSubscription(b.Subscriptions);

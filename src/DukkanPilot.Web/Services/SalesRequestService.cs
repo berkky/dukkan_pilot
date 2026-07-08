@@ -381,19 +381,22 @@ public class SalesRequestService : ISalesRequestService
     public async Task<AdminSalesRequestSummary> GetAdminSummaryAsync(CancellationToken cancellationToken = default)
     {
         var since = DateTime.UtcNow.AddDays(-7);
-        var rows = await _context.SalesRequests.AsNoTracking()
-            .Select(r => new { r.Status, r.CreatedAtUtc })
-            .ToListAsync(cancellationToken);
+        var baseQuery = _context.SalesRequests.AsNoTracking();
 
         return new AdminSalesRequestSummary
         {
-            NewCount = rows.Count(r => r.Status == "New"),
-            ContactedCount = rows.Count(r => r.Status == "Contacted"),
-            QualifiedCount = rows.Count(r => r.Status == "Qualified"),
-            WonCount = rows.Count(r => r.Status == "Won"),
-            LostCount = rows.Count(r => r.Status == "Lost"),
-            Last7DaysCount = rows.Count(r => r.CreatedAtUtc >= since),
-            OpenCount = rows.Count(r => SalesRequestDisplayHelper.OpenStatuses.Contains(r.Status))
+            NewCount = await baseQuery.CountAsync(r => r.Status == "New", cancellationToken),
+            ContactedCount = await baseQuery.CountAsync(r => r.Status == "Contacted", cancellationToken),
+            QualifiedCount = await baseQuery.CountAsync(r => r.Status == "Qualified", cancellationToken),
+            WonCount = await baseQuery.CountAsync(r => r.Status == "Won", cancellationToken),
+            LostCount = await baseQuery.CountAsync(r => r.Status == "Lost", cancellationToken),
+            Last7DaysCount = await baseQuery.CountAsync(r => r.CreatedAtUtc >= since, cancellationToken),
+            OpenCount = await baseQuery.CountAsync(
+                r => r.Status == "New"
+                    || r.Status == "Contacted"
+                    || r.Status == "Qualified"
+                    || r.Status == "WaitingCustomer",
+                cancellationToken)
         };
     }
 
@@ -402,6 +405,7 @@ public class SalesRequestService : ISalesRequestService
         return _context.SalesRequests.AsNoTracking()
             .Where(r => r.BusinessId == businessId)
             .OrderByDescending(r => r.CreatedAtUtc)
+            .Take(100)
             .ToListAsync(cancellationToken);
     }
 

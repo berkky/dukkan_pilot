@@ -374,6 +374,7 @@ public class CustomersController : BusinessBaseController
         var filteredList = filtered
             .OrderByDescending(s => s.LastOrderDate)
             .ThenByDescending(s => s.CreatedAt)
+            .Take(100)
             .Select(MapToRow)
             .ToList();
 

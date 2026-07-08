@@ -59,8 +59,8 @@ public class DashboardController : AdminBaseController
                 .ThenInclude(s => s.SubscriptionPlan)
             .ToListAsync();
 
-        var orders = await _context.Orders.AsNoTracking().ToListAsync();
-        var revenueOrders = orders.Where(o => o.Status != OrderStatus.Cancelled).ToList();
+        var ordersBase = _context.Orders.AsNoTracking();
+        var revenueOrdersBase = ordersBase.Where(o => o.Status != OrderStatus.Cancelled);
 
         var productCounts = await _context.Products
             .AsNoTracking()
@@ -86,15 +86,22 @@ public class DashboardController : AdminBaseController
             .GroupBy(x => x.BusinessId)
             .ToDictionary(g => g.Key, g => g.First().Email);
 
-        var orderStatsByBusiness = orders
+        var orderStatsByBusiness = await ordersBase
             .GroupBy(o => o.BusinessId)
-            .ToDictionary(
-                g => g.Key,
-                g => new BusinessOrderStats
+            .Select(g => new
+            {
+                BusinessId = g.Key,
+                Count = g.Count(),
+                Revenue = g.Where(o => o.Status != OrderStatus.Cancelled).Sum(o => o.TotalAmount),
+                LastOrderAt = g.Max(o => (DateTime?)o.CreatedAt)
+            })
+            .ToDictionaryAsync(
+                x => x.BusinessId,
+                x => new BusinessOrderStats
                 {
-                    Count = g.Count(),
-                    Revenue = g.Where(o => o.Status != OrderStatus.Cancelled).Sum(o => o.TotalAmount),
-                    LastOrderAt = g.Max(o => (DateTime?)o.CreatedAt)
+                    Count = x.Count,
+                    Revenue = x.Revenue,
+                    LastOrderAt = x.LastOrderAt
                 });
 
         var businessActivities = businesses.Select(b =>
@@ -134,16 +141,20 @@ public class DashboardController : AdminBaseController
                 TotalUsers = await _context.AppUsers.CountAsync(u => u.IsActive),
                 BusinessOwnersCount = await _context.AppUsers.CountAsync(u => u.IsActive && u.Role == UserRole.BusinessOwner),
                 StaffUsersCount = await _context.AppUsers.CountAsync(u => u.IsActive && u.Role == UserRole.Staff),
-                TotalOrders = orders.Count,
-                TotalRevenue = revenueOrders.Sum(o => o.TotalAmount),
-                TodayOrders = orders.Count(o => o.CreatedAt >= todayStart && o.CreatedAt < todayEnd),
-                TodayRevenue = revenueOrders
+                TotalOrders = await ordersBase.CountAsync(),
+                TotalRevenue = await revenueOrdersBase.SumAsync(o => (decimal?)o.TotalAmount) ?? 0m,
+                TodayOrders = await ordersBase.CountAsync(o => o.CreatedAt >= todayStart && o.CreatedAt < todayEnd),
+                TodayRevenue = await revenueOrdersBase
                     .Where(o => o.CreatedAt >= todayStart && o.CreatedAt < todayEnd)
-                    .Sum(o => o.TotalAmount),
-                Last7DaysOrders = orders.Count(o => o.CreatedAt >= last7Start),
-                Last7DaysRevenue = revenueOrders.Where(o => o.CreatedAt >= last7Start).Sum(o => o.TotalAmount),
-                ThisMonthOrders = orders.Count(o => o.CreatedAt >= monthStart),
-                ThisMonthRevenue = revenueOrders.Where(o => o.CreatedAt >= monthStart).Sum(o => o.TotalAmount)
+                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m,
+                Last7DaysOrders = await ordersBase.CountAsync(o => o.CreatedAt >= last7Start),
+                Last7DaysRevenue = await revenueOrdersBase
+                    .Where(o => o.CreatedAt >= last7Start)
+                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m,
+                ThisMonthOrders = await ordersBase.CountAsync(o => o.CreatedAt >= monthStart),
+                ThisMonthRevenue = await revenueOrdersBase
+                    .Where(o => o.CreatedAt >= monthStart)
+                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m
             },
             Subscriptions = BuildSubscriptionKpis(businesses, now),
             PlanDistribution = BuildPlanDistribution(businesses, now),
@@ -166,11 +177,12 @@ public class DashboardController : AdminBaseController
         model.NewSalesRequestCount = salesSummary.NewCount;
         model.OpenSalesRequestCount = salesSummary.OpenCount;
 
-        var onboardingSnaps = await _onboardingHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
+        var activeBusinessIds = businesses.Where(b => b.IsActive).Select(b => b.Id);
+        var onboardingSnaps = await _onboardingHelper.BuildForBusinessesAsync(activeBusinessIds);
         model.OnboardingAtRiskCount = onboardingSnaps.Count(s => s.IsAtRisk || s.Score < 40);
         model.OnboardingLiveCount = onboardingSnaps.Count(s => s.IsLive);
 
-        var successSnaps = await _successHelper.BuildForBusinessesAsync(businesses.Select(b => b.Id));
+        var successSnaps = await _successHelper.BuildForBusinessesAsync(activeBusinessIds);
         model.CustomerSuccessAtRiskCount = successSnaps.Count(s => s.IsAtRisk);
         model.CustomerSuccessHealthyCount = successSnaps.Count(s => s.IsHealthyOrBetter);
 

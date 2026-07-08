@@ -52,4 +52,8 @@
 | SEO | `/robots.txt` | Anon | Aç | Disallow Admin/Business/Account | Med | Script |
 | SEO | `/sitemap.xml` | Anon | Aç | Public URL var, private yok | Med | Script |
 | Security | `/` | Anon | Header kontrol | nosniff/frame/referrer/permissions | Med | Script |
+| Performance | `/m/demo-kafe` | Anon | Response süresi | 200; WARN/FAIL eşikleri | Med | Script |
+| Performance | `/DemoPacks` | Anon | Response süresi | 200 | Low | Script |
+| Support | `/Business/Support` | Anon | Auth redirect | 302 | Med | Script |
+| Support | `/Admin/Support` | Anon | Auth redirect | 302 | Med | Script |
 

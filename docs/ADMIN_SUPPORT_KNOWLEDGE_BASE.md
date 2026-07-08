@@ -81,6 +81,15 @@
 4. Anonim public ticket yok — `/Help`, `/Sales/RequestDemo`
 5. Rehber: `docs/SUPPORT_CENTER_RUNBOOK.md`, Help `destek-talepleri-yonetimi`
 
+## Senaryo: Yavaş sayfa / sunucu takılması
+
+1. `/health` — app + database OK mi?
+2. Yalnızca public menü mü (`/m/{slug}`), tüm site mi?
+3. Müşteriye: tarayıcı önbelleği temizleme, mobil veri/Wi‑Fi kontrolü
+4. Operasyon: `check-performance-smoke.ps1` (smoke, benchmark değil); ilk istek cold-start olabilir
+5. Release/build fail ise DLL lock — `RELIABILITY_RUNBOOK.md`, çalışan `dotnet run` kapat
+6. Escalation: `INCIDENT_RESPONSE_RUNBOOK.md`, `/Admin/Operations`
+
 ## Senaryo: Müşteri “bana ne kazandırır?” diyor
 
 1. `/Admin/ValueCalculator` veya public `/RoiCalculator` açın

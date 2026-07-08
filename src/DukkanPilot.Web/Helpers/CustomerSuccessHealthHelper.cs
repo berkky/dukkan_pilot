@@ -485,7 +485,7 @@ public class CustomerSuccessHealthHelper
 
     private async Task<bool> HasOpenUpgradeRequestAsync(int businessId, CancellationToken cancellationToken)
     {
-        return await _context.SalesRequests
+        return await _context.SalesRequests.AsNoTracking()
             .AnyAsync(r => r.BusinessId == businessId
                 && r.RequestType == "UpgradeRequest"
                 && (r.Status == "New" || r.Status == "Contacted" || r.Status == "Qualified" || r.Status == "WaitingCustomer"),

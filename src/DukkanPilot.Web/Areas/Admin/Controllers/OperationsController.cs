@@ -48,6 +48,10 @@ public class OperationsController : AdminBaseController
             HasBackupDocs = FileExists("docs", "DATABASE_BACKUP_AND_RECOVERY.md"),
             HasMigrationRunbook = FileExists("docs", "MIGRATION_RUNBOOK.md"),
             HasIncidentRunbook = FileExists("docs", "INCIDENT_RESPONSE_RUNBOOK.md"),
+            HasReliabilityRunbook = FileExists("docs", "RELIABILITY_RUNBOOK.md"),
+            HasPerformanceHardeningDocs = FileExists("docs", "PERFORMANCE_HARDENING_GUIDE.md"),
+            HasPerformanceSmokeDocs = FileExists("docs", "PERFORMANCE_SMOKE_TESTS.md"),
+            HasPerformanceSmokeScript = FileExists("scripts", "check-performance-smoke.ps1"),
             HasOperationalSecurityChecklist = FileExists("docs", "OPERATIONAL_SECURITY_CHECKLIST.md"),
             HasFirstReleaseOpsDocs = FileExists("docs", "FIRST_RELEASE_OPERATIONS.md"),
             HasLegalReadinessDocs = FileExists("docs", "LEGAL_READINESS_CHECKLIST.md"),
@@ -67,6 +71,9 @@ public class OperationsController : AdminBaseController
                 new OpsDocLinkViewModel { Title = "Backup & recovery", Path = "docs/DATABASE_BACKUP_AND_RECOVERY.md" },
                 new OpsDocLinkViewModel { Title = "Migration runbook", Path = "docs/MIGRATION_RUNBOOK.md" },
                 new OpsDocLinkViewModel { Title = "Incident response", Path = "docs/INCIDENT_RESPONSE_RUNBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Reliability runbook", Path = "docs/RELIABILITY_RUNBOOK.md" },
+                new OpsDocLinkViewModel { Title = "Performance hardening", Path = "docs/PERFORMANCE_HARDENING_GUIDE.md" },
+                new OpsDocLinkViewModel { Title = "Performance smoke tests", Path = "docs/PERFORMANCE_SMOKE_TESTS.md" },
                 new OpsDocLinkViewModel { Title = "Operational security", Path = "docs/OPERATIONAL_SECURITY_CHECKLIST.md" },
                 new OpsDocLinkViewModel { Title = "First release operations", Path = "docs/FIRST_RELEASE_OPERATIONS.md" },
                 new OpsDocLinkViewModel { Title = "Legal readiness", Path = "docs/LEGAL_READINESS_CHECKLIST.md" },
@@ -93,7 +100,8 @@ public class OperationsController : AdminBaseController
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-smoke-tests.ps1 -BaseUrl http://localhost:5000",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-security-headers.ps1 -BaseUrl http://localhost:5000 -Path /",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-seo-endpoints.ps1 -BaseUrl http://localhost:5000",
-                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-public-demo-readiness.ps1 -BaseUrl http://localhost:5000 -DemoSlug demo-kafe"
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-public-demo-readiness.ps1 -BaseUrl http://localhost:5000 -DemoSlugs \"demo-kafe,demo-tatlici,demo-burgerci,demo-restoran,demo-nargile\"",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-performance-smoke.ps1 -BaseUrl http://localhost:5000"
             ]
         };
 
@@ -183,6 +191,52 @@ public class OperationsController : AdminBaseController
                 Description = "/Admin/Billing (invoice/payment/cancel) + Business ledger (read-only). Resmi e-Belge değildir.",
                 IsReadyHint = FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "BillingController.cs")
                     && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Views", "Billing", "Index.cshtml")
+            }
+        ];
+
+        model.PerformanceReliabilityChecklist =
+        [
+            new OpsChecklistItemViewModel
+            {
+                Title = "Release quality gate çalıştırıldı",
+                Description = "scripts/release-quality-gate.ps1 — build, migration, smoke, SEO, demo, performance.",
+                IsReadyHint = FileExists("scripts", "release-quality-gate.ps1")
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Performance smoke çalıştırıldı",
+                Description = "scripts/check-performance-smoke.ps1 — public route response süreleri (smoke, benchmark değil).",
+                IsReadyHint = model.HasPerformanceSmokeScript && model.HasPerformanceSmokeDocs
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Public demo slugs kontrol edildi",
+                Description = "check-public-demo-readiness.ps1 — 5 vertical demo menü.",
+                IsReadyHint = FileExists("scripts", "check-public-demo-readiness.ps1")
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Migration status: no pending",
+                Description = "db-migration-status.ps1 veya dotnet ef has-pending-model-changes.",
+                IsReadyHint = model.HasMigrationRunbook
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Backup script hazır",
+                Description = "db-backup.ps1 + verify; release öncesi FULL backup.",
+                IsReadyHint = model.HasBackupDocs && FileExists("scripts", "db-backup.ps1")
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Açık acil destek talepleri",
+                Description = "/Admin/Support — Urgent/High öncelikli açık ticket kontrolü.",
+                IsReadyHint = FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "SupportController.cs")
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "DLL lock / port conflict biliniyor",
+                Description = "Çalışan dotnet run kapatılmadan build/gate fail olabilir; docs/RELIABILITY_RUNBOOK.md.",
+                IsReadyHint = model.HasReliabilityRunbook
             }
         ];
 

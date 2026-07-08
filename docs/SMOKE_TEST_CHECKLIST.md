@@ -6,6 +6,29 @@ Uygulama çalışırken manuel veya `scripts/run-smoke-tests.ps1` ile doğrulay�
 powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl http://localhost:5000
 ```
 
+## Support (auth redirect)
+
+| URL | Rol | Beklenen | Not |
+|-----|-----|----------|-----|
+| `/Business/Support` | Anon | 302 | Auth redirect |
+| `/Business/Support/Create` | Anon | 302 | Auth redirect |
+| `/Admin/Support` | Anon | 302 | SuperAdmin gerekli |
+
+## Performance smoke
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\check-performance-smoke.ps1 -BaseUrl http://localhost:5000
+```
+
+| Kontrol | Beklenen |
+|---------|----------|
+| Public routes | 200 + süre tablosu |
+| WARN | WarningMs üstü (release bloklamaz) |
+| FAIL | FailMs üstü veya non-200 → exit 1 |
+| Cold-start | İlk istek yavaş olabilir; bkz. `PERFORMANCE_SMOKE_TESTS.md` |
+
+`release-quality-gate.ps1` web checks açıkken performance smoke'u da çalıştırır (`-SkipPerformanceSmoke` ile atlanabilir).
+
 ## Public
 
 | URL | Rol | Beklenen | Not |

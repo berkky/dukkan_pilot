@@ -49,6 +49,9 @@
 12b. **Release quality gate**  
    `release-quality-gate.ps1` ile smoke + SEO + security headers + demo readiness.
 
+12c. **Performance smoke**  
+   `check-performance-smoke.ps1` — public route response süreleri (benchmark değil).
+
 13. **Müşteriye teslim**  
     - Panel URL + roller  
     - Public menü URL  

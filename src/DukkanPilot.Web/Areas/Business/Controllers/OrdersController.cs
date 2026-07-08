@@ -89,6 +89,7 @@ public class OrdersController : BusinessBaseController
 
         model.Orders = await filteredQuery
             .OrderByDescending(o => o.CreatedAt)
+            .Take(100)
             .Select(o => new OrderListViewModel
             {
                 Id = o.Id,
@@ -407,6 +408,7 @@ public class OrdersController : BusinessBaseController
     {
         return await query
             .OrderByDescending(o => o.CreatedAt)
+            .Take(50)
             .Select(o => new KitchenOrderCardViewModel
             {
                 Id = o.Id,

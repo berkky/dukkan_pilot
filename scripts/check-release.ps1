@@ -195,7 +195,11 @@ $required = @(
     "docs\SUPPORT_CENTER_RUNBOOK.md",
     "docs\SUPPORT_TICKET_DATA_MAP.md",
     "docs\SUPPORT_UAT_SCRIPT.md",
-    "docs\FEEDBACK_MANAGEMENT_PLAYBOOK.md"
+    "docs\FEEDBACK_MANAGEMENT_PLAYBOOK.md",
+    "scripts\check-performance-smoke.ps1",
+    "docs\PERFORMANCE_HARDENING_GUIDE.md",
+    "docs\RELIABILITY_RUNBOOK.md",
+    "docs\PERFORMANCE_SMOKE_TESTS.md"
 )
 
 foreach ($rel in $required) {

@@ -22,6 +22,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 10. Self-service Help Center + eğitim rehberleri (Public/Business/Admin)
 11. ROI / Değer Hesaplayıcı — tahmini senaryo (garanti gelir vaadi değil; satış dönüşümü)
 12. Vertical Demo Packs — sektörüne uygun demo menü örnekleri (kafe/tatlıcı/burgerci/restoran/lounge)
+13. Performance / reliability hardening — AsNoTracking, liste limitleri, performance smoke script, Operasyon/Kalite checklist'leri
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon

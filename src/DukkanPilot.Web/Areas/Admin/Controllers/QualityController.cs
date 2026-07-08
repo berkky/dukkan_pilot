@@ -42,7 +42,8 @@ public class QualityController : AdminBaseController
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-smoke-tests.ps1 -BaseUrl http://localhost:5000",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-security-headers.ps1 -BaseUrl http://localhost:5000 -Path /",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-seo-endpoints.ps1 -BaseUrl http://localhost:5000",
-                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-public-demo-readiness.ps1 -BaseUrl http://localhost:5000 -DemoSlug demo-kafe",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-public-demo-readiness.ps1 -BaseUrl http://localhost:5000 -DemoSlugs \"demo-kafe,demo-tatlici,demo-burgerci,demo-restoran,demo-nargile\"",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-performance-smoke.ps1 -BaseUrl http://localhost:5000",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\release-quality-gate.ps1 -BaseUrl http://localhost:5000"
             ],
             QuickLinks =
@@ -68,6 +69,8 @@ public class QualityController : AdminBaseController
             new QualityReadinessCardViewModel { Title = "Security headers", Description = "scripts/check-security-headers.ps1", IsReady = FileExists("scripts", "check-security-headers.ps1") },
             new QualityReadinessCardViewModel { Title = "SEO endpoints", Description = "scripts/check-seo-endpoints.ps1", IsReady = FileExists("scripts", "check-seo-endpoints.ps1") },
             new QualityReadinessCardViewModel { Title = "Demo readiness", Description = "scripts/check-public-demo-readiness.ps1", IsReady = FileExists("scripts", "check-public-demo-readiness.ps1") },
+            new QualityReadinessCardViewModel { Title = "Performance smoke", Description = "scripts/check-performance-smoke.ps1", IsReady = FileExists("scripts", "check-performance-smoke.ps1") },
+            new QualityReadinessCardViewModel { Title = "Performance docs", Description = "docs/PERFORMANCE_SMOKE_TESTS.md", IsReady = FileExists("docs", "PERFORMANCE_SMOKE_TESTS.md") },
             new QualityReadinessCardViewModel { Title = "Release gate", Description = "scripts/release-quality-gate.ps1", IsReady = FileExists("scripts", "release-quality-gate.ps1") },
             new QualityReadinessCardViewModel { Title = "Backup scripts", Description = "scripts/db-backup.ps1 + verify/restore", IsReady = FileExists("scripts", "db-backup.ps1") && FileExists("scripts", "db-verify-backup.ps1") && FileExists("scripts", "db-restore-test.ps1") },
             new QualityReadinessCardViewModel { Title = "Legal docs", Description = "docs/LEGAL_READINESS_CHECKLIST.md", IsReady = FileExists("docs", "LEGAL_READINESS_CHECKLIST.md") },
@@ -91,7 +94,11 @@ public class QualityController : AdminBaseController
             new QualityChecklistItemViewModel { Title = "Billing invoice create test edildi mi?", Description = "/Admin/Billing/CreateInvoice → kayıt oluşturma + audit + notification" },
             new QualityChecklistItemViewModel { Title = "Billing payment record test edildi mi?", Description = "/Admin/Billing/RecordPayment → Partial/Paid status güncelleme" },
             new QualityChecklistItemViewModel { Title = "Business billing ledger erişimi test edildi mi?", Description = "Owner: /Business/Billing/Invoices; Staff erişmemeli" },
-            new QualityChecklistItemViewModel { Title = "Release quality gate çalıştırıldı mı?", Description = "scripts/release-quality-gate.ps1 PASS" }
+            new QualityChecklistItemViewModel { Title = "Release quality gate çalıştırıldı mı?", Description = "scripts/release-quality-gate.ps1 PASS" },
+            new QualityChecklistItemViewModel { Title = "Performance smoke çalıştırıldı mı?", Description = "scripts/check-performance-smoke.ps1 — public menu + landing response (WARN kabul)" },
+            new QualityChecklistItemViewModel { Title = "Public menu response kontrol edildi mi?", Description = "/m/demo-kafe ve vertical slug'lar; ilk istek yavaş olabilir" },
+            new QualityChecklistItemViewModel { Title = "Demo packs response kontrol edildi mi?", Description = "/DemoPacks 200 + demo readiness script" },
+            new QualityChecklistItemViewModel { Title = "Support auth redirect geçti mi?", Description = "/Business/Support ve /Admin/Support auth yok → 302" }
         ];
 
         try

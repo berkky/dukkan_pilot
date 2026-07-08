@@ -6,13 +6,14 @@
 - [ ] `dotnet build` → 0 hata 0 uyarı
 - [ ] `powershell -File .\scripts\check-release.ps1` PASS
 - [ ] `dotnet ef migrations has-pending-model-changes` → no changes
-- [ ] Migration listesi beklenen set ile uyumlu (`AddNotifications` son migrations dahil)
+- [ ] Migration listesi beklenen set ile uyumlu (`AddSupportTicketCenter` son migration dahil)
 - [ ] `powershell -File .\scripts\db-migration-status.ps1` PASS
 - [ ] `db-backup.ps1` çalıştı mı? (veya SSMS FULL backup)
 - [ ] `db-verify-backup.ps1` geçti mi?
 - [ ] `db-generate-migration-script.ps1` üretildi mi? (değişiklik varsa)
 - [ ] Migration script review edildi mi?
-- [ ] `release-quality-gate.ps1` PASS (smoke + SEO + security headers + demo readiness)
+- [ ] `release-quality-gate.ps1` PASS (smoke + SEO + security headers + demo readiness + performance smoke)
+- [ ] `check-performance-smoke.ps1` çalıştırıldı (WARN kabul; FAIL yok)
 - [ ] Rollback/restore planı var mı? (`DATABASE_BACKUP_AND_RECOVERY.md`)
 - [ ] Smoke test listesi hazır mı? (`SMOKE_TEST_CHECKLIST.md` + `run-smoke-tests.ps1`)
 - [ ] `appsettings.Production.example.json` güncel; gerçek secret yok
@@ -65,7 +66,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`
-- [ ] Public menu mobile polish (`MOBILE_WEB_POLISH_CHECKLIST.md`)
+- [ ] Support routes smoke: `/Business/Support` `/Admin/Support` auth yok → 302
+- [ ] Performance smoke: public menu + landing response (`PERFORMANCE_SMOKE_TESTS.md`)
 
 ## Rollback
 

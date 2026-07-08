@@ -37,68 +37,68 @@ public class CustomerOnboardingHelper
             return null;
         }
 
-        var activeCategoryCount = await _context.Categories
+        var activeCategoryCount = await _context.Categories.AsNoTracking()
             .CountAsync(c => c.BusinessId == businessId && c.IsActive, cancellationToken);
 
-        var activeProductCount = await _context.Products
+        var activeProductCount = await _context.Products.AsNoTracking()
             .CountAsync(p => p.BusinessId == businessId
                 && p.IsActive
                 && p.Category.IsActive
                 && p.Category.BusinessId == businessId, cancellationToken);
 
-        var orderCount = await _context.Orders
+        var orderCount = await _context.Orders.AsNoTracking()
             .CountAsync(o => o.BusinessId == businessId, cancellationToken);
 
-        var hasKitchenFlowOrder = await _context.Orders
+        var hasKitchenFlowOrder = await _context.Orders.AsNoTracking()
             .AnyAsync(o => o.BusinessId == businessId
                 && (o.Status == OrderStatus.Preparing || o.Status == OrderStatus.Completed), cancellationToken);
 
-        var hasNonCancelledOrder = await _context.Orders
+        var hasNonCancelledOrder = await _context.Orders.AsNoTracking()
             .AnyAsync(o => o.BusinessId == businessId && o.Status != OrderStatus.Cancelled, cancellationToken);
 
-        var campaignCount = await _context.Campaigns
+        var campaignCount = await _context.Campaigns.AsNoTracking()
             .CountAsync(c => c.BusinessId == businessId && c.IsActive, cancellationToken);
 
-        var hasLoyaltyRule = await _context.LoyaltyRules
+        var hasLoyaltyRule = await _context.LoyaltyRules.AsNoTracking()
             .AnyAsync(r => r.BusinessId == businessId, cancellationToken);
 
-        var rewardCount = await _context.Rewards
+        var rewardCount = await _context.Rewards.AsNoTracking()
             .CountAsync(r => r.BusinessId == businessId && r.IsActive, cancellationToken);
 
-        var staffCount = await _context.UserBusinessRoles
+        var staffCount = await _context.UserBusinessRoles.AsNoTracking()
             .CountAsync(r => r.BusinessId == businessId
                 && r.IsActive
                 && r.Role == BusinessRole.Staff
                 && r.AppUser.IsActive, cancellationToken);
 
-        var hasOwner = await _context.UserBusinessRoles
+        var hasOwner = await _context.UserBusinessRoles.AsNoTracking()
             .AnyAsync(r => r.BusinessId == businessId
                 && r.IsActive
                 && r.Role == BusinessRole.Owner
                 && r.AppUser.IsActive, cancellationToken);
 
-        var customerCount = await _context.Customers
+        var customerCount = await _context.Customers.AsNoTracking()
             .CountAsync(c => c.BusinessId == businessId && c.IsActive, cancellationToken);
 
-        var hasNotification = await _context.Notifications
+        var hasNotification = await _context.Notifications.AsNoTracking()
             .AnyAsync(n => n.BusinessId == businessId, cancellationToken);
 
-        var hasAudit = await _context.AuditLogs
+        var hasAudit = await _context.AuditLogs.AsNoTracking()
             .AnyAsync(a => a.BusinessId == businessId, cancellationToken);
 
-        var lastOrderAt = await _context.Orders
+        var lastOrderAt = await _context.Orders.AsNoTracking()
             .Where(o => o.BusinessId == businessId)
             .OrderByDescending(o => o.CreatedAt)
             .Select(o => (DateTime?)o.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        var lastAuditAt = await _context.AuditLogs
+        var lastAuditAt = await _context.AuditLogs.AsNoTracking()
             .Where(a => a.BusinessId == businessId)
             .OrderByDescending(a => a.CreatedAtUtc)
             .Select(a => (DateTime?)a.CreatedAtUtc)
             .FirstOrDefaultAsync(cancellationToken);
 
-        var lastNotificationAt = await _context.Notifications
+        var lastNotificationAt = await _context.Notifications.AsNoTracking()
             .Where(n => n.BusinessId == businessId)
             .OrderByDescending(n => n.CreatedAtUtc)
             .Select(n => (DateTime?)n.CreatedAtUtc)

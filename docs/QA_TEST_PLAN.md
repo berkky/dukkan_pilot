@@ -30,7 +30,7 @@ Bu katman:
 - ROI Calculator: `/RoiCalculator` 200; `/Business/ValueCalculator` `/Admin/ValueCalculator` auth yok → 302; POST sonuç + disclaimer
 - Demo Packs: `/DemoPacks` 200; `/m/demo-*` 200; `check-public-demo-readiness.ps1` multi-slug
 - System: health, robots, sitemap, security headers
-- Deployment/backup: backup, verify, restore, migration status
+- Performance/reliability: `check-performance-smoke.ps1`, DLL lock troubleshooting (`RELIABILITY_RUNBOOK.md`)
 
 ## Scriptler neyi test eder?
 
@@ -38,7 +38,8 @@ Bu katman:
 - `scripts/check-security-headers.ps1`: nosniff / frame / referrer / permissions-policy
 - `scripts/check-seo-endpoints.ps1`: robots + sitemap (private URL yok)
 - `scripts/check-public-demo-readiness.ps1`: demo slugs (tekil veya çoklu) read-only demo readiness
-- `scripts/release-quality-gate.ps1`: build + check-release + migration status + opsiyonel web checks
+- `scripts/check-performance-smoke.ps1`: HTTP response time smoke (public routes, WARN/FAIL ms)
+- `scripts/release-quality-gate.ps1`: build + check-release + migration status + opsiyonel web checks + performance smoke
 
 ## Manuel kalan kritik testler
 

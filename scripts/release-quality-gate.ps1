@@ -12,7 +12,10 @@
 param(
     [string]$BaseUrl = "http://localhost:5000",
     [switch]$SkipWebChecks,
-    [switch]$SkipMigrationScript
+    [switch]$SkipMigrationScript,
+    [switch]$SkipPerformanceSmoke,
+    [int]$PerformanceWarningMs = 1500,
+    [int]$PerformanceFailMs = 4000
 )
 
 $ErrorActionPreference = "Continue"
@@ -94,6 +97,11 @@ if ($SkipWebChecks) {
     Run-Step "check-seo-endpoints.ps1" ".\\scripts\\check-seo-endpoints.ps1 -BaseUrl $BaseUrl"
     $demoSlugList = 'demo-kafe,demo-tatlici,demo-burgerci,demo-restoran,demo-nargile'
     Run-Step "check-public-demo-readiness.ps1" "& { .\scripts\check-public-demo-readiness.ps1 -BaseUrl '$BaseUrl' -DemoSlugs '$demoSlugList' }"
+    if (-not $SkipPerformanceSmoke) {
+        Run-Step "check-performance-smoke.ps1" "& { .\scripts\check-performance-smoke.ps1 -BaseUrl '$BaseUrl' -WarningMs $PerformanceWarningMs -FailMs $PerformanceFailMs }"
+    } else {
+        Add-Step "check-performance-smoke.ps1" "SKIP" "SkipPerformanceSmoke"
+    }
 }
 
 Write-Host ""

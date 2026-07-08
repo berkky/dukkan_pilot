@@ -21,6 +21,10 @@ public class AdminOperationsViewModel
     public bool HasBackupDocs { get; set; }
     public bool HasMigrationRunbook { get; set; }
     public bool HasIncidentRunbook { get; set; }
+    public bool HasReliabilityRunbook { get; set; }
+    public bool HasPerformanceHardeningDocs { get; set; }
+    public bool HasPerformanceSmokeDocs { get; set; }
+    public bool HasPerformanceSmokeScript { get; set; }
     public bool HasOperationalSecurityChecklist { get; set; }
     public bool HasFirstReleaseOpsDocs { get; set; }
     public bool HasLegalReadinessDocs { get; set; }
@@ -34,6 +38,7 @@ public class AdminOperationsViewModel
 
     public List<OpsChecklistItemViewModel> OperationalChecklist { get; set; } = new();
     public List<OpsChecklistItemViewModel> LegalReadinessChecklist { get; set; } = new();
+    public List<OpsChecklistItemViewModel> PerformanceReliabilityChecklist { get; set; } = new();
     public List<OpsDocLinkViewModel> DocLinks { get; set; } = new();
     public List<string> ScriptHints { get; set; } = new();
 }

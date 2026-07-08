@@ -4,7 +4,20 @@ namespace DukkanPilot.Web.Helpers;
 
 public static class DemoPackHelper
 {
+    private static readonly Lazy<IReadOnlyList<DemoPackCardViewModel>> DefaultPacks =
+        new(() => BuildPacks("/RoiCalculator"));
+
     public static IReadOnlyList<DemoPackCardViewModel> GetPacks(string roiBaseUrl = "/RoiCalculator")
+    {
+        if (string.Equals(roiBaseUrl, "/RoiCalculator", StringComparison.OrdinalIgnoreCase))
+        {
+            return DefaultPacks.Value;
+        }
+
+        return BuildPacks(roiBaseUrl);
+    }
+
+    private static IReadOnlyList<DemoPackCardViewModel> BuildPacks(string roiBaseUrl)
     {
         var packs = new List<DemoPackCardViewModel>
         {
