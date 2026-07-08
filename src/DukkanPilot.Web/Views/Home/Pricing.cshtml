@@ -43,6 +43,15 @@
                         {
                             <p class="text-muted small">@plan.Description</p>
                         }
+                        <p class="small mb-3">
+                            <span class="text-muted">Kimler için uygun?</span>
+                            <strong class="d-block">
+                                @(plan.Name.Contains("Free", StringComparison.OrdinalIgnoreCase) ? "Yeni başlayan kafeler, deneme" :
+                                  plan.Name.Contains("Starter", StringComparison.OrdinalIgnoreCase) ? "Tek şube küçük işletmeler" :
+                                  plan.Name.Contains("Pro", StringComparison.OrdinalIgnoreCase) ? "Yoğun sipariş alan büyüyen işletmeler" :
+                                  "İşletme ihtiyacına göre")
+                            </strong>
+                        </p>
                         <ul class="list-unstyled small landing-price-list mb-4">
                             <li><span>Ürün limiti</span><strong>@plan.ProductLimitText</strong></li>
                             <li><span>Kategori limiti</span><strong>@plan.CategoryLimitText</strong></li>
@@ -51,7 +60,11 @@
                             <li><span>Ödül limiti</span><strong>@plan.RewardLimitText</strong></li>
                             <li><span>QR kod limiti</span><strong>@plan.QrCodeLimitText</strong></li>
                         </ul>
-                        <a href="@cta.PrimaryUrl" class="btn btn-primary w-100">@(cta.IsAuthenticated ? cta.PrimaryText : "Ücretsiz Başla")</a>
+                        <div class="d-grid gap-2">
+                            <a href="@cta.PrimaryUrl" class="btn btn-primary">@(cta.IsAuthenticated ? cta.PrimaryText : "Bu planla başla")</a>
+                            <a href="/Demo" class="btn btn-outline-secondary btn-sm">Demo talep et / Gör</a>
+                        </div>
+                        <p class="small text-muted mt-2 mb-0">Ödeme entegrasyonu yok; plan yükseltme talebi panelden iletilebilir.</p>
                     </div>
                 </div>
             }

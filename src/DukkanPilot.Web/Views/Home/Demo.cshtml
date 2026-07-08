@@ -8,8 +8,8 @@
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
-                <span class="landing-pill landing-pill-dark mb-3">Demo Funnel</span>
-                <h1 class="display-6 fw-bold mb-3">2 dakikada ürünü hissedin</h1>
+                <span class="landing-pill landing-pill-dark mb-3">Satış demosu</span>
+                <h1 class="display-6 fw-bold mb-3">DukkanPilot’u 5 dakikada deneyin</h1>
                 <p class="text-muted mb-0">
                     Public demo menü login istemez. Panel deneyimi için giriş yapın veya kendi işletmenizi oluşturun.
                     Demo hesap şifreleri bu sayfada paylaşılmaz.
@@ -21,7 +21,7 @@
 
 <section class="pb-5">
     <div class="container">
-        <div class="row g-4">
+        <div class="row g-4 mb-4">
             <div class="col-lg-5">
                 <div class="landing-demo-card h-100">
                     <div class="landing-pill landing-pill-dark mb-3">Public demo</div>
@@ -29,45 +29,59 @@
                     <p class="text-muted">QR menü + sepet + kampanya + sipariş takip akışı.</p>
                     <code class="landing-code d-block mb-3">@Model.DemoMenuUrl</code>
                     <div class="d-grid gap-2">
-                        <a href="@Model.DemoMenuUrl" class="btn btn-success" target="_blank" rel="noopener">Demo Menüyü Aç</a>
-                        <a href="@cta.PrimaryUrl" class="btn btn-primary">@(cta.IsAuthenticated ? cta.PrimaryText : "Kendi İşletmeni Oluştur")</a>
-                        <a href="/Account/Login" class="btn btn-outline-secondary">Panel için Giriş Yap</a>
+                        <a href="@Model.DemoMenuUrl" class="btn btn-success btn-lg" target="_blank" rel="noopener">Demo QR Menüyü Aç</a>
+                        <a href="/Account/Login" class="btn btn-outline-secondary">İşletme Panelini İncele</a>
+                        <a href="/Account/Register" class="btn btn-primary">Kendi işletmeniz için ücretsiz başlayın</a>
                     </div>
                 </div>
             </div>
             <div class="col-lg-7">
                 <div class="landing-section-card h-100">
-                    <h2 class="h5 mb-3">Test akışı</h2>
+                    <h2 class="h5 mb-3">Demo akışı</h2>
                     <ol class="landing-demo-steps mb-0">
-                        <li>
-                            <strong>Menüye gir</strong>
-                            <span>@Model.DemoMenuUrl adresini açın.</span>
-                        </li>
-                        <li>
-                            <strong>Sepete ürün ekle</strong>
-                            <span>Ürün kartından sepete ekleyip özeti kontrol edin.</span>
-                        </li>
-                        <li>
-                            <strong>Kampanya indirimi gör</strong>
-                            <span>Uygun sepet tutarında sunucu tarafı indirim mesajını görün.</span>
-                        </li>
-                        <li>
-                            <strong>Sipariş oluştur</strong>
-                            <span>Confirmation ekranına gidin; WhatsApp mesajını inceleyin.</span>
-                        </li>
-                        <li>
-                            <strong>Takip ekranını gör</strong>
-                            <span>Sipariş durum sayfasında badge ve timeline’ı izleyin.</span>
-                        </li>
+                        <li><strong>QR menüyü aç</strong><span>@Model.DemoMenuUrl adresini açın.</span></li>
+                        <li><strong>Sepete ürün ekle</strong><span>Ürün kartından sepete ekleyip özeti kontrol edin.</span></li>
+                        <li><strong>Kampanya indirimini gör</strong><span>100₺ üzeri sepette otomatik indirim mesajını görün.</span></li>
+                        <li><strong>Sipariş oluştur</strong><span>Confirmation ekranı + WhatsApp mesaj özeti.</span></li>
+                        <li><strong>Sipariş takip ekranı</strong><span>Badge, timeline ve durum güncellemesini izleyin.</span></li>
+                        <li><strong>İşletme panelinde yönet</strong><span>Sipariş / Mutfak / CRM / Raporlar için panele giriş gerekir.</span></li>
                     </ol>
                 </div>
             </div>
         </div>
 
-        <div class="landing-note mt-4 p-3">
-            <strong>Not:</strong>
+        <div class="text-center mb-3">
+            <h2 class="h4 fw-bold">Özellik vitrini</h2>
+            <p class="text-muted">Demo sırasında vurgulanacak modüller</p>
+        </div>
+        <div class="row g-3 mb-4">
+            @foreach (var item in new[] {
+                ("📱", "QR Menü"), ("💬", "WhatsApp Sipariş"), ("🏷", "Kampanya"), ("⭐", "Sadakat"),
+                ("👤", "CRM"), ("📊", "Raporlar"), ("🧾", "Audit Log"), ("🔔", "Bildirimler") })
+            {
+                <div class="col-6 col-md-3">
+                    <div class="landing-mini-card text-center h-100 py-3">
+                        <div class="mb-1">@item.Item1</div>
+                        <div class="fw-semibold small">@item.Item2</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="landing-section-card mb-4">
+            <h2 class="h5 mb-3">Demo sırasında şunları test edin</h2>
+            <div class="row g-3">
+                <div class="col-md-6"><div class="landing-mini-card">Sepet toplamı sunucu fiyatıyla hesaplanır</div></div>
+                <div class="col-md-6"><div class="landing-mini-card">Kampanya auto-apply indirimi görünür</div></div>
+                <div class="col-md-6"><div class="landing-mini-card">Confirmation ve tracking token çalışır</div></div>
+                <div class="col-md-6"><div class="landing-mini-card">Panelde Kitchen / Reports / Notifications anlatılır</div></div>
+            </div>
+        </div>
+
+        <div class="landing-note p-3">
+            <strong>Güvenlik notu:</strong>
             <span class="text-muted small">
-                İşletme paneli (sipariş, mutfak, raporlar, Go-Live) için kimlik doğrulama gerekir.
+                Admin/Owner şifreleri public sayfada paylaşılmaz. Panel için /Account/Login kullanın.
                 Public menü demosu herkese açıktır.
             </span>
         </div>
@@ -76,11 +90,11 @@
 
 <section class="py-5 landing-band">
     <div class="container text-center">
-        <h2 class="h4 fw-bold mb-3">Beğendiniz mi?</h2>
+        <h2 class="h4 fw-bold mb-3">Kendi işletmeniz için ücretsiz başlayın</h2>
         <div class="d-flex flex-wrap justify-content-center gap-2">
-            <a href="/Account/Register" class="btn btn-primary">Ücretsiz Başla</a>
-            <a href="/Features" class="btn btn-outline-primary">Özellikleri Gör</a>
-            <a href="/Pricing" class="btn btn-outline-secondary">Planları İncele</a>
+            <a href="/Account/Register" class="btn btn-primary btn-lg">Ücretsiz Kayıt Ol</a>
+            <a href="@Model.DemoMenuUrl" class="btn btn-outline-primary btn-lg" target="_blank" rel="noopener">Demo QR Menüyü Aç</a>
+            <a href="/Pricing" class="btn btn-outline-secondary btn-lg">Planları İncele</a>
         </div>
     </div>
 </section>

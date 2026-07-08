@@ -1,0 +1,81 @@
+@model DukkanPilot.Web.Areas.Business.Models.DemoCenterViewModel
+@{
+    ViewData["Title"] = "Demo Merkezi";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+    <div>
+        <h2 class="h4 mb-1">Demo Merkezi</h2>
+        <p class="text-muted mb-0">DukkanPilot’un müşteriye gösterilecek temel akışlarını buradan takip edin.</p>
+    </div>
+    <div class="text-end">
+        <div class="display-6 fw-bold mb-0">@Model.ReadinessScore</div>
+        <span class="badge @Model.ReadinessBadgeClass">@Model.ReadinessLabel</span>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header">
+        <h3 class="h6 mb-0">Demo hazırlık kontrolü — @Model.BusinessName</h3>
+    </div>
+    <div class="panel-card-body">
+        <div class="row g-2">
+            @foreach (var check in Model.Checks)
+            {
+                <div class="col-md-6 col-xl-3">
+                    <div class="dp-demo-check @(check.IsReady ? "dp-demo-check-ready" : "dp-demo-check-missing")">
+                        <span class="small fw-semibold">@check.Title</span>
+                        <span class="badge @(check.IsReady ? "bg-success" : "bg-warning text-dark")">@(check.IsReady ? "Hazır" : "Eksik")</span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="/Business/GoLive" class="btn btn-sm btn-success">Go-Live Merkezi</a>
+            <a href="/Business/Products/Create" class="btn btn-sm btn-outline-primary">Ürün Ekle</a>
+            <a href="/Business/Campaigns/Create" class="btn btn-sm btn-outline-primary">Kampanya Oluştur</a>
+            <a href="@Model.PublicMenuUrl" class="btn btn-sm btn-outline-success" target="_blank" rel="noopener">Test Siparişi Ver</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    @foreach (var step in Model.Steps)
+    {
+        <div class="col-md-6 col-xl-4">
+            <div class="panel-card h-100 dp-demo-step-card">
+                <div class="panel-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+                        <span class="badge bg-light text-dark border">Adım @step.Order</span>
+                        <span class="badge @step.StatusBadgeClass">@step.StatusText</span>
+                    </div>
+                    <h3 class="h6">@step.Title</h3>
+                    <p class="small text-muted">@step.Description</p>
+                    @if (step.OpenInNewTab)
+                    {
+                        <a href="@step.ActionUrl" class="btn btn-sm @(step.IsReady ? "btn-outline-primary" : "btn-outline-secondary")" target="_blank" rel="noopener">@step.ActionText</a>
+                    }
+                    else
+                    {
+                        <a href="@step.ActionUrl" class="btn btn-sm @(step.IsReady ? "btn-outline-primary" : "btn-outline-secondary")">@step.ActionText</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="panel-card">
+    <div class="panel-card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <div class="fw-semibold">Satış demosu için hızlı linkler</div>
+            <div class="small text-muted">QR afiş, mutfak ve rapor ekranlarını bir arada kullanın.</div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/Business/QrMenu/Print" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">QR Afiş</a>
+            <a href="/Business/Orders/Kitchen" class="btn btn-sm btn-outline-secondary">Mutfak</a>
+            <a href="/Business/Reports" class="btn btn-sm btn-outline-secondary">Raporlar</a>
+            <a href="/Business/Notifications" class="btn btn-sm btn-outline-warning">Bildirimler</a>
+        </div>
+    </div>
+</div>

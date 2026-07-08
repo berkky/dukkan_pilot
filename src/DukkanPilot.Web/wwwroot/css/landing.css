@@ -319,3 +319,7 @@
         font-size: 1.45rem;
     }
 }
+
+.landing-demo-card .btn-lg {
+    font-weight: 600;
+}

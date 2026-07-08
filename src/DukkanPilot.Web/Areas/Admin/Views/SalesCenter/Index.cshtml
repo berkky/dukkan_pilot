@@ -1,0 +1,127 @@
+@model DukkanPilot.Web.Areas.Admin.Models.SalesCenterViewModel
+@{
+    ViewData["Title"] = "Satış ve Demo Merkezi";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Satış ve Demo Merkezi</h2>
+        <p class="text-muted mb-0">Demo-ready işletmeleri ve satış/operasyon akışını buradan takip edin.</p>
+    </div>
+    <a href="/Demo" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">Landing Demo</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100"><div class="stat-label">Toplam İşletme</div><div class="stat-value">@Model.TotalBusinesses</div></div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100"><div class="stat-label">Aktif</div><div class="stat-value text-success">@Model.ActiveBusinesses</div></div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100"><div class="stat-label">Trial</div><div class="stat-value">@Model.TrialBusinesses</div></div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100"><div class="stat-label">Abonelik bitmek üzere</div><div class="stat-value text-warning">@Model.ExpiringSoonBusinesses</div></div>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <div class="stat-card h-100"><div class="stat-label">Demo-ready</div><div class="stat-value text-primary">@Model.DemoReadyBusinesses</div></div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Müşteriye 7 adımda demo</h3></div>
+    <div class="panel-card-body">
+        <ol class="mb-3 small">
+            <li>Public QR menüyü aç (`/m/{slug}`)</li>
+            <li>Sepet + kampanya indirimini göster</li>
+            <li>Sipariş confirmation/tracking</li>
+            <li>Kitchen’da durum ilerlet</li>
+            <li>CRM + raporlar</li>
+            <li>Bildirim / Audit Log</li>
+            <li>Go-Live ve ücretsiz kayıt CTA</li>
+        </ol>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/Admin/Businesses" class="btn btn-sm btn-outline-primary">İşletmeler</a>
+            <a href="/Admin/Notifications" class="btn btn-sm btn-outline-warning">Bildirimler</a>
+            <a href="/Admin/AuditLogs" class="btn btn-sm btn-outline-dark">Aktivite Logları</a>
+            <a href="/m/demo-kafe" class="btn btn-sm btn-outline-success" target="_blank" rel="noopener">Demo Kafe Menü</a>
+        </div>
+        <p class="small text-muted mb-0 mt-3">Panel şifreleri public sayfalarda paylaşılmaz.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Demo-ready işletmeler</h3></div>
+            <div class="panel-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>İşletme</th>
+                                <th>Sağlık</th>
+                                <th>Ürün</th>
+                                <th>Sipariş</th>
+                                <th>Kampanya</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.DemoReadyList.Any())
+                        {
+                            <tr><td colspan="6" class="text-center text-muted py-4">Henüz demo-ready işletme yok.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var b in Model.DemoReadyList)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@b.BusinessName</div>
+                                        <a class="small" href="@b.PublicMenuUrl" target="_blank" rel="noopener">/m/@b.Slug</a>
+                                    </td>
+                                    <td><span class="badge @b.HealthBadgeClass">@b.HealthScore · @b.HealthLabel</span></td>
+                                    <td>@b.ActiveProductCount</td>
+                                    <td>@b.OrderCount</td>
+                                    <td>@b.CampaignCount</td>
+                                    <td class="text-end">
+                                        <a href="/Admin/Businesses/Details/@b.BusinessId" class="btn btn-sm btn-outline-secondary">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Dikkat gerekenler</h3></div>
+            <div class="panel-card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if (!Model.NeedsAttentionList.Any())
+                    {
+                        <li class="list-group-item text-muted">Platform sağlıklı görünüyor.</li>
+                    }
+                    else
+                    {
+                        foreach (var b in Model.NeedsAttentionList)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <div class="fw-semibold small">@b.BusinessName</div>
+                                    <div class="text-muted small">@b.AttentionReason</div>
+                                </div>
+                                <a href="/Admin/Businesses/Details/@b.BusinessId" class="btn btn-sm btn-outline-secondary">Detay</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,8 +17,8 @@
                     müşterilerinizi takip edin ve kampanyalarınızı ölçün.
                 </p>
                 <div class="d-flex flex-wrap gap-2 mb-4">
-                    <a href="@cta.PrimaryUrl" class="btn btn-light btn-lg">@cta.PrimaryText</a>
-                    <a href="@Model.DemoMenuUrl" class="btn btn-outline-light btn-lg" target="_blank" rel="noopener">Demo Menüyü Gör</a>
+                    <a href="@cta.PrimaryUrl" class="btn btn-light btn-lg">@(cta.IsAuthenticated ? cta.PrimaryText : "Ücretsiz Başla")</a>
+                    <a href="@Model.DemoMenuUrl" class="btn btn-outline-light btn-lg" target="_blank" rel="noopener">Demo QR Menüyü Gör</a>
                     <a href="/Pricing" class="btn btn-outline-light btn-lg">Planları İncele</a>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
@@ -34,12 +34,13 @@
                     <ul class="list-unstyled mb-0 landing-hero-list">
                         <li>Kafe ve kahve dükkanları</li>
                         <li>Restoran ve fast-casual işletmeler</li>
-                        <li>Tatlıcı, pastane ve içecek noktaları</li>
-                        <li>Küçük yiyecek işletmeleri</li>
+                        <li>Tatlıcı / pastane</li>
+                        <li>Nargile &amp; kahve işletmeleri</li>
+                        <li>Küçük zincir noktalar</li>
                     </ul>
                     <hr class="border-light opacity-25 my-3" />
                     <p class="small mb-0 opacity-75">
-                        QR’ı masaya koyun, menüyü anında güncelleyin, siparişleri panelden takip edin.
+                        Menü, sipariş, müşteri ve kampanya yönetimini tek panelde toplayın.
                     </p>
                 </div>
             </div>
@@ -76,6 +77,23 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold">Neden DukkanPilot?</h2>
+            <p class="text-muted mb-0">Menü, sipariş, müşteri ve kampanya yönetimini tek panelde toplayın.</p>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6 col-xl-4"><div class="landing-mini-card h-100"><strong>Hızlı kurulum</strong><div class="small text-muted mt-1">Go-Live Merkezi ile dakikalar içinde yayına çıkın.</div></div></div>
+            <div class="col-md-6 col-xl-4"><div class="landing-mini-card h-100"><strong>WhatsApp sipariş</strong><div class="small text-muted mt-1">Public sepetten sipariş; WhatsApp’a hazır mesaj.</div></div></div>
+            <div class="col-md-6 col-xl-4"><div class="landing-mini-card h-100"><strong>Sadakat ve kampanya</strong><div class="small text-muted mt-1">Otomatik indirim motoru + puan/ödül sistemi.</div></div></div>
+            <div class="col-md-6 col-xl-4"><div class="landing-mini-card h-100"><strong>Raporlama</strong><div class="small text-muted mt-1">Ciro, ürün ve kampanya performansını görün.</div></div></div>
+            <div class="col-md-6 col-xl-4"><div class="landing-mini-card h-100"><strong>Güvenli işlem geçmişi</strong><div class="small text-muted mt-1">Audit Log ile kritik işlemleri izleyin.</div></div></div>
+            <div class="col-md-6 col-xl-4"><div class="landing-mini-card h-100"><strong>Bildirim merkezi</strong><div class="small text-muted mt-1">Sipariş, limit ve abonelik uyarılarını tek yerde görün.</div></div></div>
         </div>
     </div>
 </section>

@@ -15,6 +15,7 @@ public static class DbSeeder
     {
         await SeedSubscriptionPlansAsync(context);
         await SeedDemoBusinessAsync(context);
+        await EnrichDemoBusinessCatalogAsync(context);
         await SeedDemoUsersAsync(context);
     }
 
@@ -75,14 +76,15 @@ public static class DbSeeder
             Name = "Demo Kafe",
             Slug = DemoBusinessSlug,
             Phone = "05550000000",
-            Description = "DükkanPilot demo işletmesi",
+            Description = "Demo satış menüsü: QR sipariş, kampanya indirimi ve sadakat akışını gösterin.",
+            Address = "Demo Mah. Örnek Cad. No:1",
             IsActive = true
         };
 
         var setting = new BusinessSetting
         {
             WhatsAppNumber = "905550000000",
-            ThemeColor = "#0d6efd",
+            ThemeColor = "#0f766e",
             Currency = "TRY"
         };
 
@@ -95,14 +97,7 @@ public static class DbSeeder
             Status = SubscriptionStatus.Active
         });
 
-        var categories = new List<Category>
-        {
-            new() { Name = "Kahveler", SortOrder = 1 },
-            new() { Name = "Tatlılar", SortOrder = 2 },
-            new() { Name = "Soğuk İçecekler", SortOrder = 3 }
-        };
-
-        foreach (var category in categories)
+        foreach (var category in BuildDemoCategories())
         {
             business.Categories.Add(category);
         }
@@ -110,51 +105,7 @@ public static class DbSeeder
         context.Businesses.Add(business);
         await context.SaveChangesAsync();
 
-        var kahveler = business.Categories.First(c => c.Name == "Kahveler");
-        var tatlilar = business.Categories.First(c => c.Name == "Tatlılar");
-        var sogukIcecekler = business.Categories.First(c => c.Name == "Soğuk İçecekler");
-
-        var products = new List<Product>
-        {
-            new()
-            {
-                BusinessId = business.Id,
-                CategoryId = kahveler.Id,
-                Name = "Latte",
-                Description = "Espresso ve buğulu süt",
-                Price = 85m,
-                SortOrder = 1
-            },
-            new()
-            {
-                BusinessId = business.Id,
-                CategoryId = kahveler.Id,
-                Name = "Türk Kahvesi",
-                Description = "Geleneksel Türk kahvesi",
-                Price = 60m,
-                SortOrder = 2
-            },
-            new()
-            {
-                BusinessId = business.Id,
-                CategoryId = tatlilar.Id,
-                Name = "Cheesecake",
-                Description = "Ev yapımı cheesecake",
-                Price = 120m,
-                SortOrder = 1
-            },
-            new()
-            {
-                BusinessId = business.Id,
-                CategoryId = sogukIcecekler.Id,
-                Name = "Limonata",
-                Description = "Taze sıkılmış limonata",
-                Price = 70m,
-                SortOrder = 1
-            }
-        };
-
-        context.Products.AddRange(products);
+        context.Products.AddRange(BuildDemoProducts(business));
 
         context.LoyaltyRules.Add(new LoyaltyRule
         {
@@ -167,16 +118,16 @@ public static class DbSeeder
         context.Rewards.Add(new Reward
         {
             BusinessId = business.Id,
-            Name = "Ücretsiz Kahve",
-            Description = "50 puan ile ücretsiz kahve",
-            RequiredPoints = 50
+            Name = "100 Puana Ücretsiz Kahve",
+            Description = "Sadakat puanlarınızla ücretsiz kahve kazanın",
+            RequiredPoints = 100
         });
 
         context.Campaigns.Add(new Campaign
         {
             BusinessId = business.Id,
-            Title = "Açılışa Özel %10 İndirim",
-            Description = "Tüm kahvelerde geçerli açılış kampanyası",
+            Title = "100₺ üzeri %10 indirim",
+            Description = "Sepette otomatik uygulanan demo kampanyası",
             StartDate = DateTime.UtcNow,
             EndDate = DateTime.UtcNow.AddMonths(1),
             DiscountType = CampaignDiscountType.Percentage,
@@ -184,10 +135,154 @@ public static class DbSeeder
             MinimumOrderAmount = 100m,
             IsPublicVisible = true,
             IsAutoApply = true,
-            Priority = 1
+            Priority = 1,
+            IsActive = true
         });
 
         await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Existing demo-kafe installs: add missing categories/products/campaign/reward without deleting data.
+    /// </summary>
+    private static async Task EnrichDemoBusinessCatalogAsync(AppDbContext context)
+    {
+        var business = await context.Businesses
+            .Include(b => b.Setting)
+            .Include(b => b.Categories)
+            .FirstOrDefaultAsync(b => b.Slug == DemoBusinessSlug);
+
+        if (business is null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(business.Description))
+        {
+            business.Description = "Demo satış menüsü: QR sipariş, kampanya indirimi ve sadakat akışını gösterin.";
+        }
+
+        if (string.IsNullOrWhiteSpace(business.Address))
+        {
+            business.Address = "Demo Mah. Örnek Cad. No:1";
+        }
+
+        if (business.Setting is not null)
+        {
+            if (string.IsNullOrWhiteSpace(business.Setting.WhatsAppNumber))
+            {
+                business.Setting.WhatsAppNumber = "905550000000";
+            }
+
+            if (string.IsNullOrWhiteSpace(business.Setting.ThemeColor))
+            {
+                business.Setting.ThemeColor = "#0f766e";
+            }
+        }
+
+        foreach (var template in BuildDemoCategories())
+        {
+            if (!business.Categories.Any(c => c.Name == template.Name))
+            {
+                context.Categories.Add(new Category
+                {
+                    BusinessId = business.Id,
+                    Name = template.Name,
+                    SortOrder = template.SortOrder,
+                    IsActive = true
+                });
+            }
+        }
+
+        await context.SaveChangesAsync();
+
+        business = await context.Businesses
+            .Include(b => b.Categories)
+            .FirstAsync(b => b.Id == business.Id);
+
+        var existingProductNames = await context.Products
+            .Where(p => p.BusinessId == business.Id)
+            .Select(p => p.Name)
+            .ToListAsync();
+
+        var productsToAdd = BuildDemoProducts(business)
+            .Where(p => !existingProductNames.Contains(p.Name))
+            .ToList();
+
+        if (productsToAdd.Count > 0)
+        {
+            context.Products.AddRange(productsToAdd);
+        }
+
+        if (!await context.Rewards.AnyAsync(r => r.BusinessId == business.Id && r.Name == "100 Puana Ücretsiz Kahve"))
+        {
+            context.Rewards.Add(new Reward
+            {
+                BusinessId = business.Id,
+                Name = "100 Puana Ücretsiz Kahve",
+                Description = "Sadakat puanlarınızla ücretsiz kahve kazanın",
+                RequiredPoints = 100,
+                IsActive = true
+            });
+        }
+
+        if (!await context.Campaigns.AnyAsync(c =>
+                c.BusinessId == business.Id &&
+                c.IsAutoApply &&
+                c.DiscountType == CampaignDiscountType.Percentage &&
+                c.DiscountValue == 10m &&
+                c.MinimumOrderAmount == 100m))
+        {
+            context.Campaigns.Add(new Campaign
+            {
+                BusinessId = business.Id,
+                Title = "100₺ üzeri %10 indirim",
+                Description = "Sepette otomatik uygulanan demo kampanyası",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddMonths(1),
+                DiscountType = CampaignDiscountType.Percentage,
+                DiscountValue = 10m,
+                MinimumOrderAmount = 100m,
+                IsPublicVisible = true,
+                IsAutoApply = true,
+                Priority = 1,
+                IsActive = true
+            });
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static List<Category> BuildDemoCategories() =>
+    [
+        new() { Name = "Kahveler", SortOrder = 1, IsActive = true },
+        new() { Name = "Tatlılar", SortOrder = 2, IsActive = true },
+        new() { Name = "Soğuk İçecekler", SortOrder = 3, IsActive = true },
+        new() { Name = "Atıştırmalıklar", SortOrder = 4, IsActive = true }
+    ];
+
+    private static List<Product> BuildDemoProducts(Business business)
+    {
+        var kahveler = business.Categories.First(c => c.Name == "Kahveler");
+        var tatlilar = business.Categories.First(c => c.Name == "Tatlılar");
+        var soguk = business.Categories.First(c => c.Name == "Soğuk İçecekler");
+        var atistirmalik = business.Categories.First(c => c.Name == "Atıştırmalıklar");
+
+        return
+        [
+            new() { BusinessId = business.Id, CategoryId = kahveler.Id, Name = "Latte", Description = "Espresso ve buğulu süt", Price = 85m, SortOrder = 1, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = kahveler.Id, Name = "Türk Kahvesi", Description = "Geleneksel Türk kahvesi", Price = 60m, SortOrder = 2, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = kahveler.Id, Name = "Americano", Description = "Uzun espresso", Price = 75m, SortOrder = 3, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = kahveler.Id, Name = "Filtre Kahve", Description = "Taze demlenmiş filtre", Price = 70m, SortOrder = 4, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = tatlilar.Id, Name = "Cheesecake", Description = "Ev yapımı cheesecake", Price = 120m, SortOrder = 1, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = tatlilar.Id, Name = "Brownie", Description = "Sıcak brownie", Price = 95m, SortOrder = 2, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = tatlilar.Id, Name = "Cookie", Description = "Çikolatalı kurabiye", Price = 55m, SortOrder = 3, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = soguk.Id, Name = "Limonata", Description = "Taze sıkılmış limonata", Price = 70m, SortOrder = 1, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = soguk.Id, Name = "Ice Latte", Description = "Buzlu latte", Price = 90m, SortOrder = 2, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = soguk.Id, Name = "Smoothie", Description = "Mevsim meyveli smoothie", Price = 110m, SortOrder = 3, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = atistirmalik.Id, Name = "Kruvasan", Description = "Tereyağlı kruvasan", Price = 65m, SortOrder = 1, IsActive = true },
+            new() { BusinessId = business.Id, CategoryId = atistirmalik.Id, Name = "Tost", Description = "Kaşarlı tost", Price = 80m, SortOrder = 2, IsActive = true }
+        ];
     }
 
     private static async Task SeedDemoUsersAsync(AppDbContext context)

@@ -84,6 +84,12 @@
                     <a href="/Business/GoLive" class="btn btn-sm btn-primary">Go-Live Merkezi’ne Git</a>
                 </div>
             </div>
+            @if (!Model.GoLiveStatus.IsReadyToGoLive)
+            {
+                <div class="alert alert-light border mt-3 mb-0 small">
+                    Satış demosu veya test için <a href="/Business/DemoCenter">Demo Merkezi</a>’ni de kullanabilirsiniz.
+                </div>
+            }
         </div>
     </div>
 }
@@ -384,6 +390,7 @@
             </div>
             <div class="panel-card-body d-grid gap-2">
                 <a href="/Business/GoLive" class="btn btn-success">Go-Live Merkezi</a>
+                <a href="/Business/DemoCenter" class="btn btn-outline-info">Demo Merkezi</a>
                 <a href="/Business/Notifications" class="btn btn-outline-warning">Bildirim Merkezi</a>
                 <a href="/Business/AuditLogs" class="btn btn-outline-dark">Aktivite Geçmişi</a>
                 <a href="/Business/Customers/Insights" class="btn btn-outline-primary">Müşteri CRM</a>

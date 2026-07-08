@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 28A aşaması (UX Final Polish / Boş Ekranlar / Yardım Rehberi) tamamlandı.
+> Son güncelleme: 28B aşaması (Demo & Sales Mode / Satışa Hazır Demo Deneyimi) tamamlandı.
 
 ---
 
@@ -548,6 +548,14 @@ DukkanPilot.sln
 - Public sepet/order/confirmation/tracking’e dokunulmadı; campaign engine / audit / notification logic korunuyor
 - Migration yok; Entity/DbContext değişmedi; Identity yok; SignalR yok; yeni NuGet yok
 
+### 28B aşaması — Demo & Sales Mode / Satışa Hazır Demo Deneyimi
+- **Landing:** `/Demo` satış akışı + özellik vitrini + checklist; Index “Neden DukkanPilot?” + kimler için polish; Pricing kimler için / “Bu planla başla” + demo CTA (ödeme vaadi yok)
+- **Business:** `/Business/DemoCenter` read-only demo readiness skoru + 9 adım CTA; sidebar + Dashboard entegrasyonu; subscription gate dışında
+- **Admin:** `/Admin/SalesCenter` platform KPI + demo-ready / dikkat listesi; sidebar + Dashboard CTA; SuperAdmin only
+- **Seed:** `EnrichDemoBusinessCatalogAsync` — demo-kafe eksik kategori/ürün/kampanya/ödül (Atıştırmalıklar + 12 ürün, %10 auto-apply, 100 puan ödül); silme yok
+- **Docs:** `SALES_DEMO_SCRIPT.md`, `FIRST_CUSTOMER_CHECKLIST.md`, `PRODUCT_POSITIONING.md`
+- Public şifre paylaşımı yok; Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet yok
+
 ---
 
 ## 6. Veritabanı
@@ -564,9 +572,9 @@ DukkanPilot.sln
 |-------|--------|
 | Demo işletme | **Demo Kafe** — slug: `demo-kafe` |
 | Planlar | Free, Starter, Pro |
-| Kategoriler | Kahveler, Tatlılar, Soğuk İçecekler |
-| Ürünler | Latte, Türk Kahvesi, Cheesecake, Limonata |
-| Diğer | BusinessSetting, BusinessSubscription, LoyaltyRule, Reward, Campaign |
+| Kategoriler | Kahveler, Tatlılar, Soğuk İçecekler, Atıştırmalıklar |
+| Ürünler | Latte, Türk Kahvesi, Americano, Filtre Kahve, Cheesecake, Brownie, Cookie, Limonata, Ice Latte, Smoothie, Kruvasan, Tost |
+| Diğer | BusinessSetting, BusinessSubscription, LoyaltyRule, Reward (100 puan kahve), Campaign (100₺ üzeri %10 auto-apply) |
 | WhatsApp | `905550000000` (demo işletme ayarı) |
 | Sadakat kuralı | Her 10 TL = 1 puan (seed) |
 | Demo admin | admin@dukkanpilot.local / Admin123! (SuperAdmin) |
@@ -609,7 +617,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-28A tamamlandı — Empty state / help card partial’ları; Business + Admin listede boş yönlendirme; Login/Register CTA polish.
+28B tamamlandı — Landing Demo/Pricing satış polish; /Business/DemoCenter; /Admin/SalesCenter; demo-kafe seed enrich; satış docs.
 
 ---
 
@@ -645,10 +653,12 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Admin/SubscriptionPlans` | Plan listesi |
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
 | `/Business/GoLive` | Go-Live Merkezi — kurulum sihirbazı / yayına hazırlık |
+| `/Business/DemoCenter` | Satış / test Demo Merkezi |
 | `/Business/AuditLogs` | İşletme aktivite geçmişi |
 | `/Business/Notifications` | İşletme bildirim merkezi |
 | `/Admin/AuditLogs` | Platform aktivite logları (SuperAdmin) |
 | `/Admin/Notifications` | Platform bildirim merkezi (SuperAdmin) |
+| `/Admin/SalesCenter` | Satış ve Demo Merkezi (SuperAdmin) |
 | `/Business/Products/ImportCsv` | CSV ile ürün içe aktarma |
 | `/Business/Products/DownloadImportTemplate` | CSV ürün şablonu indirme |
 | `POST /Business/Products/BulkAction` | Toplu ürün aktif/pasif ve fiyat işlemleri |
