@@ -5,6 +5,7 @@ using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,13 @@ public class BusinessesController : AdminBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public BusinessesController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
+    public BusinessesController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -272,6 +275,14 @@ public class BusinessesController : AdminBaseController
             ? "İşletme aktif duruma alındı."
             : "İşletme pasif duruma alındı.";
 
+        await _auditLog.LogAdminAsync(
+            "Admin.Business.StatusChanged",
+            "Business",
+            business.Id,
+            business.IsActive ? $"İşletme aktif duruma alındı: {business.Name}" : $"İşletme pasif duruma alındı: {business.Name}",
+            new { isActive = business.IsActive },
+            businessId: business.Id);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -328,6 +339,14 @@ public class BusinessesController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "İşletme başarıyla oluşturuldu.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Business.Created",
+            "Business",
+            business.Id,
+            $"İşletme oluşturuldu: {business.Name}",
+            businessId: business.Id);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -413,6 +432,14 @@ public class BusinessesController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "İşletme başarıyla güncellendi.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Business.Updated",
+            "Business",
+            business.Id,
+            $"İşletme güncellendi: {business.Name}",
+            businessId: business.Id);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -447,6 +474,14 @@ public class BusinessesController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "İşletme pasif duruma alındı.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Business.Deleted",
+            "Business",
+            business.Id,
+            $"İşletme silindi (pasif duruma alındı): {business.Name}",
+            businessId: business.Id);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -537,6 +572,22 @@ public class BusinessesController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Abonelik başarıyla güncellendi.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Subscription.Updated",
+            "BusinessSubscription",
+            subscription.Id,
+            $"Abonelik güncellendi (İşletme #{businessId}).",
+            new
+            {
+                subscriptionPlanId = model.SubscriptionPlanId,
+                status = model.Status.ToString(),
+                startDate = startDate,
+                endDate = endDate,
+                isActive = model.IsActive
+            },
+            businessId: businessId);
+
         return RedirectToAction(nameof(Details), new { id = businessId });
     }
 

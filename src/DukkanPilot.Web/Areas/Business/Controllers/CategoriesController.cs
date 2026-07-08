@@ -4,6 +4,7 @@ using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,11 +16,13 @@ public class CategoriesController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public CategoriesController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
+    public CategoriesController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -88,6 +91,14 @@ public class CategoriesController : BusinessBaseController
             ? "Kategori aktif duruma alındı."
             : "Kategori pasif duruma alındı.";
 
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Category.StatusChanged",
+            "Category",
+            category.Id,
+            category.IsActive ? $"Kategori aktif duruma alındı: {category.Name}" : $"Kategori pasif duruma alındı: {category.Name}",
+            new { isActive = category.IsActive });
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -147,6 +158,14 @@ public class CategoriesController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kategori başarıyla oluşturuldu.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Category.Created",
+            "Category",
+            category.Id,
+            $"Kategori oluşturuldu: {category.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -221,6 +240,14 @@ public class CategoriesController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kategori başarıyla güncellendi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Category.Updated",
+            "Category",
+            category.Id,
+            $"Kategori güncellendi: {category.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -263,6 +290,14 @@ public class CategoriesController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kategori pasif duruma alındı.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Category.Deleted",
+            "Category",
+            category.Id,
+            $"Kategori silindi (pasif duruma alındı): {category.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 

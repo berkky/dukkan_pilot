@@ -3,6 +3,7 @@ using DukkanPilot.Core.Entities;
 using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class SettingsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly IAuditLogService _auditLog;
 
-    public SettingsController(AppDbContext context)
+    public SettingsController(AppDbContext context, IAuditLogService auditLog)
     {
         _context = context;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -97,6 +100,18 @@ public class SettingsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "İşletme ayarları başarıyla kaydedildi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Business.SettingsUpdated",
+            "Business",
+            businessId,
+            "İşletme ayarları güncellendi.",
+            new
+            {
+                updatedFields = new[] { "BusinessName", "Phone", "LogoUrl", "Address", "Description", "WhatsAppNumber", "ThemeColor", "Currency" }
+            });
+
         return RedirectToAction(nameof(Index));
     }
 

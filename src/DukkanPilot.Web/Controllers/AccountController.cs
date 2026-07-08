@@ -6,6 +6,7 @@ using DukkanPilot.Infrastructure.Security;
 using DukkanPilot.Web.Constants;
 using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Models.Account;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -18,11 +19,13 @@ public class AccountController : Controller
 {
     private readonly AppDbContext _context;
     private readonly PasswordResetTokenHelper _passwordResetTokenHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public AccountController(AppDbContext context, PasswordResetTokenHelper passwordResetTokenHelper)
+    public AccountController(AppDbContext context, PasswordResetTokenHelper passwordResetTokenHelper, IAuditLogService auditLog)
     {
         _context = context;
         _passwordResetTokenHelper = passwordResetTokenHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("/Account/Register")]
@@ -111,6 +114,14 @@ public class AccountController : Controller
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kayıt başarılı. Şimdi giriş yapabilirsiniz.";
+
+        await _auditLog.LogAccountAsync(
+            "Account.Registered",
+            $"Yeni işletme sahibi kaydoldu: {business.Name}",
+            new { businessId = business.Id },
+            businessId: business.Id,
+            userEmail: user.Email);
+
         return RedirectToAction(nameof(Login));
     }
 
@@ -144,12 +155,26 @@ public class AccountController : Controller
         if (user is null || !PasswordHelper.VerifyPassword(model.Password, user.PasswordHash))
         {
             ModelState.AddModelError(string.Empty, "E-posta veya şifre hatalı.");
+
+            await _auditLog.LogAccountAsync(
+                "Account.LoginFailed",
+                $"Giriş denemesi başarısız: {normalizedEmail}",
+                severity: "Warning",
+                userEmail: normalizedEmail);
+
             return View(model);
         }
 
         if (!user.IsActive)
         {
             ModelState.AddModelError(string.Empty, "Hesabınız pasif durumda. Giriş yapamazsınız.");
+
+            await _auditLog.LogAccountAsync(
+                "Account.LoginFailed",
+                $"Giriş denemesi başarısız (pasif hesap): {normalizedEmail}",
+                severity: "Warning",
+                userEmail: normalizedEmail);
+
             return View(model);
         }
 
@@ -188,6 +213,12 @@ public class AccountController : Controller
                     : DateTimeOffset.UtcNow.AddHours(8)
             });
 
+        await _auditLog.LogAccountAsync(
+            "Account.LoginSuccess",
+            $"Giriş başarılı: {user.Email}",
+            businessId: businessRole?.BusinessId,
+            userEmail: user.Email);
+
         var localRedirect = RedirectToLocal(returnUrl);
         if (localRedirect is not null)
         {
@@ -202,7 +233,15 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        var userEmail = User.Identity?.Name is not null ? User.FindFirst(ClaimTypes.Email)?.Value : null;
+
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        await _auditLog.LogAccountAsync(
+            "Account.Logout",
+            "Kullanıcı çıkış yaptı.",
+            userEmail: userEmail);
+
         return RedirectToAction(nameof(Login));
     }
 
@@ -251,6 +290,11 @@ public class AccountController : Controller
 
             // TODO: Production ortamında resetLink e-posta ile gönderilecek.
             TempData["ResetLink"] = resetLink;
+
+            await _auditLog.LogAccountAsync(
+                "Account.PasswordResetRequested",
+                $"Şifre sıfırlama talebi oluşturuldu: {normalizedEmail}",
+                userEmail: normalizedEmail);
         }
 
         return RedirectToAction(nameof(ForgotPasswordConfirmation));
@@ -311,6 +355,11 @@ public class AccountController : Controller
         user.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        await _auditLog.LogAccountAsync(
+            "Account.PasswordResetCompleted",
+            $"Şifre sıfırlama tamamlandı: {normalizedEmail}",
+            userEmail: normalizedEmail);
 
         return RedirectToAction(nameof(ResetPasswordConfirmation));
     }

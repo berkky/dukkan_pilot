@@ -5,6 +5,7 @@ using DukkanPilot.Web.Areas.Business.Models;
 using Microsoft.AspNetCore.Mvc;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +17,13 @@ public class RewardsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public RewardsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
+    public RewardsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -108,6 +111,14 @@ public class RewardsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ödül başarıyla oluşturuldu.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Reward.Created",
+            "Reward",
+            reward.Id,
+            $"Ödül oluşturuldu: {reward.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -183,6 +194,14 @@ public class RewardsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ödül başarıyla güncellendi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Reward.Updated",
+            "Reward",
+            reward.Id,
+            $"Ödül güncellendi: {reward.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -225,6 +244,14 @@ public class RewardsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ödül pasif duruma alındı.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Reward.Deleted",
+            "Reward",
+            reward.Id,
+            $"Ödül silindi (pasif duruma alındı): {reward.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -343,6 +370,15 @@ public class RewardsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = $"Ödül kullanıldı: {reward.Name} ({reward.RequiredPoints} puan düşüldü).";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Reward.Redeemed",
+            "Reward",
+            reward.Id,
+            $"Ödül kullanıldı: {reward.Name}",
+            new { customerId = customer.Id, pointsDeducted = reward.RequiredPoints });
+
         return Redirect($"/Business/Customers/Details/{customer.Id}");
     }
     private async Task<bool> IsRewardNameAvailableAsync(int businessId, string name, int? excludeId = null)

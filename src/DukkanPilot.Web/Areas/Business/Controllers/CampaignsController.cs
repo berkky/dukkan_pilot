@@ -4,6 +4,7 @@ using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,11 +16,13 @@ public class CampaignsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public CampaignsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
+    public CampaignsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -125,6 +128,14 @@ public class CampaignsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kampanya başarıyla oluşturuldu.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Campaign.Created",
+            "Campaign",
+            campaign.Id,
+            $"Kampanya oluşturuldu: {campaign.Title}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -208,6 +219,14 @@ public class CampaignsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kampanya başarıyla güncellendi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Campaign.Updated",
+            "Campaign",
+            campaign.Id,
+            $"Kampanya güncellendi: {campaign.Title}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -250,6 +269,14 @@ public class CampaignsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Kampanya pasif duruma alındı.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Campaign.Deleted",
+            "Campaign",
+            campaign.Id,
+            $"Kampanya silindi (pasif duruma alındı): {campaign.Title}");
+
         return RedirectToAction(nameof(Index));
     }
     private async Task<bool> IsCampaignTitleAvailableAsync(int businessId, string title, int? excludeId = null)

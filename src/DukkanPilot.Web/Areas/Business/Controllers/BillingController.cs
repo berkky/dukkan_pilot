@@ -3,6 +3,7 @@ using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,18 @@ public class BillingController : BusinessBaseController
     private readonly AppDbContext _context;
     private readonly BusinessSubscriptionStatusHelper _subscriptionStatusHelper;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
     public BillingController(
         AppDbContext context,
         BusinessSubscriptionStatusHelper subscriptionStatusHelper,
-        BusinessPlanLimitHelper planLimitHelper)
+        BusinessPlanLimitHelper planLimitHelper,
+        IAuditLogService auditLog)
     {
         _context = context;
         _subscriptionStatusHelper = subscriptionStatusHelper;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -120,6 +124,14 @@ public class BillingController : BusinessBaseController
 
         builtModel.RequestMessage = BuildRequestMessage(builtModel);
         TempData["UpgradeRequestMessage"] = builtModel.RequestMessage;
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Subscription.UpgradeRequested",
+            "BusinessSubscription",
+            planId,
+            $"Plan yükseltme talebi oluşturuldu: {builtModel.CurrentPlanName} → {builtModel.RequestedPlanName}",
+            new { requestedPlanId = planId, requestedPlanName = builtModel.RequestedPlanName });
 
         return RedirectToAction(nameof(RequestUpgradeConfirmation));
     }

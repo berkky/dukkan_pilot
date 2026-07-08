@@ -3,6 +3,7 @@ using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class OrdersController : BusinessBaseController
 {
     private readonly AppDbContext _context;
+    private readonly IAuditLogService _auditLog;
 
-    public OrdersController(AppDbContext context)
+    public OrdersController(AppDbContext context, IAuditLogService auditLog)
     {
         _context = context;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -304,6 +307,25 @@ public class OrdersController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = loyaltyMessage ?? $"Sipariş durumu \"{OrderDisplayHelper.GetStatusLabel(status)}\" olarak güncellendi.";
+
+        var statusChangeSummary = isTransitionToCompleted
+            ? $"Sipariş durumu güncellendi: {previousStatus} → {status} (sadakat puanı akışı tetiklendi)."
+            : $"Sipariş durumu güncellendi: {previousStatus} → {status}.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Order.StatusChanged",
+            "Order",
+            order.Id,
+            statusChangeSummary,
+            new
+            {
+                orderId = order.Id,
+                oldStatus = previousStatus.ToString(),
+                newStatus = status.ToString(),
+                totalAmount = order.TotalAmount
+            });
+
         return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
     }
 

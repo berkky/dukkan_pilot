@@ -6,6 +6,7 @@ using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Models.PublicMenu;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,15 +23,18 @@ public class PublicMenuController : Controller
     private readonly AppDbContext _context;
     private readonly PublicOrderTrackingTokenHelper _trackingTokenHelper;
     private readonly PublicOrderPricingHelper _pricingHelper;
+    private readonly IAuditLogService _auditLog;
 
     public PublicMenuController(
         AppDbContext context,
         PublicOrderTrackingTokenHelper trackingTokenHelper,
-        PublicOrderPricingHelper pricingHelper)
+        PublicOrderPricingHelper pricingHelper,
+        IAuditLogService auditLog)
     {
         _context = context;
         _trackingTokenHelper = trackingTokenHelper;
         _pricingHelper = pricingHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("/m/{slug}")]
@@ -259,6 +263,20 @@ public class PublicMenuController : Controller
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
+
+        await _auditLog.LogPublicAsync(
+            business.Id,
+            "Public.OrderCreated",
+            "Order",
+            order.Id,
+            $"Yeni sipariş oluşturuldu: {orderNumber}",
+            new
+            {
+                orderId = order.Id,
+                orderNumber,
+                totalAmount = order.TotalAmount,
+                itemCount = order.Items.Count
+            });
 
         var messageLines = pricing.Items
             .Select(i => (i.ProductName, i.Quantity, i.UnitPrice))

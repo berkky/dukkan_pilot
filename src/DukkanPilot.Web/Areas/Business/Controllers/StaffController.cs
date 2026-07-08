@@ -5,6 +5,7 @@ using DukkanPilot.Infrastructure.Security;
 using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,13 @@ public class StaffController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public StaffController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
+    public StaffController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -125,6 +128,14 @@ public class StaffController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Personel başarıyla oluşturuldu.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Staff.Created",
+            "Staff",
+            user.Id,
+            $"Personel oluşturuldu: {user.FullName} ({model.BusinessRole})");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -215,6 +226,14 @@ public class StaffController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Personel bilgileri güncellendi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Staff.Updated",
+            "Staff",
+            user.Id,
+            $"Personel güncellendi: {user.FullName}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -262,6 +281,14 @@ public class StaffController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Personel pasif duruma alındı.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Staff.Deleted",
+            "Staff",
+            businessStaff.AppUserId,
+            $"Personel silindi (pasif duruma alındı): {businessStaff.AppUser.FullName}");
+
         return RedirectToAction(nameof(Index));
     }
 

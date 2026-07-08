@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 27A aşaması (Production Readiness / Güvenlik / Hata Sayfaları) tamamlandı.
+> Son güncelleme: 27B aşaması (Audit Log / Aktivite Geçmişi) tamamlandı.
 
 ---
 
@@ -515,6 +515,17 @@ DukkanPilot.sln
 - Admin Dashboard’a `/health` kısayolu
 - Public/Business/Admin/Account akışları bozulmadı; Migration yok; Identity yok; SignalR yok; yeni NuGet yok
 
+### 27B aşaması — Audit Log / Aktivite Geçmişi / Güvenli İşlem İzleme
+- **Entity:** `AuditLog` (yalnızca yeni tablo; mevcut entity’ler değişmedi)
+- **Migration:** `AddAuditLogs` (`20260708130220`) — yalnızca `AuditLogs` + indeksler
+- **Service:** `IAuditLogService` / `AuditLogService` — fail-safe (log hatası ana işlemi kırmaz); şifre/token/cookie/tracking token loglanmaz
+- **Business log:** Product/Category/Campaign/Reward/Order/Settings/Staff/Billing kritik başarı işlemleri
+- **Admin log:** Business CRUD/toggle/subscription, Plan CRUD
+- **Account log:** LoginSuccess/Failed, Logout, Registered, PasswordResetRequested/Completed
+- **Public log:** `Public.OrderCreated` (preview-order hariç); telefon/token yok
+- **UI:** `/Business/AuditLogs` (tenant filtresi), `/Admin/AuditLogs` (SuperAdmin); sidebar + dashboard kısayolları
+- Identity yok; SignalR yok; yeni NuGet dependency yok
+
 ---
 
 ## 6. Veritabanı
@@ -523,7 +534,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`) |
 
 ### Seed verisi
 
@@ -576,7 +587,7 @@ DukkanPilot.sln
 
 Sonraki MVP aşaması proje ihtiyacına göre belirlenecek.
 
-27A tamamlandı — production readiness (error pages, security headers, health, robots/sitemap, deployment checklist).
+27B tamamlandı — AuditLog entity/migration, fail-safe audit service, Business/Admin aktivite ekranları.
 
 ---
 
@@ -612,6 +623,8 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Admin/SubscriptionPlans` | Plan listesi |
 | `/Business/Dashboard` | İşletme paneli özeti + sadakat özeti |
 | `/Business/GoLive` | Go-Live Merkezi — kurulum sihirbazı / yayına hazırlık |
+| `/Business/AuditLogs` | İşletme aktivite geçmişi |
+| `/Admin/AuditLogs` | Platform aktivite logları (SuperAdmin) |
 | `/Business/Products/ImportCsv` | CSV ile ürün içe aktarma |
 | `/Business/Products/DownloadImportTemplate` | CSV ürün şablonu indirme |
 | `POST /Business/Products/BulkAction` | Toplu ürün aktif/pasif ve fiyat işlemleri |

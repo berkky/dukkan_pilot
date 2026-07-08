@@ -2,6 +2,7 @@ using DukkanPilot.Core.Entities;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Areas.Admin.Models;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +12,12 @@ namespace DukkanPilot.Web.Areas.Admin.Controllers;
 public class SubscriptionPlansController : AdminBaseController
 {
     private readonly AppDbContext _context;
+    private readonly IAuditLogService _auditLog;
 
-    public SubscriptionPlansController(AppDbContext context)
+    public SubscriptionPlansController(AppDbContext context, IAuditLogService auditLog)
     {
         _context = context;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -96,6 +99,13 @@ public class SubscriptionPlansController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Abonelik planı başarıyla oluşturuldu.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Plan.Created",
+            "SubscriptionPlan",
+            plan.Id,
+            $"Abonelik planı oluşturuldu: {plan.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -160,6 +170,13 @@ public class SubscriptionPlansController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Abonelik planı başarıyla güncellendi.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Plan.Updated",
+            "SubscriptionPlan",
+            plan.Id,
+            $"Abonelik planı güncellendi: {plan.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -194,6 +211,13 @@ public class SubscriptionPlansController : AdminBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Abonelik planı pasif duruma alındı.";
+
+        await _auditLog.LogAdminAsync(
+            "Admin.Plan.Deleted",
+            "SubscriptionPlan",
+            plan.Id,
+            $"Abonelik planı silindi (pasif duruma alındı): {plan.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 

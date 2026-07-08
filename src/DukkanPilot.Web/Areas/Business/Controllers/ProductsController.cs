@@ -7,6 +7,7 @@ using DukkanPilot.Web.Areas.Business.Models;
 using Microsoft.AspNetCore.Mvc;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,11 +19,13 @@ public class ProductsController : BusinessBaseController
 {
     private readonly AppDbContext _context;
     private readonly BusinessPlanLimitHelper _planLimitHelper;
+    private readonly IAuditLogService _auditLog;
 
-    public ProductsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper)
+    public ProductsController(AppDbContext context, BusinessPlanLimitHelper planLimitHelper, IAuditLogService auditLog)
     {
         _context = context;
         _planLimitHelper = planLimitHelper;
+        _auditLog = auditLog;
     }
 
     [HttpGet("")]
@@ -337,6 +340,20 @@ public class ProductsController : BusinessBaseController
 
             await _context.SaveChangesAsync();
             TempData["Success"] = $"{importResult.ImportedRows} ürün başarıyla içe aktarıldı.";
+
+            await _auditLog.LogBusinessAsync(
+                businessId,
+                "Product.Imported",
+                "Product",
+                null,
+                $"CSV içe aktarma tamamlandı: {importResult.ImportedRows} ürün eklendi.",
+                new
+                {
+                    totalRows = importResult.TotalRows,
+                    importedRows = importResult.ImportedRows,
+                    errorRows = importResult.ErrorRows,
+                    skippedByPlanLimitRows = importResult.SkippedByPlanLimitRows
+                });
         }
         else if (isDryRun && importResult.ValidRows > 0)
         {
@@ -460,6 +477,20 @@ public class ProductsController : BusinessBaseController
         if (updatedCount > 0)
         {
             await _context.SaveChangesAsync();
+
+            await _auditLog.LogBusinessAsync(
+                businessId,
+                "Product.BulkAction",
+                "Product",
+                null,
+                $"Toplu işlem uygulandı: {normalizedAction} ({updatedCount} ürün etkilendi).",
+                new
+                {
+                    actionType = normalizedAction,
+                    updatedCount,
+                    requestedCount = distinctIds.Length,
+                    percentValue
+                });
         }
 
         return LocalRedirect(ValidateReturnUrl(returnUrl));
@@ -491,6 +522,14 @@ public class ProductsController : BusinessBaseController
             ? "Ürün aktif duruma alındı."
             : "Ürün pasif duruma alındı.";
 
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Product.StatusChanged",
+            "Product",
+            product.Id,
+            product.IsActive ? $"Ürün aktif duruma alındı: {product.Name}" : $"Ürün pasif duruma alındı: {product.Name}",
+            new { isActive = product.IsActive });
+
         return LocalRedirect(ValidateReturnUrl(returnUrl));
     }
 
@@ -518,11 +557,21 @@ public class ProductsController : BusinessBaseController
             return NotFound();
         }
 
+        var oldPrice = product.Price;
         product.Price = price;
         product.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ürün fiyatı güncellendi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Product.PriceUpdated",
+            "Product",
+            product.Id,
+            $"Ürün fiyatı güncellendi: {product.Name}",
+            new { oldPrice, newPrice = price });
+
         return LocalRedirect(ValidateReturnUrl(returnUrl));
     }
 
@@ -572,6 +621,15 @@ public class ProductsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = $"Ürün kopyalandı: {copyName}";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Product.Duplicated",
+            "Product",
+            duplicate.Id,
+            $"Ürün kopyalandı: {source.Name} → {copyName}",
+            new { sourceProductId = source.Id, duplicateProductId = duplicate.Id });
+
         return LocalRedirect(ValidateReturnUrl(returnUrl));
     }
 
@@ -644,6 +702,14 @@ public class ProductsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ürün başarıyla oluşturuldu.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Product.Created",
+            "Product",
+            product.Id,
+            $"Ürün oluşturuldu: {product.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -728,6 +794,14 @@ public class ProductsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ürün başarıyla güncellendi.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Product.Updated",
+            "Product",
+            product.Id,
+            $"Ürün güncellendi: {product.Name}");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -770,6 +844,15 @@ public class ProductsController : BusinessBaseController
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "Ürün pasif duruma alındı.";
+
+        await _auditLog.LogBusinessAsync(
+            businessId,
+            "Product.StatusChanged",
+            "Product",
+            product.Id,
+            $"Ürün silindi (pasif duruma alındı): {product.Name}",
+            new { isActive = product.IsActive });
+
         return RedirectToAction(nameof(Index));
     }
 

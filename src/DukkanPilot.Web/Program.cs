@@ -3,12 +3,14 @@ using DukkanPilot.Infrastructure.Data.Seed;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Middleware;
+using DukkanPilot.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -36,6 +38,7 @@ builder.Services.AddScoped<BusinessSubscriptionStatusHelper>();
 builder.Services.AddScoped<BusinessPlanLimitHelper>();
 builder.Services.AddScoped<GoLiveHelper>();
 builder.Services.AddScoped<PublicOrderPricingHelper>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<RequireActiveSubscriptionFilter>();
 
 builder.Services.AddAntiforgery(options =>

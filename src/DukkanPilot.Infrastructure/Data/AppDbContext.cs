@@ -25,6 +25,7 @@ public class AppDbContext : DbContext
     public DbSet<Reward> Rewards => Set<Reward>();
     public DbSet<Campaign> Campaigns => Set<Campaign>();
     public DbSet<QrCode> QrCodes => Set<QrCode>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,6 +47,7 @@ public class AppDbContext : DbContext
         ConfigureReward(modelBuilder);
         ConfigureCampaign(modelBuilder);
         ConfigureQrCode(modelBuilder);
+        ConfigureAuditLog(modelBuilder);
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)
@@ -323,6 +325,30 @@ public class AppDbContext : DbContext
                 .WithMany(b => b.QrCodes)
                 .HasForeignKey(e => e.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureAuditLog(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.ToTable("AuditLogs");
+
+            entity.Property(e => e.Area).HasMaxLength(40).IsRequired();
+            entity.Property(e => e.Action).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Summary).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.EntityName).HasMaxLength(80);
+            entity.Property(e => e.UserEmail).HasMaxLength(200);
+            entity.Property(e => e.UserRole).HasMaxLength(50);
+            entity.Property(e => e.Severity).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.IpAddress).HasMaxLength(64);
+            entity.Property(e => e.UserAgent).HasMaxLength(400);
+            entity.Property(e => e.MetadataJson).HasMaxLength(4000);
+
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAtUtc });
+            entity.HasIndex(e => e.Action);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.EntityName, e.EntityId });
         });
     }
 }
