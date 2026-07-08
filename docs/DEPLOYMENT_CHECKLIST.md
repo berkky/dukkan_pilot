@@ -34,6 +34,12 @@ Ayrı terminalde:
 powershell -ExecutionPolicy Bypass -File .\scripts\run-smoke-tests.ps1 -BaseUrl http://localhost:5000
 ```
 
+Önerilen: tek komut kalite kapısı:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\release-quality-gate.ps1 -BaseUrl http://localhost:5000
+```
+
 ## 3. Production appsettings
 
 1. `src/DukkanPilot.Web/appsettings.Production.example.json` dosyasını kopyalayın → sunucuda `appsettings.Production.json`
@@ -78,6 +84,7 @@ veya publish öncesi CI/CD’de aynı komut + Production connection string.
 - Olay müdahalesi: `docs/INCIDENT_RESPONSE_RUNBOOK.md`
 - İlk müşteri: `docs/FIRST_RELEASE_OPERATIONS.md`
 - Admin izleme (salt okunur): `/Admin/Operations`
+- Admin kalite merkezi (salt okunur): `/Admin/Quality`
 
 ## 5. Production environment variables
 

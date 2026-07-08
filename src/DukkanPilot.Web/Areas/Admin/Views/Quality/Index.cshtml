@@ -1,0 +1,99 @@
+@model DukkanPilot.Web.Areas.Admin.Models.AdminQualityViewModel
+@{
+    ViewData["Title"] = "Kalite Merkezi";
+    ViewData["Subtitle"] = "Release, smoke test, regression ve müşteri kabul kontrol noktalarını takip edin.";
+}
+
+<div class="page-header mb-4">
+    <h2 class="h4 mb-1">Kalite Merkezi</h2>
+    <p class="text-muted mb-0">Release, smoke test, regression ve müşteri kabul kontrol noktalarını takip edin.</p>
+</div>
+
+<div class="alert alert-light border mb-4">
+    <strong>Uyarı:</strong> Bu ekran test çalıştırmaz; release öncesi scriptleri terminalden çalıştırın. Secret/connection string göstermez.
+</div>
+
+<div class="row g-3 mb-4">
+    @foreach (var card in Model.ReadinessCards)
+    {
+        <div class="col-sm-6 col-xl-3">
+            <div class="panel-card h-100 dp-quality-card">
+                <div class="panel-card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-semibold">@card.Title</div>
+                            <div class="small text-muted">@card.Description</div>
+                        </div>
+                        <span class="badge @card.BadgeClass">@(card.IsReady ? "Ready" : "Missing")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">System snapshot</h3></div>
+            <div class="panel-card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-5">Environment</dt><dd class="col-7">@Model.EnvironmentName</dd>
+                    <dt class="col-5">Machine</dt><dd class="col-7">@Model.MachineName</dd>
+                    <dt class="col-5">UTC</dt><dd class="col-7">@Model.UtcNow.ToString("O")</dd>
+                    <dt class="col-5">Assembly</dt><dd class="col-7">@Model.AssemblyVersion</dd>
+                    <dt class="col-5">DB</dt><dd class="col-7">@Model.DatabaseStatusMessage</dd>
+                    <dt class="col-5">Applied migrations</dt><dd class="col-7">@Model.AppliedMigrationCount</dd>
+                    <dt class="col-5">Pending migrations</dt><dd class="col-7">@Model.PendingMigrationCount</dd>
+                </dl>
+                @if (Model.PendingMigrationCount > 0 && Model.PendingMigrationNames.Count > 0)
+                {
+                    <div class="mt-2 small text-muted">
+                        Pending: @string.Join(", ", Model.PendingMigrationNames.Take(5))
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">QA checklist</h3></div>
+            <div class="panel-card-body">
+                <ul class="mb-0 small dp-quality-checklist">
+                    @foreach (var item in Model.QaChecklist)
+                    {
+                        <li class="mb-2">
+                            <div class="fw-semibold">@item.Title</div>
+                            <div class="text-muted">@item.Description</div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Script usage</h3></div>
+            <div class="panel-card-body">
+                <pre class="dp-quality-script-block mb-0">@string.Join("\n", Model.ScriptHints)</pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card h-100">
+            <div class="panel-card-header"><h3 class="h6 mb-0">Quick links</h3></div>
+            <div class="panel-card-body d-flex flex-wrap gap-2">
+                @foreach (var link in Model.QuickLinks)
+                {
+                    <a href="@link.Url" class="btn btn-sm @link.ButtonClass" target="@(link.Url.StartsWith("/m/") || link.Url == "/Demo" ? "_blank" : null)" rel="noopener">
+                        @link.Title
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

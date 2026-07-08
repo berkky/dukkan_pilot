@@ -12,6 +12,7 @@
 - [ ] `db-verify-backup.ps1` geçti mi?
 - [ ] `db-generate-migration-script.ps1` üretildi mi? (değişiklik varsa)
 - [ ] Migration script review edildi mi?
+- [ ] `release-quality-gate.ps1` PASS (smoke + SEO + security headers + demo readiness)
 - [ ] Rollback/restore planı var mı? (`DATABASE_BACKUP_AND_RECOVERY.md`)
 - [ ] Smoke test listesi hazır mı? (`SMOKE_TEST_CHECKLIST.md` + `run-smoke-tests.ps1`)
 - [ ] `appsettings.Production.example.json` güncel; gerçek secret yok
@@ -55,6 +56,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\publish-release.ps1
 - [ ] SuperAdmin: Admin Dashboard + SalesCenter + Onboarding + CustomerSuccess
 - [ ] Onboarding routes smoke: `/Business/Onboarding` `/Admin/Onboarding` (auth yok → 302)
 - [ ] Success routes smoke: `/Business/Success` `/Admin/CustomerSuccess` (auth yok → 302)
+- [ ] Quality Center: `/Admin/Quality` (SuperAdmin)
 - [ ] Test sipariş (public → kitchen)
 - [ ] Notification / Audit log görünür
 - [ ] `/robots.txt` `/sitemap.xml`

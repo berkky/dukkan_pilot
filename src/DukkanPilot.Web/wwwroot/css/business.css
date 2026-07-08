@@ -461,3 +461,8 @@
     border-color: #bbf7d0;
     background: #f0fdf4;
 }
+
+/* 32A — QA checklist card */
+.dp-qa-checklist-card ul {
+    margin-bottom: 0;
+}

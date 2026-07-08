@@ -47,7 +47,6 @@ public class SeoController : Controller
             ("/Kvkk", "0.5", "monthly"),
             ("/Cookies", "0.5", "monthly"),
             ("/DataProcessing", "0.5", "monthly"),
-            ("/Account/Register", "0.6", "monthly"),
             ("/m/demo-kafe", "0.7", "weekly")
         };
 

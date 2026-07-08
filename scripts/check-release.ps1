@@ -28,9 +28,10 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "==> EF has-pending-model-changes"
-$infra = Join-Path $RepoRoot "src\DukkanPilot.Infrastructure"
-$web = Join-Path $RepoRoot "src\DukkanPilot.Web"
-$efOut = & dotnet ef migrations has-pending-model-changes --project $infra --startup-project $web 2>&1
+$infra = Join-Path $RepoRoot "src\DukkanPilot.Infrastructure\DukkanPilot.Infrastructure.csproj"
+$web = Join-Path $RepoRoot "src\DukkanPilot.Web\DukkanPilot.Web.csproj"
+# Use Release + --no-build to avoid Debug file locks when app is running.
+$efOut = & dotnet ef migrations has-pending-model-changes --project $infra --startup-project $web --configuration Release --no-build 2>&1
 $efCode = $LASTEXITCODE
 $efText = ($efOut | Out-String)
 
@@ -89,11 +90,23 @@ $required = @(
     "src\DukkanPilot.Web\Areas\Admin\Controllers\CustomerSuccessController.cs",
     "scripts\publish-release.ps1",
     "scripts\run-smoke-tests.ps1",
+    "scripts\check-security-headers.ps1",
+    "scripts\check-seo-endpoints.ps1",
+    "scripts\check-public-demo-readiness.ps1",
+    "scripts\release-quality-gate.ps1",
     "scripts\db-backup.ps1",
     "scripts\db-verify-backup.ps1",
     "scripts\db-restore-test.ps1",
     "scripts\db-generate-migration-script.ps1",
     "scripts\db-migration-status.ps1",
+    "docs\QA_TEST_PLAN.md",
+    "docs\REGRESSION_TEST_MATRIX.md",
+    "docs\UAT_SCRIPT_FIRST_CUSTOMER.md",
+    "docs\BUG_REPORT_TEMPLATE.md",
+    "docs\RELEASE_QUALITY_GATE.md",
+    "src\DukkanPilot.Web\Areas\Admin\Controllers\QualityController.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Models\AdminQualityViewModel.cs",
+    "src\DukkanPilot.Web\Areas\Admin\Views\Quality\Index.cshtml",
     "src\DukkanPilot.Web\Controllers\LegalController.cs",
     "src\DukkanPilot.Web\Views\Legal\Privacy.cshtml",
     "src\DukkanPilot.Web\Views\Legal\Trust.cshtml",

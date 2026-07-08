@@ -46,6 +46,9 @@
 12. **Smoke**  
     `run-smoke-tests.ps1` + `SMOKE_TEST_CHECKLIST.md` + `/Admin/Operations`.
 
+12b. **Release quality gate**  
+   `release-quality-gate.ps1` ile smoke + SEO + security headers + demo readiness.
+
 13. **Müşteriye teslim**  
     - Panel URL + roller  
     - Public menü URL  

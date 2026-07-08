@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: 31B (Customer Success / Retention / Business Health Score) tamamlandı.
+> Son güncelleme: 32A (QA / Regression / UAT / Release Quality Gate) tamamlandı.
 
 ---
 
@@ -611,6 +611,13 @@ DukkanPilot.sln
 - Admin: `/Admin/CustomerSuccess` + `/Admin/CustomerSuccess/Details/{businessId}` + Dashboard/SalesCenter/Operations/BusinessDetails/SalesRequests entegrasyonu
 - Docs: CUSTOMER_SUCCESS_HEALTH_SCORE, RETENTION_PLAYBOOK, UPGRADE_OPPORTUNITY_PLAYBOOK, CHURN_RISK_RUNBOOK
 - Migration yok; Entity/DbContext değişmedi; Identity/SignalR/NuGet/ödeme yok; Success ekranları read-only, audit üretmez, notification spam yaratmaz
+
+### 32A — QA / Regression / UAT / Release Quality Gate
+- Script tabanlı smoke / security headers / SEO / demo readiness kontrolleri
+- Tek komut: `scripts/release-quality-gate.ps1`
+- Admin: `/Admin/Quality` (read-only) kalite merkezi; script çalıştırmaz, secret göstermez
+- Docs: QA_TEST_PLAN, REGRESSION_TEST_MATRIX, UAT_SCRIPT_FIRST_CUSTOMER, BUG_REPORT_TEMPLATE, RELEASE_QUALITY_GATE
+- Migration yok; Entity/DbContext değişmedi; test project/NuGet yok
 
 ---
 

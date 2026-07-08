@@ -83,11 +83,15 @@ public class OperationsController : AdminBaseController
             ScriptHints =
             [
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-release.ps1",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\release-quality-gate.ps1 -BaseUrl http://localhost:5000",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\publish-release.ps1",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\db-backup.ps1 -ServerInstance \"(localdb)\\MSSQLLocalDB\" -DatabaseName \"DukkanPilotDb\"",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\db-generate-migration-script.ps1",
                 "powershell -ExecutionPolicy Bypass -File .\\scripts\\db-migration-status.ps1",
-                "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-smoke-tests.ps1 -BaseUrl http://localhost:5000"
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-smoke-tests.ps1 -BaseUrl http://localhost:5000",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-security-headers.ps1 -BaseUrl http://localhost:5000 -Path /",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-seo-endpoints.ps1 -BaseUrl http://localhost:5000",
+                "powershell -ExecutionPolicy Bypass -File .\\scripts\\check-public-demo-readiness.ps1 -BaseUrl http://localhost:5000 -DemoSlug demo-kafe"
             ]
         };
 
@@ -162,6 +166,13 @@ public class OperationsController : AdminBaseController
                 Description = "/Admin/CustomerSuccess + docs/CUSTOMER_SUCCESS_HEALTH_SCORE.md",
                 IsReadyHint = FileExists("docs", "CUSTOMER_SUCCESS_HEALTH_SCORE.md")
                     && FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "CustomerSuccessController.cs")
+            },
+            new OpsChecklistItemViewModel
+            {
+                Title = "Quality Center available",
+                Description = "/Admin/Quality + release-quality-gate scripts",
+                IsReadyHint = FileExists("src", "DukkanPilot.Web", "Areas", "Admin", "Controllers", "QualityController.cs")
+                    && FileExists("scripts", "release-quality-gate.ps1")
             }
         ];
 

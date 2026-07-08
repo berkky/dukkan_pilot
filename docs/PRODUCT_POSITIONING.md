@@ -17,6 +17,7 @@ Kafe/restoran/tatlıcı için **QR Menü + WhatsApp Sipariş + Sadakat + Kampany
 5. Audit log + bildirim merkezi ile güven
 6. Satış sonrası kurulum desteği ve onboarding (Kurulum Sihirbazı + Admin Kurulum Takibi)
 7. Customer success / retention health (İşletme Sağlığı + Customer Success Merkezi)
+8. Release quality gate + QA dokümanları (Kalite Merkezi + script tabanlı doğrulama)
 
 ## Ayrışma
 - Sadece PDF menü değil; sipariş + operasyon

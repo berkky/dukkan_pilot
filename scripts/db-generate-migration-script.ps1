@@ -42,6 +42,8 @@ $args = @(
     "ef", "migrations", "script",
     "--project", $infra,
     "--startup-project", $web,
+    "--configuration", "Release",
+    "--no-build",
     "--output", $outFile
 )
 

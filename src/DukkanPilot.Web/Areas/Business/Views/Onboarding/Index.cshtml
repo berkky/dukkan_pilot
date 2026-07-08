@@ -25,6 +25,26 @@
     Variant = "info"
 })
 
+<div class="panel-card mb-4 border-dark dp-qa-checklist-card">
+    <div class="panel-card-header"><h3 class="h6 mb-0">Canlıya çıkmadan test et</h3></div>
+    <div class="panel-card-body small">
+        <ul class="mb-3 ps-3">
+            <li><a href="@s.PublicMenuUrl" target="_blank" rel="noopener">Public menüyü aç</a></li>
+            <li>Test siparişi oluştur (public menü → WhatsApp)</li>
+            <li><a href="/Business/Orders/Kitchen">Kitchen</a> ekranında durum değiştir (Preparing/Completed)</li>
+            <li>Confirmation / tracking ekranını kontrol et</li>
+            <li>WhatsApp metnini kontrol et</li>
+            <li><a href="/Business/QrMenu/Print" target="_blank" rel="noopener">QR poster indir</a></li>
+            <li>Notification / Audit oluştu mu kontrol et</li>
+        </ul>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/Business/GoLive" class="btn btn-sm btn-outline-success">Go-Live</a>
+            <a href="/Business/Notifications" class="btn btn-sm btn-outline-warning">Bildirimler</a>
+            <a href="/Business/AuditLogs" class="btn btn-sm btn-outline-dark">Audit</a>
+        </div>
+    </div>
+</div>
+
 <div class="panel-card mb-4 onboarding-score-card @s.CardVariantClass">
     <div class="panel-card-body">
         <div class="row g-3 align-items-center">

@@ -8,8 +8,8 @@ $ErrorActionPreference = "Continue"
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $RepoRoot
 
-$infra = Join-Path $RepoRoot "src\DukkanPilot.Infrastructure"
-$web = Join-Path $RepoRoot "src\DukkanPilot.Web"
+$infra = Join-Path $RepoRoot "src\DukkanPilot.Infrastructure\DukkanPilot.Infrastructure.csproj"
+$web = Join-Path $RepoRoot "src\DukkanPilot.Web\DukkanPilot.Web.csproj"
 $failed = $false
 
 Write-Host "==> DukkanPilot db-migration-status" -ForegroundColor Cyan
@@ -17,7 +17,7 @@ Write-Host "Repo: $RepoRoot"
 Write-Host ""
 
 Write-Host "==> migrations list"
-$listOut = & dotnet ef migrations list --project $infra --startup-project $web 2>&1
+$listOut = & dotnet ef migrations list --project $infra --startup-project $web --configuration Release --no-build 2>&1
 $listCode = $LASTEXITCODE
 Write-Host ($listOut | Out-String)
 
@@ -33,7 +33,7 @@ if ($listCode -ne 0) {
 
 Write-Host ""
 Write-Host "==> has-pending-model-changes"
-$pendingOut = & dotnet ef migrations has-pending-model-changes --project $infra --startup-project $web 2>&1
+$pendingOut = & dotnet ef migrations has-pending-model-changes --project $infra --startup-project $web --configuration Release --no-build 2>&1
 $pendingCode = $LASTEXITCODE
 $pendingText = ($pendingOut | Out-String)
 Write-Host $pendingText

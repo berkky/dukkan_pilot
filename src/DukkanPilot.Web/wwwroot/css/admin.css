@@ -106,3 +106,18 @@
     white-space: nowrap;
     font-size: 0.8rem;
 }
+
+/* 32A — Quality Center */
+.dp-quality-script-block {
+    background: #0b1220;
+    color: #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.9rem 1rem;
+    overflow: auto;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    font-size: 0.8rem;
+}
+
+.dp-quality-checklist {
+    padding-left: 1.1rem;
+}
