@@ -5,7 +5,7 @@
 | Dakika | Konu | Ekran / Rehber |
 |--------|------|----------------|
 | 0–5 | Giriş, panel turu | Dashboard, `/Business/HelpCenter` |
-| 5–10 | Ayarlar ve menü yayını | Settings, `qr-menu-yayinlama` |
+| 5–10 | Ayarlar ve menü yayını | Settings, `qr-menu-yayinlama`, `masa-qr-siparis` |
 | 10–15 | Kategori/ürün | Products, `kategori-urun-ekleme` |
 | 15–20 | Public menü test | `/m/{slug}`, DemoCenter |
 | 20–28 | Sipariş + mutfak | Orders/Kitchen, `siparis-mutfak` |

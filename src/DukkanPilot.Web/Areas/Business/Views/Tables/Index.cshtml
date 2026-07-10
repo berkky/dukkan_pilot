@@ -1,0 +1,125 @@
+@model BusinessTablesIndexViewModel
+@{
+    ViewData["Title"] = "Masa QR Kodları";
+    ViewData["Subtitle"] = "Masaya özel sipariş linkleri";
+    var isOwner = Model.IsBusinessOwner;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="h4 mb-1">Masa QR Kodları</h2>
+        <p class="text-muted mb-0">Her masa için ayrı QR linki — garson/mutfak hangi masadan sipariş geldiğini görür.</p>
+    </div>
+    @if (isOwner)
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">Yeni Masa</a>
+    }
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/_HelpCard.cshtml", new HelpCardViewModel
+{
+    Title = "Masa QR nasıl çalışır?",
+    Description = "Her masaya özel link oluşturun, QR yazdırın. Müşteri masadaki QR'ı okutunca siparişe masa bilgisi otomatik eklenir.",
+    ActionText = "QR Menü (genel)",
+    ActionUrl = "/Business/QrMenu",
+    HelpGuideText = "Masa QR rehberi",
+    HelpGuideUrl = "/Business/HelpCenter/Article/masa-qr-siparis"
+})
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success small">@successMessage</div>
+}
+
+@if (!Model.Tables.Any())
+{
+    @await Html.PartialAsync("~/Views/Shared/_EmptyState.cshtml", new EmptyStateViewModel
+    {
+        Icon = "🪑",
+        Title = "Henüz masa tanımlı değil",
+        Description = "İlk masanızı oluşturun; her masa için benzersiz QR linki üretilir.",
+        PrimaryActionText = isOwner ? "İlk Masayı Oluştur" : null,
+        PrimaryActionUrl = isOwner ? "/Business/Tables/Create" : null,
+        SecondaryActionText = "QR Menü",
+        SecondaryActionUrl = "/Business/QrMenu"
+    })
+}
+else
+{
+    <div class="panel-card">
+        <div class="panel-card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Masa</th>
+                            <th>Kod</th>
+                            <th>Sıra</th>
+                            <th>Durum</th>
+                            <th>QR Link</th>
+                            <th class="text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var table in Model.Tables)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@table.TableLabel</td>
+                            <td><code class="small">@table.PublicCode</code></td>
+                            <td>@table.DisplayOrder</td>
+                            <td>
+                                @if (table.IsActive)
+                                {
+                                    <span class="badge bg-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Pasif</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm" style="min-width: 220px;">
+                                    <input type="text" class="form-control form-control-sm table-url-input" value="@table.PublicMenuUrl" readonly />
+                                    <button type="button" class="btn btn-outline-primary btn-sm copy-table-url-btn">Kopyala</button>
+                                </div>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Qr" asp-route-id="@table.Id" class="btn btn-sm btn-outline-success" target="_blank" rel="noopener">QR</a>
+                                <a href="@table.PublicMenuUrl" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener">Menü</a>
+                                @if (isOwner)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@table.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                    <form asp-action="Toggle" asp-route-id="@table.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-warning">
+                                            @(table.IsActive ? "Pasif" : "Aktif")
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.copy-table-url-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const input = btn.closest('.input-group').querySelector('.table-url-input');
+                if (!input) return;
+                input.select();
+                navigator.clipboard.writeText(input.value).then(function () {
+                    btn.textContent = 'Kopyalandı';
+                    setTimeout(function () { btn.textContent = 'Kopyala'; }, 1500);
+                }).catch(function () {
+                    document.execCommand('copy');
+                });
+            });
+        });
+    </script>
+}

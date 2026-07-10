@@ -73,6 +73,11 @@
     border-color: rgba(34, 197, 94, 0.4);
 }
 
+.public-menu-hero-badge-table {
+    background: rgba(59, 130, 246, 0.28);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
 .public-menu-info {
     margin: 0.875rem 1rem 0;
     padding: 0.875rem 1rem;

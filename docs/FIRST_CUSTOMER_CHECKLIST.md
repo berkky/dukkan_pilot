@@ -10,6 +10,7 @@
 - [ ] Tema rengi / kısa açıklama
 - [ ] QR Menü linki kontrol (`/m/{slug}`)
 - [ ] QR afiş yazdır (`/Business/QrMenu/Print`)
+- [ ] (Pilot restoran) Masa QR kurulumu (`/Business/Tables`, `TABLE_SERVICE_QR_GUIDE.md`)
 - [ ] Test siparişi ver → confirmation/tracking
 - [ ] Kitchen’da durumu ilerlet
 - [ ] (Opsiyonel) Kampanya: 100₺ üzeri %10 auto-apply

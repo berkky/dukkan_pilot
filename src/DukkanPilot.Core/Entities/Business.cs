@@ -22,4 +22,5 @@ public class Business : BaseEntity
     public ICollection<BusinessSubscription> Subscriptions { get; set; } = new List<BusinessSubscription>();
     public ICollection<UserBusinessRole> UserRoles { get; set; } = new List<UserBusinessRole>();
     public ICollection<QrCode> QrCodes { get; set; } = new List<QrCode>();
+    public ICollection<BusinessTable> Tables { get; set; } = new List<BusinessTable>();
 }

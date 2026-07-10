@@ -1,12 +1,14 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using DukkanPilot.Core.Common;
 using DukkanPilot.Core.Entities;
 using DukkanPilot.Core.Enums;
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Models.PublicMenu;
 using DukkanPilot.Web.Services;
+using DukkanPilot.Web.Areas.Business.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,7 +43,7 @@ public class PublicMenuController : Controller
     }
 
     [HttpGet("/m/{slug}")]
-    public async Task<IActionResult> Index(string slug)
+    public async Task<IActionResult> Index(string slug, [FromQuery] string? table)
     {
         var normalizedSlug = slug.Trim().ToLowerInvariant();
 
@@ -54,6 +56,16 @@ public class PublicMenuController : Controller
         {
             Response.StatusCode = StatusCodes.Status404NotFound;
             return View("NotFound", normalizedSlug);
+        }
+
+        BusinessTable? resolvedTable = null;
+        var hasTableQuery = !string.IsNullOrWhiteSpace(table);
+        if (hasTableQuery)
+        {
+            resolvedTable = await BusinessTableCodeHelper.ResolveActiveTableAsync(
+                _context,
+                business.Id,
+                table);
         }
 
         var now = DateTime.UtcNow;
@@ -146,6 +158,12 @@ public class PublicMenuController : Controller
             ThemeColor = themeColor,
             Currency = currency,
             WhatsAppNumber = whatsAppNumber,
+            BusinessTableId = resolvedTable?.Id,
+            TableLabel = resolvedTable?.TableLabel,
+            TablePublicCode = resolvedTable?.PublicCode ?? (hasTableQuery ? table?.Trim() : null),
+            ServiceType = resolvedTable is not null ? OrderServiceTypes.TableService : null,
+            HasResolvedTable = resolvedTable is not null,
+            ShowTableWarning = hasTableQuery && resolvedTable is null,
             Campaigns = campaignViewModels,
             Rewards = rewards,
             Categories = categories
@@ -236,6 +254,11 @@ public class PublicMenuController : Controller
         var currency = ResolveCurrency(business.Setting?.Currency);
         var orderNumber = GenerateOrderNumber();
 
+        var resolvedTable = await BusinessTableCodeHelper.ResolveActiveTableAsync(
+            _context,
+            business.Id,
+            request.TablePublicCode);
+
         var order = new Order
         {
             BusinessId = business.Id,
@@ -250,7 +273,12 @@ public class PublicMenuController : Controller
             Source = OrderSource.WhatsApp,
             Notes = BuildOrderNotes(request.Notes, pricing),
             CustomerName = TrimToMax(request.CustomerName, 200),
-            CustomerPhone = TrimToMax(request.CustomerPhone, 20)
+            CustomerPhone = TrimToMax(request.CustomerPhone, 20),
+            ServiceType = resolvedTable is not null ? OrderServiceTypes.TableService : null,
+            BusinessTableId = resolvedTable?.Id,
+            TableLabelSnapshot = resolvedTable is not null
+                ? TrimToMax(resolvedTable.TableLabel, 80)
+                : null
         };
 
         foreach (var item in pricing.Items)
@@ -309,7 +337,9 @@ public class PublicMenuController : Controller
             order.CustomerPhone,
             pricing.RewardRequestName,
             pricing.CampaignMessage,
-            ExtractCustomerNote(order.Notes));
+            ExtractCustomerNote(order.Notes),
+            order.ServiceType,
+            order.TableLabelSnapshot);
 
         var whatsAppUrl = $"https://wa.me/{whatsAppNumber}?text={Uri.EscapeDataString(message)}";
         var trackingToken = _trackingTokenHelper.CreateToken(order.Id, business.Id, order.CreatedAt);
@@ -486,7 +516,9 @@ public class PublicMenuController : Controller
                 order.CustomerPhone,
                 rewardRequestText,
                 campaignInfoText,
-                customerNote);
+                customerNote,
+                order.ServiceType,
+                order.TableLabelSnapshot);
             whatsAppUrl = $"https://wa.me/{whatsAppNumber}?text={Uri.EscapeDataString(message)}";
         }
 
@@ -525,7 +557,9 @@ public class PublicMenuController : Controller
             EarnedPointsPreview = earnedPointsPreview,
             LoyaltyPreviewMessage = loyaltyPreviewMessage,
             RewardRequestText = rewardRequestText,
-            CampaignInfoText = campaignInfoText
+            CampaignInfoText = campaignInfoText,
+            ServiceType = order.ServiceType,
+            TableLabelSnapshot = order.TableLabelSnapshot
         };
 
         ViewData["Title"] = isConfirmationPage
@@ -721,7 +755,9 @@ public class PublicMenuController : Controller
         string? customerPhone,
         string? rewardRequest,
         string? campaignInfo,
-        string? notes)
+        string? notes,
+        string? serviceType = null,
+        string? tableLabelSnapshot = null)
     {
         var culture = CultureInfo.GetCultureInfo("tr-TR");
         var sb = new StringBuilder();
@@ -729,6 +765,12 @@ public class PublicMenuController : Controller
         sb.AppendLine($"Merhaba, {businessName} menüsünden sipariş vermek istiyorum.");
         sb.AppendLine();
         sb.AppendLine($"Sipariş No: {orderNumber}");
+
+        if (OrderDisplayHelper.HasTableInfo(serviceType, tableLabelSnapshot))
+        {
+            sb.AppendLine($"Masa: {tableLabelSnapshot!.Trim()}");
+            sb.AppendLine($"Servis: {OrderDisplayHelper.GetServiceTypeLabel(serviceType)}");
+        }
 
         if (!string.IsNullOrWhiteSpace(customerName))
         {

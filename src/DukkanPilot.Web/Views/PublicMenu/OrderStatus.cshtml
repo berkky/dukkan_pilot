@@ -74,6 +74,15 @@
 
             <p class="order-status-message" id="order-status-message">@Model.StatusMessage</p>
 
+            @if (Model.HasTableInfo)
+            {
+                <div class="public-order-info-box mb-3">
+                    <div class="public-order-info-label">Masa</div>
+                    <div class="fw-semibold">@Model.TableDisplayLabel</div>
+                    <div class="small text-muted">@Model.ServiceTypeText</div>
+                </div>
+            }
+
             <div id="order-status-polling-error" class="alert alert-warning py-2 small mb-0" hidden role="alert"></div>
 
             <div class="order-timeline" id="order-status-timeline" aria-label="Sipariş durumu">

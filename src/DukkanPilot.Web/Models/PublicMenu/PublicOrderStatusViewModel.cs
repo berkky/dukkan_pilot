@@ -1,4 +1,5 @@
 using DukkanPilot.Core.Enums;
+using DukkanPilot.Web.Areas.Business.Models;
 using DukkanPilot.Web.Helpers;
 
 namespace DukkanPilot.Web.Models.PublicMenu;
@@ -67,6 +68,18 @@ public class PublicOrderStatusViewModel
     public string? RewardRequestText { get; set; }
 
     public string? CampaignInfoText { get; set; }
+
+    public string? ServiceType { get; set; }
+
+    public string? TableLabelSnapshot { get; set; }
+
+    public string ServiceTypeText => OrderDisplayHelper.GetServiceTypeLabel(ServiceType);
+
+    public string ServiceTypeBadgeClass => OrderDisplayHelper.GetServiceTypeBadgeClass(ServiceType);
+
+    public bool HasTableInfo => OrderDisplayHelper.HasTableInfo(ServiceType, TableLabelSnapshot);
+
+    public string? TableDisplayLabel => OrderDisplayHelper.GetTableDisplayLabel(TableLabelSnapshot);
 
     public string TrackingPageUrl { get; set; } = string.Empty;
 

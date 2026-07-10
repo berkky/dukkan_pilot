@@ -167,6 +167,7 @@ else
                     <thead class="table-light">
                         <tr>
                             <th>Sipariş No</th>
+                            <th>Masa</th>
                             <th>Müşteri</th>
                             <th>Telefon</th>
                             <th>Tarih</th>
@@ -179,7 +180,7 @@ else
                     @if (!Model.Orders.Any())
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">Filtreye uygun sipariş bulunamadı.</td>
+                            <td colspan="8" class="text-center text-muted py-4">Filtreye uygun sipariş bulunamadı.</td>
                         </tr>
                     }
                     else
@@ -188,6 +189,16 @@ else
                         {
                             <tr>
                                 <td class="fw-semibold">@item.OrderNumber</td>
+                                <td>
+                                    @if (item.HasTableInfo)
+                                    {
+                                        <span class="badge @item.ServiceTypeBadgeClass">@item.TableDisplayLabel</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">—</span>
+                                    }
+                                </td>
                                 <td>@(item.CustomerName ?? "-")</td>
                                 <td>@(item.CustomerPhone ?? "-")</td>
                                 <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", culture)</td>

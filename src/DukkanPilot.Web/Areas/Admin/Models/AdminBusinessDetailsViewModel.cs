@@ -95,6 +95,10 @@ public class AdminBusinessMenuReadinessViewModel
 
     public int ActiveProducts { get; set; }
 
+    public int TotalTables { get; set; }
+
+    public int ActiveTables { get; set; }
+
     public int PassiveProducts { get; set; }
 
     public decimal AverageProductPrice { get; set; }

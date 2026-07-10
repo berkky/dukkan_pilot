@@ -199,7 +199,12 @@ $required = @(
     "scripts\check-performance-smoke.ps1",
     "docs\PERFORMANCE_HARDENING_GUIDE.md",
     "docs\RELIABILITY_RUNBOOK.md",
-    "docs\PERFORMANCE_SMOKE_TESTS.md"
+    "docs\PERFORMANCE_SMOKE_TESTS.md",
+    "src\DukkanPilot.Core\Entities\BusinessTable.cs",
+    "src\DukkanPilot.Web\Areas\Business\Controllers\TablesController.cs",
+    "src\DukkanPilot.Web\Areas\Business\Views\Tables\Index.cshtml",
+    "docs\TABLE_SERVICE_QR_GUIDE.md",
+    "docs\TABLE_SERVICE_UAT_SCRIPT.md"
 )
 
 foreach ($rel in $required) {

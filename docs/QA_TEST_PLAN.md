@@ -22,6 +22,7 @@ Bu katman:
 - Legal: privacy/kvkk/terms/cookies/data processing
 - Sales: request demo/plan
 - Public menu: `/m/{slug}` (demo-kafe) + mobile polish checklist
+- Table service: `/m/demo-kafe?table=TBL-KAFE-1` — `TABLE_SERVICE_UAT_SCRIPT.md`
 - Order flow: cart → WhatsApp order → confirmation/tracking → kitchen
 - Business: dashboard, onboarding, success, golive, demos
 - Admin: dashboard, salescenter, onboarding, customersuccess, operations, quality

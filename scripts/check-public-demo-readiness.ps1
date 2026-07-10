@@ -111,6 +111,18 @@ foreach ($slug in $slugs) {
             Write-WarnMsg ("Found private path in HTML: " + $bad + " (verify it is not a clickable link)")
         }
     }
+
+    if ($slug -eq "demo-kafe") {
+        $tablePath = "/m/demo-kafe?table=TBL-KAFE-1"
+        $tableResp = Get-Body "$BaseUrl$tablePath"
+        if ($null -eq $tableResp.Status -or $tableResp.Status -ne 200) {
+            Write-Fail "$tablePath expected 200 got $($tableResp.Status)"
+        } elseif ($tableResp.Body -notmatch 'Masa:\s*Masa 1|public-menu-hero-badge-table') {
+            Write-WarnMsg "$tablePath 200 but table badge not detected"
+        } else {
+            Write-Ok "$tablePath 200 with table badge"
+        }
+    }
 }
 
 Write-Host ""

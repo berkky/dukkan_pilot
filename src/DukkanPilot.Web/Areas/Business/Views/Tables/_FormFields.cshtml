@@ -1,0 +1,30 @@
+@model BusinessTableFormViewModel
+
+<div class="mb-3">
+    <label asp-for="TableLabel" class="form-label"></label>
+    <input asp-for="TableLabel" class="form-control" placeholder="Örn: Masa 1, Bahçe 4" />
+    <span asp-validation-for="TableLabel" class="text-danger small"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="DisplayOrder" class="form-label"></label>
+    <input asp-for="DisplayOrder" class="form-control" type="number" min="0" />
+    <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+</div>
+
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.PublicCode))
+{
+    <div class="alert alert-light border small mb-0">
+        <strong>QR kodu:</strong> <code>@Model.PublicCode</code>
+        <div class="text-muted mt-1">Kod değiştirilmez; mevcut QR afişler geçerli kalır.</div>
+    </div>
+}
+else
+{
+    <p class="small text-muted mb-0">Kayıt sonrası benzersiz QR kodu otomatik üretilir.</p>
+}

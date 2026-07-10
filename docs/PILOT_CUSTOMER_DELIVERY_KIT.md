@@ -22,6 +22,7 @@ E-posta: [owner@email]
 ━━━ MÜŞTERİ MENÜSÜ ━━━
 QR menü linki: [SITE_URL]/m/[slug]
 QR afiş: Panel → QR Menü → Yazdırılabilir afiş
+Masa QR: Panel → Masa QR Kodları → QR yazdır (restoran/kafe pilot)
 
 ━━━ HIZLI LİNKLER ━━━
 • Siparişler / Mutfak: /Business/Orders/Kitchen

@@ -38,6 +38,31 @@ public static class OrderDisplayHelper
         _ => "bg-secondary"
     };
 
+    public static string GetServiceTypeLabel(string? serviceType) => serviceType switch
+    {
+        Core.Common.OrderServiceTypes.TableService => "Masaya servis",
+        Core.Common.OrderServiceTypes.TakeAway => "Gel-al",
+        Core.Common.OrderServiceTypes.Delivery => "Teslimat",
+        Core.Common.OrderServiceTypes.Unknown => "Belirtilmedi",
+        null or "" => "Belirtilmedi",
+        _ => serviceType
+    };
+
+    public static string GetServiceTypeBadgeClass(string? serviceType) => serviceType switch
+    {
+        Core.Common.OrderServiceTypes.TableService => "bg-primary",
+        Core.Common.OrderServiceTypes.TakeAway => "bg-info text-dark",
+        Core.Common.OrderServiceTypes.Delivery => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+
+    public static bool HasTableInfo(string? serviceType, string? tableLabelSnapshot)
+        => serviceType == Core.Common.OrderServiceTypes.TableService &&
+           !string.IsNullOrWhiteSpace(tableLabelSnapshot);
+
+    public static string? GetTableDisplayLabel(string? tableLabelSnapshot)
+        => string.IsNullOrWhiteSpace(tableLabelSnapshot) ? null : tableLabelSnapshot.Trim();
+
     public static IReadOnlyList<OrderStatusAction> GetQuickStatusActions(OrderStatus current) => current switch
     {
         OrderStatus.Pending =>

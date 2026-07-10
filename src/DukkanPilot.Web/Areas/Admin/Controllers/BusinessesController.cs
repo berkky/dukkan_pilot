@@ -869,6 +869,8 @@ public class BusinessesController : AdminBaseController
         var activeCategories = await _context.Categories.CountAsync(c => c.BusinessId == id && c.IsActive);
         var totalProducts = await _context.Products.CountAsync(p => p.BusinessId == id);
         var activeProducts = await _context.Products.CountAsync(p => p.BusinessId == id && p.IsActive);
+        var totalTables = await _context.BusinessTables.CountAsync(t => t.BusinessId == id);
+        var activeTables = await _context.BusinessTables.CountAsync(t => t.BusinessId == id && t.IsActive);
         var averageProductPrice = await _context.Products
             .AsNoTracking()
             .Where(p => p.BusinessId == id && p.IsActive)
@@ -991,6 +993,8 @@ public class BusinessesController : AdminBaseController
                 ActiveCategories = activeCategories,
                 TotalProducts = totalProducts,
                 ActiveProducts = activeProducts,
+                TotalTables = totalTables,
+                ActiveTables = activeTables,
                 PassiveProducts = totalProducts - activeProducts,
                 AverageProductPrice = averageProductPrice,
                 PublicMenuUrl = $"/m/{business.Slug}"

@@ -18,4 +18,13 @@ public class OrderDetailsViewModel
     public bool HasActiveLoyaltyRule { get; set; }
     public int? PotentialLoyaltyPoints { get; set; }
     public int? AwardedLoyaltyPoints { get; set; }
+    public string? ServiceType { get; set; }
+    public string? TableLabelSnapshot { get; set; }
+    public int? BusinessTableId { get; set; }
+
+    public string ServiceTypeText => OrderDisplayHelper.GetServiceTypeLabel(ServiceType);
+    public string ServiceTypeBadgeClass => OrderDisplayHelper.GetServiceTypeBadgeClass(ServiceType);
+    public bool HasTableInfo => OrderDisplayHelper.HasTableInfo(ServiceType, TableLabelSnapshot);
+    public string? TableDisplayLabel => OrderDisplayHelper.GetTableDisplayLabel(TableLabelSnapshot);
+    public bool IsTableServiceOrder => ServiceType == Core.Common.OrderServiceTypes.TableService;
 }

@@ -15,6 +15,10 @@
         <span class="badge @OrderDisplayHelper.GetStatusBadgeClass(Model.Status)">
             @OrderDisplayHelper.GetStatusLabel(Model.Status)
         </span>
+        @if (Model.HasTableInfo)
+        {
+            <span class="badge @Model.ServiceTypeBadgeClass ms-1">@Model.TableDisplayLabel</span>
+        }
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
 </div>
@@ -32,6 +36,24 @@
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Sipariş No</dt>
                     <dd class="col-sm-8 fw-semibold">@Model.OrderNumber</dd>
+
+                    <dt class="col-sm-4">Kaynak</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge @OrderDisplayHelper.GetSourceBadgeClass(Model.Source)">
+                            @OrderDisplayHelper.GetSourceLabel(Model.Source)
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4">Servis tipi</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge @Model.ServiceTypeBadgeClass">@Model.ServiceTypeText</span>
+                    </dd>
+
+                    @if (Model.HasTableInfo)
+                    {
+                        <dt class="col-sm-4">Masa</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model.TableDisplayLabel</dd>
+                    }
 
                     <dt class="col-sm-4">Müşteri Adı</dt>
                     <dd class="col-sm-8">@(Model.CustomerName ?? "-")</dd>

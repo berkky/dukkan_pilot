@@ -12,7 +12,14 @@ public class KitchenOrderCardViewModel
     public decimal TotalAmount { get; set; }
     public OrderStatus Status { get; set; }
     public string? Notes { get; set; }
+    public string? ServiceType { get; set; }
+    public string? TableLabelSnapshot { get; set; }
     public List<OrderItemViewModel> Items { get; set; } = new();
+
+    public string ServiceTypeText => OrderDisplayHelper.GetServiceTypeLabel(ServiceType);
+    public string ServiceTypeBadgeClass => OrderDisplayHelper.GetServiceTypeBadgeClass(ServiceType);
+    public bool HasTableInfo => OrderDisplayHelper.HasTableInfo(ServiceType, TableLabelSnapshot);
+    public string? TableDisplayLabel => OrderDisplayHelper.GetTableDisplayLabel(TableLabelSnapshot);
 
     public string StatusText => OrderDisplayHelper.GetStatusLabel(Status);
     public string StatusBadgeClass => OrderDisplayHelper.GetStatusBadgeClass(Status);

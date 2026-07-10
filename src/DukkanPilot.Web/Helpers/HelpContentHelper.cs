@@ -384,6 +384,21 @@ public static class HelpContentHelper
             new[] { L("QR Yazdır", "/Business/QrMenu/Print") },
             related: new[] { "qr-menu-yayinlama" }),
 
+        A(ScopeBusiness, "masa-qr-siparis", "QR Menü", "Masa QR sipariş modu",
+            "Her masaya özel QR ile siparişte masa bilgisi.",
+            7, "Orta",
+            new[]
+            {
+                "/Business/Tables üzerinden masaları tanımlayın.",
+                "Her masa için QR linki: /m/{slug}?table={PublicCode}",
+                "Masa QR yazdır: /Business/Tables/Qr/{id}",
+                "Mutfak ve sipariş listesinde masa badge görünür.",
+                "Genel QR menü (?table yok) eski akış gibi çalışır."
+            },
+            "masa qr table service garson",
+            new[] { L("Masa QR Kodları", "/Business/Tables"), L("Mutfak", "/Business/Orders/Kitchen") },
+            related: new[] { "qr-menu-yayinlama", "siparis-mutfak" }),
+
         A(ScopeBusiness, "siparis-mutfak", "Sipariş & Mutfak", "Sipariş ve mutfak operasyonu",
             "Gelen siparişleri yönetme.",
             7, "Başlangıç",

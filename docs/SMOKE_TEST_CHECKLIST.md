@@ -44,6 +44,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\check-performance-smoke.ps1 -
 | `/Cookies` | Anon | 200 | Çerez politikası |
 | `/DataProcessing` | Anon | 200 | Veri işleme yaklaşımı |
 | `/m/demo-kafe` | Anon | 200 | Menü + sepet; cookie notice |
+| `/m/demo-kafe?table=TBL-KAFE-1` | Anon | 200 | Masa badge + table service |
 | `/health` | Anon | 200 JSON | DB fail → 503 |
 | `/robots.txt` | Anon | 200 | Legal allow |
 | `/sitemap.xml` | Anon | 200 | Trust/Legal URL’ler dahil |

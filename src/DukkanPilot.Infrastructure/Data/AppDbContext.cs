@@ -32,6 +32,7 @@ public class AppDbContext : DbContext
     public DbSet<BillingPayment> BillingPayments => Set<BillingPayment>();
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
     public DbSet<SupportTicketMessage> SupportTicketMessages => Set<SupportTicketMessage>();
+    public DbSet<BusinessTable> BusinessTables => Set<BusinessTable>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,6 +61,7 @@ public class AppDbContext : DbContext
         ConfigureBillingPayment(modelBuilder);
         ConfigureSupportTicket(modelBuilder);
         ConfigureSupportTicketMessage(modelBuilder);
+        ConfigureBusinessTable(modelBuilder);
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)
@@ -220,16 +222,47 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Notes).HasMaxLength(1000);
             entity.Property(e => e.CustomerName).HasMaxLength(200);
             entity.Property(e => e.CustomerPhone).HasMaxLength(20);
+            entity.Property(e => e.ServiceType).HasMaxLength(40);
+            entity.Property(e => e.TableLabelSnapshot).HasMaxLength(80);
+
+            entity.HasIndex(e => new { e.BusinessId, e.ServiceType });
+            entity.HasIndex(e => new { e.BusinessId, e.BusinessTableId });
+            entity.HasIndex(e => new { e.BusinessId, e.CreatedAt });
 
             entity.HasOne(e => e.Business)
                 .WithMany(b => b.Orders)
                 .HasForeignKey(e => e.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            entity.HasOne(e => e.BusinessTable)
+                .WithMany(t => t.Orders)
+                .HasForeignKey(e => e.BusinessTableId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             entity.HasOne(e => e.Customer)
                 .WithMany(c => c.Orders)
                 .HasForeignKey(e => e.CustomerId)
                 .OnDelete(DeleteBehavior.NoAction);
+        });
+    }
+
+    private static void ConfigureBusinessTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BusinessTable>(entity =>
+        {
+            entity.ToTable("BusinessTables");
+
+            entity.Property(e => e.TableLabel).HasMaxLength(80).IsRequired();
+            entity.Property(e => e.PublicCode).HasMaxLength(64).IsRequired();
+
+            entity.HasIndex(e => new { e.BusinessId, e.PublicCode }).IsUnique();
+            entity.HasIndex(e => new { e.BusinessId, e.TableLabel });
+            entity.HasIndex(e => new { e.BusinessId, e.IsActive, e.DisplayOrder });
+
+            entity.HasOne(e => e.Business)
+                .WithMany(b => b.Tables)
+                .HasForeignKey(e => e.BusinessId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 

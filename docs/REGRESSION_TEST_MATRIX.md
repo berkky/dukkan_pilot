@@ -17,6 +17,10 @@
 | Account | `/Account/Login` | Anon | Form aç | 200 | High | Script |
 | Account | `/Account/Register` | Anon | Form aç | 200 | Med | Script |
 | Public menu | `/m/demo-kafe` | Anon | Menü aç | 200 + ürün/kategori görünür | High | Script |
+| Table QR menu | `/m/demo-kafe?table=TBL-KAFE-1` | Anon | Masa badge + sipariş | 200 + masa badge; siparişte TableService | High | Script + Manual |
+| Table QR invalid | `/m/demo-kafe?table=INVALID` | Anon | Menü aç | 200 + uyarı; sipariş akışı bozulmaz | Med | Manual |
+| Business tables | `/Business/Tables` | Unauth | Auth redirect | 302 | High | Script |
+| Business tables create | `/Business/Tables/Create` | Unauth | Auth redirect | 302 | High | Script |
 | Cart/order | `/m/{slug}` | Anon | Sepete ekle → WhatsApp order | Order oluşur + WhatsApp metni | Critical | Manual |
 | Tracking | `/m/{slug}/order-confirmation` | Anon | Order sonrası görüntüle | Doğru özet | High | Manual |
 | Tracking | `/m/{slug}/order-status/{token}` | Anon | Status görüntüle | 200 | High | Manual |

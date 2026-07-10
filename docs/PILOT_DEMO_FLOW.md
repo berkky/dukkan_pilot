@@ -31,6 +31,7 @@
 
 1. **(30 sn) Problem** — Dağınık WhatsApp siparişi, güncel olmayan menü, tekrar müşteri takibi zor
 2. **(2 dk) Public menü** — `/m/demo-kafe` (veya sektör)
+   - (Opsiyonel masa QR) `/m/demo-kafe?table=TBL-KAFE-1` — “Masa: Masa 1” badge göster
    - Kategori gezin
    - Sepete 2 ürün ekle (toplam 100₺+ → kampanya indirimi göster)
    - Sipariş oluştur → confirmation + takip linki

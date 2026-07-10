@@ -1,6 +1,6 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: **36A — Pilot Launch Package (İlk 5–10 Müşteri Satış Paketi)** tamamlandı.
+> Son güncelleme: **36B — Table Service / Masa QR Sipariş Modu** tamamlandı.
 
 ---
 
@@ -701,7 +701,7 @@ DukkanPilot.sln
 |-----|--------|
 | Database | `DukkanPilotDb` |
 | Connection | `Server=(localdb)\mssqllocaldb;...` |
-| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`), `AddManualBillingOperations` (`20260708170630`), `AddSupportTicketCenter` (`20260708213904`) |
+| Migration | `InitialCreate`, `AddCampaignDiscountFields`, `AddOrderCampaignReportingFields` (`20260708120000`), `AddAuditLogs` (`20260708130220`), `AddNotifications` (`20260708132718`), `AddSalesRequests` (`20260708180000`), `AddManualBillingOperations` (`20260708170630`), `AddSupportTicketCenter` (`20260708213904`), `AddTableServiceMode` (`20260710153613`) |
 
 ### Seed verisi
 
@@ -771,13 +771,26 @@ DukkanPilot.sln
 - `FIRST_CUSTOMER_CHECKLIST.md`, `SALES_PIPELINE_RUNBOOK.md` pilot paket cross-link
 - Migration yok; Entity/DbContext değişmedi; ödeme/WhatsApp API/NuGet yok; mevcut Sales/Onboarding/CustomerSuccess akışları korunur
 
+### 36B — Table Service / Masa QR Sipariş Modu
+- **Entity:** `BusinessTable` + `Order` nullable `ServiceType`, `BusinessTableId`, `TableLabelSnapshot`
+- **Migration:** `AddTableServiceMode` (`20260710153613`) — `BusinessTables` + `Orders` alanları/indeksleri
+- **Business:** `/Business/Tables` (Index/Create/Edit/Toggle/Qr) — Owner CRUD; Staff görüntüleme; tenant filtresi
+- **Public:** `/m/{slug}?table={PublicCode}` masa çözümleme; geçersiz kodda uyarı, akış bozulmaz
+- **Sipariş:** Orders/Kitchen/Details + Public Order Status + WhatsApp mesajında masa bilgisi
+- **Helper:** `BusinessTableCodeHelper`, `OrderDisplayHelper` servis tipi etiketleri, `OrderServiceTypes`
+- **Seed:** demo vertical işletmelere idempotent masa (`TBL-KAFE-1` vb.)
+- **Admin:** Businesses Details — aktif/toplam masa sayısı
+- **Scripts:** smoke + performance + demo readiness masa route; check-release kritik dosyalar
+- **Docs:** `TABLE_SERVICE_QR_GUIDE.md`, `TABLE_SERVICE_UAT_SCRIPT.md` + pilot/onboarding/QA güncellemeleri
+- Identity/SignalR/NuGet/cache yok; campaign/pricing/loyalty akışı korunur
+
 ---
 
 ## 9. Sıradaki aşama
 
-**Son tamamlanan checkpoint:** 36A — Pilot Launch Package (İlk 5–10 Müşteri Satış Paketi)
+**Son tamamlanan checkpoint:** 36B — Table Service / Masa QR Sipariş Modu
 
-**Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36B+).
+**Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36C+).
 
 ---
 
@@ -858,6 +871,8 @@ docs/PROJECT_STATE.md dosyasını oku. DukkanPilot projesinde kaldığımız yer
 | `/Business/Reports/Products` | Ürün raporu |
 | `/Business/Reports/Customers` | Müşteri raporu |
 | `/Business/QrMenu` | QR menü yönetimi + QR kod |
+| `/Business/Tables` | Masa QR kodları (masa bazlı sipariş) |
+| `/Business/Tables/Qr/{id}` | Masa QR yazdırılabilir afiş |
 | `/Business/QrMenu/Print` | Yazdırılabilir QR masa kartı / afiş |
 | `/Business/Billing` | Abonelik durumu (BusinessOwner) |
 | `/Business/Billing/RequestUpgrade/{planId}` | Plan yükseltme talebi (BusinessOwner) |

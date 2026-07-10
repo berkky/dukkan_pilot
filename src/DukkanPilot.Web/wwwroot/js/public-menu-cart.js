@@ -402,7 +402,8 @@
             customerName: customerNameInput ? customerNameInput.value.trim() : '',
             customerPhone: customerPhoneInput ? customerPhoneInput.value.trim() : '',
             notes: orderNotesInput ? orderNotesInput.value.trim() : '',
-            rewardRequestName: rewardRequestName || null
+            rewardRequestName: rewardRequestName || null,
+            tablePublicCode: (root.dataset.tableCode || '').trim() || null
         };
 
         try {

@@ -67,6 +67,7 @@
 
 - [ ] `/Business/QrMenu` — link kopyalandı
 - [ ] QR PNG indirildi veya `/Business/QrMenu/Print` afiş yazdırıldı
+- [ ] (Opsiyonel) `/Business/Tables` — masa QR linkleri + `/Business/Tables/Qr/{id}` yazdır
 - [ ] Masalara / kasaya QR yerleşim planı müşteriyle teyit
 - [ ] (Opsiyonel) WhatsApp’ta menü paylaşım linki test
 

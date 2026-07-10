@@ -158,6 +158,8 @@ Test-Url "PublicMenu" "/m/demo-tatlici" @(200) "Public menu (tatlıcı)"
 Test-Url "PublicMenu" "/m/demo-burgerci" @(200) "Public menu (burgerci)"
 Test-Url "PublicMenu" "/m/demo-restoran" @(200) "Public menu (restoran)"
 Test-Url "PublicMenu" "/m/demo-nargile" @(200) "Public menu (lounge)"
+Test-Url "PublicMenu" "/m/demo-kafe?table=TBL-KAFE-1" @(200) "Table QR menu (kafe)"
+Test-Url "PublicMenu" "/m/demo-restoran?table=TBL-REST-1" @(200) "Table QR menu (restoran)"
 
 Test-Url "System" "/health" @(200) "JSON health" -MustContain '"status"'
 Test-Url "System" "/robots.txt" @(200)
@@ -176,6 +178,8 @@ Test-Url "AuthRedirects" "/Business/HelpCenter" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/Support" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/Support/Create" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Business/ValueCalculator" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Business/Tables" @(302, 301) "Auth redirect"
+Test-Url "AuthRedirects" "/Business/Tables/Create" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Dashboard" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/SalesRequests" @(302, 301) "Auth redirect"
 Test-Url "AuthRedirects" "/Admin/Onboarding" @(302, 301) "Auth redirect"

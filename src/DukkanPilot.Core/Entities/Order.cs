@@ -18,8 +18,12 @@ public class Order : BaseEntity
     public string? Notes { get; set; }
     public string? CustomerName { get; set; }
     public string? CustomerPhone { get; set; }
+    public string? ServiceType { get; set; }
+    public int? BusinessTableId { get; set; }
+    public string? TableLabelSnapshot { get; set; }
 
     public Business Business { get; set; } = null!;
+    public BusinessTable? BusinessTable { get; set; }
     public Customer? Customer { get; set; }
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 }

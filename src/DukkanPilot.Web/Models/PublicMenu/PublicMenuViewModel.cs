@@ -15,6 +15,13 @@ public class PublicMenuViewModel
     public string Currency { get; set; } = "TRY";
     public string? WhatsAppNumber { get; set; }
 
+    public int? BusinessTableId { get; set; }
+    public string? TableLabel { get; set; }
+    public string? TablePublicCode { get; set; }
+    public string? ServiceType { get; set; }
+    public bool HasResolvedTable { get; set; }
+    public bool ShowTableWarning { get; set; }
+
     public List<PublicMenuCampaignViewModel> Campaigns { get; set; } = new();
 
     public List<PublicRewardViewModel> Rewards { get; set; } = new();

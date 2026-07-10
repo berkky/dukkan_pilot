@@ -16,6 +16,13 @@
         <span class="badge @Model.StatusBadgeClass">@Model.StatusText</span>
     </div>
 
+    @if (Model.HasTableInfo)
+    {
+        <div class="kitchen-order-table mb-2">
+            <span class="badge @Model.ServiceTypeBadgeClass fs-6 px-3 py-2">@Model.TableDisplayLabel</span>
+        </div>
+    }
+
     @if (!string.IsNullOrWhiteSpace(Model.CustomerName) || !string.IsNullOrWhiteSpace(Model.CustomerPhone))
     {
         <div class="kitchen-order-customer mb-2">

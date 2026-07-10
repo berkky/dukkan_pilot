@@ -9,7 +9,8 @@
      data-order-url="/m/@Model.Slug/order"
      data-preview-url="/m/@Model.Slug/preview-order"
      data-whatsapp-number="@(Model.WhatsAppNumber ?? string.Empty)"
-     data-currency="@Model.Currency">
+     data-currency="@Model.Currency"
+     data-table-code="@(Model.TablePublicCode ?? string.Empty)">
 
     <header class="public-menu-header" style="background: linear-gradient(135deg, @Model.ThemeColor, color-mix(in srgb, @Model.ThemeColor 75%, #000))">
         <div class="d-flex align-items-start gap-3">
@@ -33,6 +34,10 @@
                 <h1 class="h4 mb-1 fw-bold">@Model.BusinessName</h1>
                 <div class="public-menu-badges">
                     <span class="badge public-menu-hero-badge">QR Menü Aktif</span>
+                    @if (Model.HasResolvedTable && !string.IsNullOrWhiteSpace(Model.TableLabel))
+                    {
+                        <span class="badge public-menu-hero-badge public-menu-hero-badge-table">Masa: @Model.TableLabel</span>
+                    }
                     @if (!string.IsNullOrWhiteSpace(Model.WhatsAppNumber))
                     {
                         <span class="badge public-menu-hero-badge public-menu-hero-badge-success">WhatsApp ile sipariş</span>
@@ -49,6 +54,13 @@
             </div>
         </div>
     </header>
+
+    @if (Model.ShowTableWarning)
+    {
+        <div class="alert alert-warning small mx-3 mt-3 mb-0" role="alert">
+            Masa bilgisi doğrulanamadı. Siparişiniz masa bilgisi olmadan alınabilir.
+        </div>
+    }
 
     @if (!string.IsNullOrWhiteSpace(Model.Address) || !string.IsNullOrWhiteSpace(Model.Phone))
     {

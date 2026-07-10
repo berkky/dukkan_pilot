@@ -25,7 +25,78 @@ public static class DbSeeder
         await SeedDemoBusinessAsync(context);
         await EnrichDemoBusinessCatalogAsync(context);
         await EnsureVerticalDemoBusinessesAsync(context);
+        await SeedDemoTablesAsync(context);
         await SeedDemoUsersAsync(context);
+    }
+
+    private static async Task SeedDemoTablesAsync(AppDbContext context)
+    {
+        var demoTableSeeds = new (string Slug, (string Label, string Code, int Order)[] Tables)[]
+        {
+            ("demo-kafe",
+            [
+                ("Masa 1", "TBL-KAFE-1", 1),
+                ("Masa 2", "TBL-KAFE-2", 2),
+                ("Masa 3", "TBL-KAFE-3", 3)
+            ]),
+            ("demo-restoran",
+            [
+                ("Masa 1", "TBL-REST-1", 1),
+                ("Masa 2", "TBL-REST-2", 2),
+                ("Bahçe 1", "TBL-BAHCE-1", 3)
+            ]),
+            ("demo-tatlici",
+            [
+                ("Masa 1", "TBL-TATL-1", 1),
+                ("Masa 2", "TBL-TATL-2", 2)
+            ]),
+            ("demo-burgerci",
+            [
+                ("Masa 1", "TBL-BURG-1", 1),
+                ("Masa 2", "TBL-BURG-2", 2)
+            ]),
+            ("demo-nargile",
+            [
+                ("Masa 1", "TBL-NARG-1", 1),
+                ("Masa 2", "TBL-NARG-2", 2)
+            ])
+        };
+
+        foreach (var (slug, tables) in demoTableSeeds)
+        {
+            var business = await context.Businesses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Slug == slug);
+
+            if (business is null)
+            {
+                continue;
+            }
+
+            var existingCodes = await context.BusinessTables
+                .AsNoTracking()
+                .Where(t => t.BusinessId == business.Id)
+                .Select(t => t.PublicCode)
+                .ToListAsync();
+
+            var toAdd = tables
+                .Where(t => !existingCodes.Contains(t.Code))
+                .Select(t => new BusinessTable
+                {
+                    BusinessId = business.Id,
+                    TableLabel = t.Label,
+                    PublicCode = t.Code,
+                    DisplayOrder = t.Order,
+                    IsActive = true
+                })
+                .ToList();
+
+            if (toAdd.Count > 0)
+            {
+                context.BusinessTables.AddRange(toAdd);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 
     private static async Task EnsureVerticalDemoBusinessesAsync(AppDbContext context)

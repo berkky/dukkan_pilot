@@ -1,0 +1,60 @@
+@model BusinessTableQrViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.TableLabel — Masa QR</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/qr-menu-print.css" asp-append-version="true" />
+</head>
+<body class="qr-print-body">
+    <div class="qr-print-toolbar no-print">
+        <button type="button" class="btn btn-primary" id="printBtn">Yazdır</button>
+        <a href="/Business/Tables" class="btn btn-outline-secondary">Masalara Dön</a>
+    </div>
+
+    <div class="qr-print-page" style="--qr-print-theme: @Model.ThemeColor;">
+        <div class="qr-print-poster">
+            <header class="qr-print-header">
+                @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+                {
+                    <img src="@Model.LogoUrl" alt="@Model.BusinessName" class="qr-print-logo" onerror="this.hidden=true;" />
+                }
+                <h1 class="qr-print-title">@Model.BusinessName</h1>
+                <p class="qr-print-subtitle fw-bold">@Model.TableLabel</p>
+            </header>
+
+            <div class="qr-print-qr-wrap">
+                <div id="qrcode-table"></div>
+            </div>
+
+            <p class="qr-print-instructions">Menüyü görmek ve sipariş vermek için QR kodu okutun</p>
+            <p class="qr-print-instructions-secondary">Siparişiniz bu masaya işlenir</p>
+
+            <div class="qr-print-link">@Model.PublicMenuUrl</div>
+        </div>
+
+        <footer class="qr-print-footer">DükkanPilot · Masa QR</footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        (function () {
+            const qrPayload = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.QrPayload));
+            new QRCode(document.getElementById('qrcode-table'), {
+                text: qrPayload,
+                width: 220,
+                height: 220,
+                colorDark: '#111827',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+        })();
+    </script>
+</body>
+</html>

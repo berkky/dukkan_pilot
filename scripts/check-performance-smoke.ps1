@@ -39,6 +39,7 @@ $defaultPaths = @(
     "/RoiCalculator",
     "/Help",
     "/m/demo-kafe",
+    "/m/demo-kafe?table=TBL-KAFE-1",
     "/m/demo-tatlici",
     "/m/demo-burgerci",
     "/m/demo-restoran",

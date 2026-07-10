@@ -99,6 +99,8 @@ public class OrdersController : BusinessBaseController
                 TotalAmount = o.TotalAmount,
                 Status = o.Status,
                 Source = o.Source,
+                ServiceType = o.ServiceType,
+                TableLabelSnapshot = o.TableLabelSnapshot,
                 CreatedAt = o.CreatedAt
             })
             .ToListAsync();
@@ -233,6 +235,9 @@ public class OrdersController : BusinessBaseController
                 Notes = o.Notes,
                 TotalAmount = o.TotalAmount,
                 CreatedAt = o.CreatedAt,
+                ServiceType = o.ServiceType,
+                TableLabelSnapshot = o.TableLabelSnapshot,
+                BusinessTableId = o.BusinessTableId,
                 Items = o.Items
                     .OrderBy(i => i.Id)
                     .Select(i => new OrderItemViewModel
@@ -419,6 +424,8 @@ public class OrdersController : BusinessBaseController
                 TotalAmount = o.TotalAmount,
                 Status = o.Status,
                 Notes = o.Notes,
+                ServiceType = o.ServiceType,
+                TableLabelSnapshot = o.TableLabelSnapshot,
                 Items = o.Items
                     .OrderBy(i => i.Id)
                     .Select(i => new OrderItemViewModel
