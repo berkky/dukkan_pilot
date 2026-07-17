@@ -4,4 +4,7 @@
     <Project Path="src/DukkanPilot.Infrastructure/DukkanPilot.Infrastructure.csproj" />
     <Project Path="src/DukkanPilot.Web/DukkanPilot.Web.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DukkanPilot.IntegrationTests/DukkanPilot.IntegrationTests.csproj" />
+  </Folder>
 </Solution>

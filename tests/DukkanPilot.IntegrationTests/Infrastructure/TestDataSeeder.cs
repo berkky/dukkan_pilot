@@ -1,0 +1,19 @@
+using DukkanPilot.Core.Common;
+using DukkanPilot.Core.Entities;
+using DukkanPilot.Core.Enums;
+using DukkanPilot.Infrastructure.Data;
+namespace DukkanPilot.IntegrationTests.Infrastructure;
+public static class TestDataSeeder
+{
+ public static async Task<TestFixtureData> SeedAsync(AppDbContext db)
+ {
+  var plan=new SubscriptionPlan{Name="Integration",MaxProducts=-1,MaxCampaigns=-1,Price=0,SortOrder=1}; db.SubscriptionPlans.Add(plan);
+  var a=new Business{Name="Tenant A",Slug="tenant-a",Phone="905550000001"};var b=new Business{Name="Tenant B",Slug="tenant-b",Phone="905550000002"};db.Businesses.AddRange(a,b);await db.SaveChangesAsync();
+  db.BusinessSettings.AddRange(new BusinessSetting{BusinessId=a.Id,WhatsAppNumber=a.Phone},new BusinessSetting{BusinessId=b.Id,WhatsAppNumber=b.Phone});db.BusinessSubscriptions.AddRange(new BusinessSubscription{BusinessId=a.Id,SubscriptionPlanId=plan.Id,Status=SubscriptionStatus.Active,StartDate=DateTime.UtcNow.AddDays(-1)},new BusinessSubscription{BusinessId=b.Id,SubscriptionPlanId=plan.Id,Status=SubscriptionStatus.Active,StartDate=DateTime.UtcNow.AddDays(-1)});
+  var admin=new AppUser{Email="admin.integration@dukkanpilot.test",FullName="Admin",Role=UserRole.SuperAdmin};var ao=new AppUser{Email="owner.a@dukkanpilot.test",FullName="A Owner",Role=UserRole.BusinessOwner};var ast=new AppUser{Email="staff.a@dukkanpilot.test",FullName="A Staff",Role=UserRole.Staff};var bo=new AppUser{Email="owner.b@dukkanpilot.test",FullName="B Owner",Role=UserRole.BusinessOwner};var bs=new AppUser{Email="staff.b@dukkanpilot.test",FullName="B Staff",Role=UserRole.Staff};db.AppUsers.AddRange(admin,ao,ast,bo,bs);await db.SaveChangesAsync();
+  db.UserBusinessRoles.AddRange(new UserBusinessRole{AppUserId=ao.Id,BusinessId=a.Id,Role=BusinessRole.Owner},new UserBusinessRole{AppUserId=ast.Id,BusinessId=a.Id,Role=BusinessRole.Staff},new UserBusinessRole{AppUserId=bo.Id,BusinessId=b.Id,Role=BusinessRole.Owner},new UserBusinessRole{AppUserId=bs.Id,BusinessId=b.Id,Role=BusinessRole.Staff});var ac=new Category{BusinessId=a.Id,Name="A",SortOrder=1};var bc=new Category{BusinessId=b.Id,Name="B",SortOrder=1};db.Categories.AddRange(ac,bc);await db.SaveChangesAsync();
+  var ap=new Product{BusinessId=a.Id,CategoryId=ac.Id,Name="A Product",Price=50,SortOrder=1};var bp=new Product{BusinessId=b.Id,CategoryId=bc.Id,Name="B Product",Price=60,SortOrder=1};db.Products.AddRange(ap,bp);var at=new BusinessTable{BusinessId=a.Id,TableLabel="A Masa 1",PublicCode="A-TABLE-1",DisplayOrder=1};var at2=new BusinessTable{BusinessId=a.Id,TableLabel="A Masa 2",PublicCode="A-TABLE-2",DisplayOrder=2};var bt=new BusinessTable{BusinessId=b.Id,TableLabel="B Masa 1",PublicCode="B-TABLE-1",DisplayOrder=1};db.BusinessTables.AddRange(at,at2,bt);await db.SaveChangesAsync();
+  var ao1=new Order{BusinessId=a.Id,OrderNumber="A-ORDER-1",TotalAmount=50,SubtotalAmount=50,CustomerName="A Customer",ServiceType=OrderServiceTypes.TableService,BusinessTableId=at.Id,TableLabelSnapshot=at.TableLabel,Items={new OrderItem{ProductId=ap.Id,ProductName=ap.Name,Quantity=1,UnitPrice=50}}};var bo1=new Order{BusinessId=b.Id,OrderNumber="B-ORDER-1",TotalAmount=60,SubtotalAmount=60,CustomerName="Tenant B Customer",ServiceType=OrderServiceTypes.TableService,BusinessTableId=bt.Id,TableLabelSnapshot=bt.TableLabel,Items={new OrderItem{ProductId=bp.Id,ProductName=bp.Name,Quantity=1,UnitPrice=60}}};db.Orders.AddRange(ao1,bo1);await db.SaveChangesAsync();
+  return new(){TenantAId=a.Id,TenantBId=b.Id,TenantASlug=a.Slug,AdminUserId=admin.Id,TenantAOwnerUserId=ao.Id,TenantAStaffUserId=ast.Id,TenantBOwnerUserId=bo.Id,TenantBStaffUserId=bs.Id,TenantATable1Id=at.Id,TenantBTable1Id=bt.Id,TenantATable1Code=at.PublicCode,TenantBTable1Code=bt.PublicCode,TenantATable1Label=at.TableLabel,TenantBTable1Label=bt.TableLabel,TenantAProductId=ap.Id,TenantBOrderId=bo1.Id,TenantBOrderNumber=bo1.OrderNumber,TenantBCustomerName=bo1.CustomerName!};
+ }
+}
