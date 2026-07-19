@@ -204,9 +204,10 @@ $required = @(
     "src\DukkanPilot.Web\Areas\Business\Controllers\TablesController.cs",
     "src\DukkanPilot.Web\Areas\Business\Views\Tables\Index.cshtml",
     "docs\TABLE_SERVICE_QR_GUIDE.md",
-    "docs\TABLE_SERVICE_UAT_SCRIPT.md"
+    "docs\TABLE_SERVICE_UAT_SCRIPT.md",
+    "scripts\check-integration-tests.ps1",
+    "docs\TENANT_TABLE_SERVICE_INTEGRATION_TESTS.md"
 )
-
 foreach ($rel in $required) {
     $path = Join-Path $RepoRoot $rel
     if (Test-Path $path) {

@@ -24,3 +24,5 @@ public sealed class SqliteTestAppDbContext : AppDbContext
                 }
             }
         }
+    }
+}

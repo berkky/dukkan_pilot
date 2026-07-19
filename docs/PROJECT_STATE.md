@@ -1,6 +1,7 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
 > Son güncelleme: **36B — Table Service / Masa QR Sipariş Modu** tamamlandı.
+> Current integration-test checkpoint: **36C - Tenant and Table Service Integration Tests** completed.
 
 ---
 
@@ -784,14 +785,24 @@ DukkanPilot.sln
 - **Docs:** `TABLE_SERVICE_QR_GUIDE.md`, `TABLE_SERVICE_UAT_SCRIPT.md` + pilot/onboarding/QA güncellemeleri
 - Identity/SignalR/NuGet/cache yok; campaign/pricing/loyalty akışı korunur
 
+### 36C - Tenant and Table Service Integration Tests
+- New `DukkanPilot.IntegrationTests` project runs MVC requests with a test-only, open SQLite in-memory connection.
+- Test-only `SqliteTestAppDbContext` adapts only explicit `nvarchar(max)` types after the production model is built; production mappings, entities, migrations, and snapshot are unchanged.
+- Startup verifies SQLite provider, `PRAGMA foreign_keys = ON`, and table/order schema creation.
+- Coverage includes tenant isolation, staff/owner authorization, antiforgery-protected writes, invalid table codes, table label snapshots, and idempotent seeding.
+- `scripts/check-integration-tests.ps1` and `TENANT_TABLE_SERVICE_INTEGRATION_TESTS.md` document the gate and maintenance rules.
+- No migration was created, no database update was run, and no LocalDB database was used.
+
 ---
 
 ## 9. Sıradaki aşama
 
 **Son tamamlanan checkpoint:** 36B — Table Service / Masa QR Sipariş Modu
 
+**Current integration-test checkpoint:** 36C - Tenant and Table Service Integration Tests
 **Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36C+).
 
+**Next after 36C:** Project need will determine the next checkpoint (36D+).
 ---
 
 ## 10. Yeni sohbette devam notu

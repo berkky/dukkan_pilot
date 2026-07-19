@@ -20,6 +20,7 @@ public class ErrorController : Controller
     }
 
     [HttpGet("{code:int}")]
+    [HttpPost("{code:int}")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult ByStatus(int code)
     {
