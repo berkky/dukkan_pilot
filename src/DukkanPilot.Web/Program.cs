@@ -1,5 +1,7 @@
 using DukkanPilot.Infrastructure.Data;
 using DukkanPilot.Infrastructure.Data.Seed;
+using DukkanPilot.Web.Api.Mobile.V1;
+using DukkanPilot.Web.Api.Mobile.V1.Common;
 using DukkanPilot.Web.Filters;
 using DukkanPilot.Web.Helpers;
 using DukkanPilot.Web.Middleware;
@@ -30,6 +32,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddMobileApi(builder.Configuration);
 
 builder.Services.AddDataProtection();
 builder.Services.AddSingleton<PasswordResetTokenHelper>();
@@ -57,6 +60,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<MobileApiExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -73,7 +78,25 @@ else
     app.UseHsts();
 }
 
-app.UseStatusCodePagesWithReExecute("/Error/{0}");
+app.UseWhen(
+    context => context.Request.Path.StartsWithSegments("/api/mobile"),
+    branch => branch.UseStatusCodePages(async statusContext =>
+    {
+        var response = statusContext.HttpContext.Response;
+        var code = response.StatusCode == StatusCodes.Status404NotFound
+            ? "resource_not_found"
+            : response.StatusCode == StatusCodes.Status403Forbidden
+                ? "forbidden"
+                : "unauthorized";
+        await MobileProblemDetails.WriteAsync(
+            statusContext.HttpContext,
+            response.StatusCode,
+            code,
+            "The mobile API request could not be completed.");
+    }));
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/api/mobile"),
+    branch => branch.UseStatusCodePagesWithReExecute("/Error/{0}"));
 
 if (!app.Environment.IsDevelopment())
 {
@@ -82,6 +105,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSecurityHeaders();
 app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

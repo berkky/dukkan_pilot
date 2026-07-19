@@ -47,6 +47,14 @@ if (-not $buildOk) {
 }
 
 Write-Host ""
+Write-Host "==> check-mobile-api.ps1"
+& powershell -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "scripts\check-mobile-api.ps1") -NoBuild
+if ($LASTEXITCODE -ne 0) {
+    Write-Fail "check-mobile-api.ps1"
+} else {
+    Write-Ok "check-mobile-api.ps1"
+}
+
 Write-Host "==> EF has-pending-model-changes"
 $infra = Join-Path $RepoRoot "src\DukkanPilot.Infrastructure\DukkanPilot.Infrastructure.csproj"
 $web = Join-Path $RepoRoot "src\DukkanPilot.Web\DukkanPilot.Web.csproj"
@@ -206,6 +214,8 @@ $required = @(
     "docs\TABLE_SERVICE_QR_GUIDE.md",
     "docs\TABLE_SERVICE_UAT_SCRIPT.md",
     "scripts\check-integration-tests.ps1",
+    "scripts\check-mobile-api.ps1",
+    "docs\MOBILE_API_AUTH_FOUNDATION.md",
     "docs\TENANT_TABLE_SERVICE_INTEGRATION_TESTS.md"
 )
 foreach ($rel in $required) {

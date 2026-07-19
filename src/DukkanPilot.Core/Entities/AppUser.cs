@@ -11,4 +11,5 @@ public class AppUser : BaseEntity
     public UserRole Role { get; set; } = UserRole.Staff;
 
     public ICollection<UserBusinessRole> BusinessRoles { get; set; } = new List<UserBusinessRole>();
+    public ICollection<MobileRefreshToken> MobileRefreshTokens { get; set; } = new List<MobileRefreshToken>();
 }

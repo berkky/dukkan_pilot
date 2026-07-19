@@ -1,7 +1,7 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son güncelleme: **36B — Table Service / Masa QR Sipariş Modu** tamamlandı.
-> Current integration-test checkpoint: **36C - Tenant and Table Service Integration Tests** completed.
+> Son guncelleme: **37A - Mobile API, Token Authentication and Tenant Security Foundation** completed.
+> Current integration-test checkpoint: **37A - Mobile API integration and security tests** completed.
 
 ---
 
@@ -793,16 +793,26 @@ DukkanPilot.sln
 - `scripts/check-integration-tests.ps1` and `TENANT_TABLE_SERVICE_INTEGRATION_TESTS.md` document the gate and maintenance rules.
 - No migration was created, no database update was run, and no LocalDB database was used.
 
+### 37A - Mobile API, Token Authentication and Tenant Security Foundation
+- Separate `MobileBearer` JWT scheme; the existing Cookie scheme remains the default for MVC/Razor web requests.
+- Versioned Owner/Staff endpoints: auth login/refresh/logout/logout-all/me, bootstrap, orders, kitchen, and dashboard today.
+- Claim-derived `BusinessId`/`BusinessRole`, case-sensitive mobile policies, JSON ProblemDetails, and IP-partitioned login/refresh rate limits.
+- `MobileRefreshToken` persistence stores only SHA-256 hashes and supports rotation, family reuse detection, idempotent logout, and tenant-scoped logout-all.
+- Shared `IOrderStatusService` keeps web/mobile status transitions, loyalty, audit, and notification side effects consistent.
+- Migration `20260719172749_AddMobileAuthenticationFoundation` adds only `MobileRefreshTokens`, restrictive AppUser/Business foreign keys, and required indexes; no database update was run and LocalDB was not used.
+- SQLite in-memory tests exercise the real JWT handler: Mobile API 16/16 PASS, existing 36C regression 12/12 PASS, total 28/28 PASS.
+- `scripts/check-mobile-api.ps1`, release gates, and `docs/MOBILE_API_AUTH_FOUNDATION.md` document and enforce the foundation.
+
 ---
 
 ## 9. Sıradaki aşama
 
-**Son tamamlanan checkpoint:** 36B — Table Service / Masa QR Sipariş Modu
+**Son tamamlanan checkpoint:** 37A - Mobile API, Token Authentication and Tenant Security Foundation
 
-**Current integration-test checkpoint:** 36C - Tenant and Table Service Integration Tests
-**Sıradaki aşama:** Proje ihtiyacına göre belirlenecek (36C+).
+**Current integration-test checkpoint:** 37A - Mobile API integration and security tests
+**Siradaki asama:** 37B - Android/iOS mobile client implementation.
 
-**Next after 36C:** Project need will determine the next checkpoint (36D+).
+**Next after 37A:** Build the mobile client against the auth, bootstrap, orders, kitchen, and dashboard endpoints.
 ---
 
 ## 10. Yeni sohbette devam notu

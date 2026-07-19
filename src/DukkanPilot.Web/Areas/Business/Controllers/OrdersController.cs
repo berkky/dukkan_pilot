@@ -14,14 +14,12 @@ namespace DukkanPilot.Web.Areas.Business.Controllers;
 public class OrdersController : BusinessBaseController
 {
     private readonly AppDbContext _context;
-    private readonly IAuditLogService _auditLog;
-    private readonly INotificationService _notifications;
+    private readonly IOrderStatusService _orderStatusService;
 
-    public OrdersController(AppDbContext context, IAuditLogService auditLog, INotificationService notifications)
+    public OrdersController(AppDbContext context, IOrderStatusService orderStatusService)
     {
         _context = context;
-        _auditLog = auditLog;
-        _notifications = notifications;
+        _orderStatusService = orderStatusService;
     }
 
     [HttpGet("")]
@@ -283,103 +281,26 @@ public class OrdersController : BusinessBaseController
             return forbidResult;
         }
 
-        if (!Enum.IsDefined(status) ||
-            status is not (OrderStatus.Pending or OrderStatus.Preparing or OrderStatus.Completed or OrderStatus.Cancelled))
-        {
-            TempData["Error"] = "Geçersiz sipariş durumu.";
-            return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
-        }
+        var result = await _orderStatusService.ChangeAsync(
+            businessId,
+            id,
+            status,
+            HttpContext.RequestAborted);
 
-        var order = await _context.Orders
-            .FirstOrDefaultAsync(o => o.Id == id && o.BusinessId == businessId);
-
-        if (order is null)
+        if (result.Failure == OrderStatusChangeFailure.NotFound)
         {
             return NotFound();
         }
 
-        var previousStatus = order.Status;
-        var isTransitionToCompleted = status == OrderStatus.Completed && previousStatus != OrderStatus.Completed;
-
-        order.Status = status;
-        order.UpdatedAt = DateTime.UtcNow;
-
-        string? loyaltyMessage = null;
-
-        if (isTransitionToCompleted)
+        if (result.Failure is OrderStatusChangeFailure.InvalidStatus or OrderStatusChangeFailure.InvalidTransition)
         {
-            var awardResult = await TryAwardCompletionPointsAsync(order, businessId);
-            loyaltyMessage = awardResult.Message;
+            TempData["Error"] = result.Failure == OrderStatusChangeFailure.InvalidTransition
+                ? "Invalid order status transition."
+                : "Invalid order status.";
+            return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
         }
 
-        await _context.SaveChangesAsync();
-
-        TempData["Success"] = loyaltyMessage ?? $"Sipariş durumu \"{OrderDisplayHelper.GetStatusLabel(status)}\" olarak güncellendi.";
-
-        var statusChangeSummary = isTransitionToCompleted
-            ? $"Sipariş durumu güncellendi: {previousStatus} → {status} (sadakat puanı akışı tetiklendi)."
-            : $"Sipariş durumu güncellendi: {previousStatus} → {status}.";
-
-        await _auditLog.LogBusinessAsync(
-            businessId,
-            "Order.StatusChanged",
-            "Order",
-            order.Id,
-            statusChangeSummary,
-            new
-            {
-                orderId = order.Id,
-                oldStatus = previousStatus.ToString(),
-                newStatus = status.ToString(),
-                totalAmount = order.TotalAmount
-            });
-
-        if (previousStatus != status)
-        {
-            if (status == OrderStatus.Preparing)
-            {
-                await _notifications.CreateBusinessAsync(
-                    businessId,
-                    "OrderStatusChanged",
-                    "Sipariş hazırlanıyor",
-                    $"Sipariş durumu güncellendi: {previousStatus} → Preparing",
-                    $"/Business/Orders/Details/{order.Id}",
-                    "Info",
-                    "Order",
-                    order.Id,
-                    new { orderId = order.Id, oldStatus = previousStatus.ToString(), newStatus = status.ToString() },
-                    allowDuplicate: true);
-            }
-            else if (status == OrderStatus.Completed)
-            {
-                await _notifications.CreateBusinessAsync(
-                    businessId,
-                    "OrderCompleted",
-                    "Sipariş tamamlandı",
-                    $"Sipariş tamamlandı (#{order.OrderNumber}).",
-                    $"/Business/Orders/Details/{order.Id}",
-                    "Success",
-                    "Order",
-                    order.Id,
-                    new { orderId = order.Id, oldStatus = previousStatus.ToString(), newStatus = status.ToString() },
-                    allowDuplicate: true);
-            }
-            else if (status == OrderStatus.Cancelled)
-            {
-                await _notifications.CreateBusinessAsync(
-                    businessId,
-                    "OrderCancelled",
-                    "Sipariş iptal edildi",
-                    $"Sipariş iptal edildi (#{order.OrderNumber}).",
-                    $"/Business/Orders/Details/{order.Id}",
-                    "Warning",
-                    "Order",
-                    order.Id,
-                    new { orderId = order.Id, oldStatus = previousStatus.ToString(), newStatus = status.ToString() },
-                    allowDuplicate: true);
-            }
-        }
-
+        TempData["Success"] = result.Message;
         return RedirectAfterStatusUpdate(returnTo, id, statusFilter, period, search);
     }
 
@@ -467,53 +388,6 @@ public class OrdersController : BusinessBaseController
         }
     }
 
-    private async Task<LoyaltyAwardResult> TryAwardCompletionPointsAsync(Order order, int businessId)
-    {
-        var customer = await ResolveCustomerAsync(order, businessId);
-        if (customer is null)
-        {
-            return LoyaltyAwardResult.NoCustomer();
-        }
-
-        var activeRule = await GetActiveLoyaltyRuleAsync(businessId);
-        if (activeRule is null || activeRule.PointsPerAmount <= 0)
-        {
-            return LoyaltyAwardResult.NoAward();
-        }
-
-        var earnedPoints = OrderLoyaltyHelper.CalculateEarnedPoints(order.TotalAmount, activeRule.PointsPerAmount);
-        if (earnedPoints <= 0)
-        {
-            return LoyaltyAwardResult.NoAward();
-        }
-
-        var description = OrderLoyaltyHelper.BuildCompletionDescription(order.OrderNumber);
-        var alreadyAwarded = await _context.LoyaltyTransactions.AnyAsync(t =>
-            t.BusinessId == businessId &&
-            t.CustomerId == customer.Id &&
-            t.Type == LoyaltyTransactionType.Earn &&
-            t.Description == description);
-
-        if (alreadyAwarded)
-        {
-            return LoyaltyAwardResult.NoAward();
-        }
-
-        customer.TotalPoints += earnedPoints;
-        customer.UpdatedAt = DateTime.UtcNow;
-
-        _context.LoyaltyTransactions.Add(new LoyaltyTransaction
-        {
-            BusinessId = businessId,
-            CustomerId = customer.Id,
-            Points = earnedPoints,
-            Type = LoyaltyTransactionType.Earn,
-            Description = description
-        });
-
-        return LoyaltyAwardResult.Awarded(earnedPoints);
-    }
-
     private async Task<Customer?> ResolveCustomerAsync(Order order, int businessId)
     {
         if (order.CustomerId.HasValue)
@@ -545,20 +419,4 @@ public class OrdersController : BusinessBaseController
             .FirstOrDefaultAsync();
     }
 
-    private sealed class LoyaltyAwardResult
-    {
-        public string? Message { get; init; }
-
-        public static LoyaltyAwardResult Awarded(int points) => new()
-        {
-            Message = $"Sipariş tamamlandı ve müşteriye {points} puan eklendi."
-        };
-
-        public static LoyaltyAwardResult NoCustomer() => new()
-        {
-            Message = "Sipariş tamamlandı. Müşteri kaydı bulunamadığı için puan eklenmedi."
-        };
-
-        public static LoyaltyAwardResult NoAward() => new();
-    }
 }

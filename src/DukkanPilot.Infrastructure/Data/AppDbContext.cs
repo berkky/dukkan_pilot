@@ -33,6 +33,7 @@ public class AppDbContext : DbContext
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
     public DbSet<SupportTicketMessage> SupportTicketMessages => Set<SupportTicketMessage>();
     public DbSet<BusinessTable> BusinessTables => Set<BusinessTable>();
+    public DbSet<MobileRefreshToken> MobileRefreshTokens => Set<MobileRefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -62,6 +63,7 @@ public class AppDbContext : DbContext
         ConfigureSupportTicket(modelBuilder);
         ConfigureSupportTicketMessage(modelBuilder);
         ConfigureBusinessTable(modelBuilder);
+        modelBuilder.ConfigureMobileRefreshToken();
     }
 
     private static void ConfigureBusiness(ModelBuilder modelBuilder)

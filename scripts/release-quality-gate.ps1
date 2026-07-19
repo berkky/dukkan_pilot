@@ -80,6 +80,7 @@ if ($LASTEXITCODE -ne 0) { Add-Step "dotnet build" "FAIL" "exit $LASTEXITCODE"; 
 Run-Step "check-release.ps1" ".\\scripts\\check-release.ps1"
 Run-Step "db-migration-status.ps1" ".\\scripts\\db-migration-status.ps1"
 Run-Step "check-integration-tests.ps1" ".\\scripts\\check-integration-tests.ps1"
+Run-Step "check-mobile-api.ps1" ".\scripts\check-mobile-api.ps1 -NoBuild"
 
 if (-not $SkipMigrationScript) {
     Run-Step "db-generate-migration-script.ps1" ".\\scripts\\db-generate-migration-script.ps1"
