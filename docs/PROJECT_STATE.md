@@ -1,7 +1,8 @@
 # DukkanPilot — Proje Durumu (Checkpoint)
 
-> Son guncelleme: **37A - Mobile API, Token Authentication and Tenant Security Foundation** completed.
-> Current integration-test checkpoint: **37A - Mobile API integration and security tests** completed.
+> Son güncelleme: **37B — Android-First DukkanPilot Mobile Application** completed.
+> Current mobile checkpoint: **37B — 30/30 mobile tests, Android/Windows Release builds** completed.
+> Current backend integration checkpoint: **37A — Mobile API 16/16 + 36C regression 12/12 (28/28)** completed.
 
 ---
 
@@ -802,17 +803,28 @@ DukkanPilot.sln
 - Migration `20260719172749_AddMobileAuthenticationFoundation` adds only `MobileRefreshTokens`, restrictive AppUser/Business foreign keys, and required indexes; no database update was run and LocalDB was not used.
 - SQLite in-memory tests exercise the real JWT handler: Mobile API 16/16 PASS, existing 36C regression 12/12 PASS, total 28/28 PASS.
 - `scripts/check-mobile-api.ps1`, release gates, and `docs/MOBILE_API_AUTH_FOUNDATION.md` document and enforce the foundation.
+### 37B — Android-First DukkanPilot Mobile Application
+- Separate `DukkanPilot.Mobile.slnx` contains MAUI-independent `Mobile.Core`, Android/Windows MAUI Blazor Hybrid UI, and `Mobile.Tests`; backend solution/release gate remains MAUI-independent.
+- Real 37A DTO/endpoint contracts drive login, business selection, bootstrap, dashboard, order list/detail/status, kitchen, logout, and logout-all without Web/entity references.
+- Refresh token is stored through MAUI SecureStorage; access token is memory-only. Single-flight refresh, one retry, request clone, second-401 cleanup, and auth endpoint loop prevention are implemented.
+- Platform-aware URL defaults are Windows `localhost:5000` and Android emulator `10.0.2.2:5000`; Release requires an HTTPS deployment property and Android cleartext is Debug-only.
+- Professional mobile operation UI includes restore-gated auth navigation, offline banner, dashboard, pagination/filter orders, kitchen polling cancellation, and account session controls.
+- `scripts/check-mobile-app.ps1` passed: Mobile.Core 0 warnings/errors, mobile tests 30/30, Android Release 0 warnings/errors, Windows Release 0 warnings/errors.
+- `docs/MOBILE_APP_FOUNDATION.md` documents architecture, security, Android SDK/JDK, build/run, manual API smoke, limitations, 37C, and later iOS requirements.
+- No migration was created, no database update was run, and LocalDB was not used.
+
 
 ---
 
 ## 9. Sıradaki aşama
 
-**Son tamamlanan checkpoint:** 37A - Mobile API, Token Authentication and Tenant Security Foundation
+**Son tamamlanan checkpoint:** 37B — Android-First DukkanPilot Mobile Application
 
-**Current integration-test checkpoint:** 37A - Mobile API integration and security tests
-**Siradaki asama:** 37B - Android/iOS mobile client implementation.
+**Current mobile-test checkpoint:** 37B — 30/30 PASS; Android ve Windows Release build PASS.
+**Current backend integration-test checkpoint:** 37A — Mobile API 16/16 + 36C regression 12/12, total 28/28 PASS.
+**Sıradaki aşama:** 37C — push notification, device registration ve tenant-safe real-time planı.
 
-**Next after 37A:** Build the mobile client against the auth, bootstrap, orders, kitchen, and dashboard endpoints.
+**Next after 37B:** Add consent-driven push/device lifecycle and evaluate secure real-time order updates without weakening mobile auth or tenant boundaries.
 ---
 
 ## 10. Yeni sohbette devam notu

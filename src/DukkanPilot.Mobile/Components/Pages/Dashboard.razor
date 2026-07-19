@@ -1,0 +1,118 @@
+@page "/dashboard"
+@implements IDisposable
+@inject DashboardState DashboardData
+@inject SessionState Session
+
+<section class="screen dashboard-screen">
+    <header class="screen-header dashboard-header">
+        <div>
+            <p class="eyebrow">BUGÜNÜN OPERASYONU</p>
+            <h1>@Session.CurrentBusiness?.Name</h1>
+            <p>@Session.CurrentUser?.FullName · @RoleLabel(Session.BusinessRole)</p>
+        </div>
+        <button class="icon-action" @onclick="RefreshAsync" disabled="@DashboardData.IsBusy"
+                aria-label="Dashboard verilerini yenile">↻</button>
+    </header>
+
+    @if (DashboardData.IsBusy && DashboardData.Today is null)
+    {
+        <div class="skeleton-grid" aria-label="Dashboard yükleniyor">
+            @for (var i = 0; i < 4; i++)
+            {
+                <div class="skeleton-card"></div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(DashboardData.LastError) && DashboardData.Today is null)
+    {
+        <div class="empty-state error-state">
+            <h2>Veriler yüklenemedi</h2>
+            <p>@DashboardData.LastError</p>
+            <button class="secondary-button" @onclick="RefreshAsync">Tekrar dene</button>
+        </div>
+    }
+    else if (DashboardData.Today is not null)
+    {
+        <article class="revenue-card">
+            <span>Bugünkü ciro</span>
+            <strong>@Money(DashboardData.Today.Revenue)</strong>
+            <small>@DashboardData.Today.TotalOrders sipariş</small>
+        </article>
+
+        <div class="metric-grid">
+            <article class="metric-card status-pending">
+                <span>Bekleyen</span><strong>@DashboardData.Today.PendingOrders</strong>
+            </article>
+            <article class="metric-card status-preparing">
+                <span>Hazırlanan</span><strong>@DashboardData.Today.PreparingOrders</strong>
+            </article>
+            <article class="metric-card status-completed">
+                <span>Tamamlanan</span><strong>@DashboardData.Today.CompletedOrders</strong>
+            </article>
+            <article class="metric-card status-cancelled">
+                <span>İptal</span><strong>@DashboardData.Today.CancelledOrders</strong>
+            </article>
+        </div>
+
+        <div class="quick-actions">
+            <a class="quick-action primary" href="/orders">
+                <span>▤</span><strong>Siparişlere Git</strong>
+            </a>
+            <a class="quick-action" href="/kitchen">
+                <span>◫</span><strong>Mutfak</strong>
+            </a>
+        </div>
+
+        <section class="section-block">
+            <div class="section-title">
+                <h2>Son siparişler</h2>
+                <a href="/orders">Tümünü gör</a>
+            </div>
+
+            @if (DashboardData.RecentOrders.Count == 0)
+            {
+                <div class="inline-empty">Bugün henüz sipariş yok.</div>
+            }
+            else
+            {
+                <div class="compact-list">
+                    @foreach (var order in DashboardData.RecentOrders)
+                    {
+                        <a class="compact-order" href="@($"/orders/{order.Id}")">
+                            <div>
+                                <strong>#@order.OrderNumber</strong>
+                                <small>@order.CreatedAtUtc.ToLocalTime().ToString("HH:mm") · @Service(order)</small>
+                            </div>
+                            <div class="align-end">
+                                <span class="status-chip @StatusClass(order.Status)">
+                                    @MobileOrderStatuses.ToTurkish(order.Status)
+                                </span>
+                                <strong>@Money(order.TotalAmount)</strong>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </section>
+    }
+</section>
+
+@code {
+    private static readonly CultureInfo TurkishCulture = CultureInfo.GetCultureInfo("tr-TR");
+
+    protected override async Task OnInitializedAsync()
+    {
+        DashboardData.Changed += OnChanged;
+        await DashboardData.LoadAsync();
+    }
+
+    public void Dispose() => DashboardData.Changed -= OnChanged;
+
+    private Task RefreshAsync() => DashboardData.LoadAsync();
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    private static string Money(decimal value) => value.ToString("C", TurkishCulture);
+    private static string RoleLabel(string? role) => role == "Owner" ? "İşletme sahibi" : "Personel";
+    private static string Service(MobileOrderListItem order) =>
+        order.TableLabel ?? order.ServiceType ?? order.Source;
+    private static string StatusClass(string status) => $"status-{status.ToLowerInvariant()}";
+}

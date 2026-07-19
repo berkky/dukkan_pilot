@@ -1,0 +1,117 @@
+@page "/orders"
+@implements IDisposable
+@inject OrderState OrdersState
+
+<section class="screen">
+    <header class="screen-header">
+        <div>
+            <p class="eyebrow">OPERASYON</p>
+            <h1>Siparişler</h1>
+            <p>@OrdersState.TotalCount kayıt</p>
+        </div>
+        <button class="icon-action" @onclick="RefreshAsync" disabled="@OrdersState.IsBusy"
+                aria-label="Siparişleri yenile">↻</button>
+    </header>
+
+    <div class="filter-bar">
+        <label for="status-filter">Durum</label>
+        <select id="status-filter" value="@_filter" @onchange="FilterChangedAsync"
+                disabled="@OrdersState.IsBusy">
+            <option value="">Tümü</option>
+            @foreach (var status in MobileOrderStatuses.All)
+            {
+                <option value="@status">@MobileOrderStatuses.ToTurkish(status)</option>
+            }
+        </select>
+    </div>
+
+    @if (OrdersState.IsBusy && OrdersState.Items.Count == 0)
+    {
+        <div class="order-list">
+            @for (var i = 0; i < 5; i++)
+            {
+                <div class="skeleton-row"></div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(OrdersState.LastError) && OrdersState.Items.Count == 0)
+    {
+        <div class="empty-state error-state">
+            <h2>Siparişler alınamadı</h2>
+            <p>@OrdersState.LastError</p>
+            <button class="secondary-button" @onclick="RefreshAsync">Tekrar dene</button>
+        </div>
+    }
+    else if (OrdersState.Items.Count == 0)
+    {
+        <div class="empty-state">
+            <h2>Sipariş bulunamadı</h2>
+            <p>Seçili filtrede gösterilecek sipariş yok.</p>
+        </div>
+    }
+    else
+    {
+        <div class="order-list">
+            @foreach (var order in OrdersState.Items)
+            {
+                <a class="order-card" href="@($"/orders/{order.Id}")">
+                    <div class="order-card-top">
+                        <div>
+                            <span class="order-number">#@order.OrderNumber</span>
+                            <span class="status-chip @StatusClass(order.Status)">
+                                @MobileOrderStatuses.ToTurkish(order.Status)
+                            </span>
+                        </div>
+                        <strong>@Money(order.TotalAmount)</strong>
+                    </div>
+                    <div class="order-meta">
+                        <span>@order.CreatedAtUtc.ToLocalTime().ToString("dd MMM · HH:mm", TurkishCulture)</span>
+                        <span>@Service(order)</span>
+                        @if (!string.IsNullOrWhiteSpace(order.CustomerName))
+                        {
+                            <span>@order.CustomerName</span>
+                        }
+                    </div>
+                    @if (order.Status is MobileOrderStatuses.Pending or MobileOrderStatuses.Preparing)
+                    {
+                        <span class="attention-dot" aria-label="Aktif sipariş"></span>
+                    }
+                </a>
+            }
+        </div>
+
+        @if (OrdersState.HasMore)
+        {
+            <button class="load-more" @onclick="LoadMoreAsync" disabled="@OrdersState.IsBusy">
+                @(OrdersState.IsBusy ? "Yükleniyor…" : "Daha fazla yükle")
+            </button>
+        }
+    }
+</section>
+
+@code {
+    private static readonly CultureInfo TurkishCulture = CultureInfo.GetCultureInfo("tr-TR");
+    private string _filter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        OrdersState.Changed += OnChanged;
+        await OrdersState.LoadFirstPageAsync();
+    }
+
+    public void Dispose() => OrdersState.Changed -= OnChanged;
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    private Task RefreshAsync() => OrdersState.LoadFirstPageAsync(_filter);
+    private Task LoadMoreAsync() => OrdersState.LoadMoreAsync();
+
+    private async Task FilterChangedAsync(ChangeEventArgs args)
+    {
+        _filter = args.Value?.ToString() ?? string.Empty;
+        await OrdersState.LoadFirstPageAsync(_filter);
+    }
+
+    private static string Money(decimal value) => value.ToString("C", TurkishCulture);
+    private static string StatusClass(string status) => $"status-{status.ToLowerInvariant()}";
+    private static string Service(MobileOrderListItem order) =>
+        order.TableLabel ?? order.ServiceType ?? order.Source;
+}

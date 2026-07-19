@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DukkanPilot.Mobile.Core/DukkanPilot.Mobile.Core.csproj" />
+    <Project Path="src/DukkanPilot.Mobile/DukkanPilot.Mobile.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DukkanPilot.Mobile.Tests/DukkanPilot.Mobile.Tests.csproj" />
+  </Folder>
+</Solution>

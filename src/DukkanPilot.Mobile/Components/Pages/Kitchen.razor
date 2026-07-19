@@ -1,0 +1,121 @@
+@page "/kitchen"
+@implements IAsyncDisposable
+@inject KitchenState KitchenState
+@inject KitchenPollingService Polling
+
+<section class="screen kitchen-screen">
+    <header class="screen-header">
+        <div>
+            <p class="eyebrow">CANLI OPERASYON</p>
+            <h1>Mutfak</h1>
+            <p>@(KitchenState.Data is null ? "Siparişler yükleniyor" : $"{KitchenState.Data.PendingCount} bekleyen · {KitchenState.Data.PreparingCount} hazırlanan")</p>
+        </div>
+        <button class="icon-action" @onclick="RefreshAsync" disabled="@KitchenState.IsBusy"
+                aria-label="Mutfak siparişlerini yenile">↻</button>
+    </header>
+
+    @if (KitchenState.IsBusy && KitchenState.Data is null)
+    {
+        <div class="kitchen-grid">
+            <div class="skeleton-card tall"></div>
+            <div class="skeleton-card tall"></div>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(KitchenState.LastError) && KitchenState.Data is null)
+    {
+        <div class="empty-state error-state">
+            <h2>Mutfak verisi alınamadı</h2>
+            <p>@KitchenState.LastError</p>
+            <button class="secondary-button" @onclick="RefreshAsync">Tekrar dene</button>
+        </div>
+    }
+    else if (KitchenState.Data?.Orders.Count == 0)
+    {
+        <div class="empty-state success-state">
+            <h2>Mutfak sakin</h2>
+            <p>Hazırlanmayı bekleyen aktif sipariş yok.</p>
+        </div>
+    }
+    else if (KitchenState.Data is not null)
+    {
+        @foreach (var group in KitchenState.Data.Orders.GroupBy(order => order.Status))
+        {
+            <section class="kitchen-group">
+                <div class="section-title">
+                    <h2>@MobileOrderStatuses.ToTurkish(group.Key)</h2>
+                    <span>@group.Count()</span>
+                </div>
+                <div class="kitchen-grid">
+                    @foreach (var order in group.OrderBy(order => order.CreatedAtUtc))
+                    {
+                        <article class="kitchen-card @StatusClass(order.Status)">
+                            <div class="kitchen-card-head">
+                                <div>
+                                    <strong>#@order.OrderNumber</strong>
+                                    <span>@(order.TableLabel ?? order.ServiceType ?? order.Source)</span>
+                                </div>
+                                <span class="age">@Age(order.CreatedAtUtc, KitchenState.Data.ServerTimeUtc)</span>
+                            </div>
+                            <div class="kitchen-items">
+                                @foreach (var item in order.Items)
+                                {
+                                    <div><strong>@item.Quantity×</strong><span>@item.ProductName</span></div>
+                                }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(order.Notes))
+                            {
+                                <div class="kitchen-note">Not: @order.Notes</div>
+                            }
+                            @{
+                                var next = order.Status == MobileOrderStatuses.Pending
+                                    ? MobileOrderStatuses.Preparing
+                                    : MobileOrderStatuses.Completed;
+                            }
+                            <button class="primary-button" disabled="@KitchenState.IsBusy"
+                                    @onclick="() => UpdateAsync(order.Id, next)">
+                                @(next == MobileOrderStatuses.Preparing ? "Hazırlamaya Başla" : "Tamamlandı")
+                            </button>
+                        </article>
+                    }
+                </div>
+            </section>
+        }
+    }
+
+    @if (!string.IsNullOrWhiteSpace(KitchenState.LastError) && KitchenState.Data is not null)
+    {
+        <div class="alert alert-error" role="alert">@KitchenState.LastError</div>
+    }
+</section>
+
+@code {
+    protected override void OnInitialized()
+    {
+        KitchenState.Changed += OnChanged;
+        Polling.Start();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        KitchenState.Changed -= OnChanged;
+        await Polling.DisposeAsync();
+    }
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    private Task RefreshAsync() => KitchenState.LoadAsync();
+    private Task<bool> UpdateAsync(int id, string status) => KitchenState.UpdateStatusAsync(id, status);
+    private static string StatusClass(string status) => $"status-{status.ToLowerInvariant()}";
+
+    private static string Age(DateTime createdAtUtc, DateTime serverTimeUtc)
+    {
+        var elapsed = serverTimeUtc - createdAtUtc;
+        if (elapsed < TimeSpan.Zero)
+        {
+            elapsed = TimeSpan.Zero;
+        }
+
+        return elapsed.TotalHours >= 1
+            ? $"{(int)elapsed.TotalHours} sa {elapsed.Minutes} dk"
+            : $"{Math.Max(0, (int)elapsed.TotalMinutes)} dk";
+    }
+}

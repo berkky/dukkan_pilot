@@ -1,0 +1,135 @@
+@page "/account"
+@inject SessionState Session
+@inject BootstrapState Bootstrap
+@inject IMobileSessionService SessionService
+@inject ApiEndpointConfiguration Endpoint
+@inject NavigationManager Navigation
+@inject IJSRuntime JavaScript
+
+<section class="screen account-screen">
+    <header class="screen-header">
+        <div>
+            <p class="eyebrow">HESAP VE OTURUM</p>
+            <h1>Hesap</h1>
+        </div>
+    </header>
+
+    <article class="profile-card">
+        <div class="profile-avatar">@Initials(Session.CurrentUser?.FullName)</div>
+        <div>
+            <h2>@Session.CurrentUser?.FullName</h2>
+            <p>@Session.CurrentUser?.Email</p>
+        </div>
+    </article>
+
+    <section class="settings-group">
+        <h2>İşletme</h2>
+        <dl class="settings-list">
+            <div><dt>İşletme</dt><dd>@Session.CurrentBusiness?.Name</dd></div>
+            <div><dt>Rol</dt><dd>@RoleLabel(Session.BusinessRole)</dd></div>
+            <div><dt>Plan</dt><dd>@Bootstrap.Subscription?.Name</dd></div>
+            <div><dt>Plan durumu</dt><dd>@Bootstrap.Subscription?.Status</dd></div>
+            <div>
+                <dt>Modüller</dt>
+                <dd>@string.Join(", ", Bootstrap.AvailableModules.Select(ModuleLabel))</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="settings-group">
+        <h2>Uygulama</h2>
+        <dl class="settings-list">
+            <div><dt>Sürüm</dt><dd>@AppInfo.Current.VersionString</dd></div>
+            @if (Endpoint.IsDebug)
+            {
+                <div><dt>API sunucusu (Debug)</dt><dd class="breakable">@Endpoint.BaseUri</dd></div>
+            }
+        </dl>
+    </section>
+
+    @if (Endpoint.IsDebug)
+    {
+        <section class="settings-group debug-settings">
+            <h2>Fiziksel cihaz API ayarı</h2>
+            <p>LAN üzerindeki geliştirme adresini girin. Değişiklik yeniden başlatmada uygulanır.</p>
+            <input type="url" @bind="_debugBaseUrl" placeholder="http://192.168.1.10:5000" />
+            <button class="secondary-button" @onclick="SaveDebugEndpoint">Debug adresini kaydet</button>
+            @if (!string.IsNullOrWhiteSpace(_debugMessage))
+            {
+                <small>@_debugMessage</small>
+            }
+        </section>
+    }
+
+    <div class="account-actions">
+        <button class="secondary-button full" disabled="@_busy" @onclick="LogoutAsync">
+            Çıkış Yap
+        </button>
+        <button class="danger-button full" disabled="@_busy" @onclick="LogoutAllAsync">
+            Tüm Cihazlardan Çıkış Yap
+        </button>
+    </div>
+</section>
+
+@code {
+    private bool _busy;
+    private string _debugBaseUrl = string.Empty;
+    private string? _debugMessage;
+
+    private async Task LogoutAsync()
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        await SessionService.LogoutAsync();
+        Navigation.NavigateTo("/login", replace: true);
+    }
+
+    private async Task LogoutAllAsync()
+    {
+        if (_busy ||
+            !await JavaScript.InvokeAsync<bool>(
+                "confirm",
+                "Tüm cihazlardaki aktif oturumlar kapatılacak. Devam etmek istiyor musunuz?"))
+        {
+            return;
+        }
+
+        _busy = true;
+        await SessionService.LogoutAllAsync();
+        Navigation.NavigateTo("/login", replace: true);
+    }
+
+    private void SaveDebugEndpoint()
+    {
+        ApiEndpointConfiguration.SetDebugOverride(_debugBaseUrl);
+        _debugMessage = "Adres kaydedildi. Uygulamayı yeniden başlatın.";
+    }
+
+    private static string Initials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return "DP";
+        }
+
+        return string.Concat(fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(part => char.ToUpperInvariant(part[0])));
+    }
+
+    private static string RoleLabel(string? role) => role == "Owner" ? "İşletme sahibi" : "Personel";
+    private static string ModuleLabel(string module) => module switch
+    {
+        "dashboard" => "Dashboard",
+        "orders" => "Siparişler",
+        "kitchen" => "Mutfak",
+        "business" => "İşletme",
+        "staff" => "Ekip",
+        "billing" => "Faturalama",
+        _ => module
+    };
+}

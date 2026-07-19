@@ -1,0 +1,97 @@
+@page "/login"
+@inject IMobileSessionService SessionService
+@inject SessionState Session
+@inject NavigationManager Navigation
+
+<section class="auth-page">
+    <header class="auth-header">
+        <div class="brand-mark">DP</div>
+        <div>
+            <p class="eyebrow">DUKKANPILOT MOBILE</p>
+            <h1>İşletmenize giriş yapın</h1>
+            <p>Günün operasyonu tek ekranda.</p>
+        </div>
+    </header>
+
+    <form class="auth-card" @onsubmit="SubmitAsync" @onsubmit:preventDefault>
+        <label for="email">E-posta</label>
+        <input id="email" type="email" inputmode="email" autocomplete="username"
+               @bind="_email" disabled="@Session.IsBusy" placeholder="ornek@isletme.com" />
+
+        <label for="password">Şifre</label>
+        <div class="password-field">
+            <input id="password" type="@(_showPassword ? "text" : "password")"
+                   autocomplete="current-password" @bind="_password"
+                   disabled="@Session.IsBusy" placeholder="Şifreniz" />
+            <button type="button" class="icon-button" @onclick="TogglePassword"
+                    aria-label="@(_showPassword ? "Şifreyi gizle" : "Şifreyi göster")">
+                @(_showPassword ? "Gizle" : "Göster")
+            </button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <div class="alert alert-error" role="alert">
+                <span>@_error</span>
+                @if (!string.IsNullOrWhiteSpace(_traceId))
+                {
+                    <small>Destek kodu: @_traceId</small>
+                }
+            </div>
+        }
+
+        <button class="primary-button" type="submit" disabled="@Session.IsBusy">
+            @if (Session.IsBusy)
+            {
+                <span class="button-spinner" aria-hidden="true"></span>
+                <span>Giriş yapılıyor…</span>
+            }
+            else
+            {
+                <span>Giriş Yap</span>
+            }
+        </button>
+    </form>
+</section>
+
+@code {
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string? _error;
+    private string? _traceId;
+    private bool _showPassword;
+
+    private void TogglePassword() => _showPassword = !_showPassword;
+
+    private async Task SubmitAsync()
+    {
+        if (Session.IsBusy)
+        {
+            return;
+        }
+
+        _error = null;
+        _traceId = null;
+        if (string.IsNullOrWhiteSpace(_email) || string.IsNullOrWhiteSpace(_password))
+        {
+            _error = "E-posta ve şifre alanları zorunludur.";
+            return;
+        }
+
+        var result = await SessionService.LoginAsync(_email, _password);
+        _password = string.Empty;
+        if (result.Kind == LoginOutcomeKind.Authenticated)
+        {
+            Navigation.NavigateTo("/dashboard", replace: true);
+        }
+        else if (result.Kind == LoginOutcomeKind.BusinessSelectionRequired)
+        {
+            Navigation.NavigateTo("/business-select", replace: true);
+        }
+        else
+        {
+            _error = result.Message;
+            _traceId = result.TraceId;
+        }
+    }
+}

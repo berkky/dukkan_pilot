@@ -1,0 +1,31 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject SessionState Session
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        Session.Changed += OnSessionChanged;
+        Evaluate();
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        Session.Changed -= OnSessionChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args) => Evaluate();
+
+    private void OnSessionChanged() => _ = InvokeAsync(Evaluate);
+
+    private void Evaluate()
+    {
+        var redirect = AuthRouteGuard.GetRedirect(Navigation.Uri, Session);
+        if (redirect is not null)
+        {
+            Navigation.NavigateTo(redirect, replace: true);
+        }
+    }
+}

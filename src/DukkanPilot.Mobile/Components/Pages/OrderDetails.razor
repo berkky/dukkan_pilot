@@ -1,0 +1,136 @@
+@page "/orders/{Id:int}"
+@implements IDisposable
+@inject OrderState OrdersState
+@inject NavigationManager Navigation
+
+<section class="screen">
+    <header class="screen-header detail-header">
+        <button class="back-button" @onclick="Back" aria-label="Siparişlere dön">‹</button>
+        <div class="grow">
+            <p class="eyebrow">SİPARİŞ DETAYI</p>
+            <h1>@(OrdersState.SelectedOrder is null ? "Sipariş" : $"#{OrdersState.SelectedOrder.OrderNumber}")</h1>
+        </div>
+    </header>
+
+    @if (OrdersState.IsBusy && OrdersState.SelectedOrder is null)
+    {
+        <div class="detail-skeleton"></div>
+    }
+    else if (OrdersState.SelectedOrder is null)
+    {
+        <div class="empty-state error-state">
+            <h2>Sipariş gösterilemiyor</h2>
+            <p>@(OrdersState.LastError ?? "Sipariş bulunamadı veya artık erişilemiyor.")</p>
+            @if (!string.IsNullOrWhiteSpace(OrdersState.TraceId))
+            {
+                <small>Destek kodu: @OrdersState.TraceId</small>
+            }
+            <button class="secondary-button" @onclick="Back">Siparişlere dön</button>
+        </div>
+    }
+    else
+    {
+        var order = OrdersState.SelectedOrder;
+        <article class="detail-summary">
+            <div>
+                <span class="status-chip @StatusClass(order.Status)">
+                    @MobileOrderStatuses.ToTurkish(order.Status)
+                </span>
+                <strong>@Money(order.TotalAmount)</strong>
+            </div>
+            <dl class="detail-grid">
+                <div><dt>Tarih</dt><dd>@order.CreatedAtUtc.ToLocalTime().ToString("dd MMMM yyyy · HH:mm", TurkishCulture)</dd></div>
+                <div><dt>Servis</dt><dd>@(order.ServiceType ?? order.Source)</dd></div>
+                <div><dt>Masa</dt><dd>@(order.TableLabel ?? "—")</dd></div>
+                <div><dt>Müşteri</dt><dd>@(order.CustomerName ?? "—")</dd></div>
+            </dl>
+        </article>
+
+        <section class="section-block">
+            <h2>Ürünler</h2>
+            <div class="item-list">
+                @foreach (var item in order.Items)
+                {
+                    <div class="line-item">
+                        <span class="quantity">@item.Quantity×</span>
+                        <div class="grow">
+                            <strong>@item.ProductName</strong>
+                            <small>Birim @Money(item.UnitPrice)</small>
+                        </div>
+                        <strong>@Money(item.LineTotal)</strong>
+                    </div>
+                }
+            </div>
+            <div class="totals">
+                <div><span>Ara toplam</span><span>@Money(order.SubtotalAmount)</span></div>
+                @if (order.DiscountAmount > 0)
+                {
+                    <div><span>İndirim</span><span>-@Money(order.DiscountAmount)</span></div>
+                }
+                <div class="grand-total"><strong>Toplam</strong><strong>@Money(order.TotalAmount)</strong></div>
+            </div>
+        </section>
+
+        @if (!string.IsNullOrWhiteSpace(order.Notes))
+        {
+            <section class="note-card">
+                <span>Not</span>
+                <p>@order.Notes</p>
+            </section>
+        }
+
+        @if (MobileOrderStatuses.GetAllowedTargets(order.Status).Count > 0)
+        {
+            <section class="sticky-actions">
+                <span>Durumu güncelle</span>
+                <div>
+                    @foreach (var target in MobileOrderStatuses.GetAllowedTargets(order.Status))
+                    {
+                        <button class="@(target == MobileOrderStatuses.Cancelled ? "danger-button" : "primary-button")"
+                                disabled="@OrdersState.IsBusy"
+                                @onclick="() => UpdateAsync(target)">
+                            @ActionLabel(target)
+                        </button>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(OrdersState.LastError))
+        {
+            <div class="alert alert-error" role="alert">@OrdersState.LastError</div>
+        }
+    }
+</section>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private static readonly CultureInfo TurkishCulture = CultureInfo.GetCultureInfo("tr-TR");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        OrdersState.Changed += OnChanged;
+        try
+        {
+            await OrdersState.LoadDetailsAsync(Id);
+        }
+        catch (MobileApiException)
+        {
+            // State already contains the safe message and trace id.
+        }
+    }
+
+    public void Dispose() => OrdersState.Changed -= OnChanged;
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    private void Back() => Navigation.NavigateTo("/orders");
+    private Task UpdateAsync(string status) => OrdersState.UpdateStatusAsync(Id, status);
+    private static string Money(decimal value) => value.ToString("C", TurkishCulture);
+    private static string StatusClass(string status) => $"status-{status.ToLowerInvariant()}";
+    private static string ActionLabel(string status) => status switch
+    {
+        MobileOrderStatuses.Preparing => "Hazırlamaya Başla",
+        MobileOrderStatuses.Completed => "Tamamlandı",
+        MobileOrderStatuses.Cancelled => "İptal Et",
+        _ => status
+    };
+}

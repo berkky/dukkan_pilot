@@ -1,0 +1,84 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject SessionState Session
+@inject IConnectivityService Connectivity
+
+<div class="app-shell">
+    @if (!Connectivity.IsOnline)
+    {
+        <div class="offline-banner" role="status">
+            <span>Çevrimdışı</span>
+            <strong>İnternet bağlantısı yok. Değişiklikler gönderilemez.</strong>
+        </div>
+    }
+
+    <main class="app-content @(Session.IsAuthenticated ? "with-bottom-nav" : null)">
+        @if (CanRenderBody)
+        {
+            @Body
+        }
+        else
+        {
+            <section class="full-state">
+                <div class="brand-mark">DP</div>
+                <div class="spinner" aria-label="Oturum kontrol ediliyor"></div>
+                <p>Güvenli oturum kontrol ediliyor…</p>
+            </section>
+        }
+    </main>
+
+    @if (Session.IsAuthenticated && Session.IsRestoreComplete)
+    {
+        <nav class="bottom-nav" aria-label="Ana navigasyon">
+            <NavLink href="/dashboard" Match="NavLinkMatch.All">
+                <span aria-hidden="true">⌂</span><small>Ana Sayfa</small>
+            </NavLink>
+            <NavLink href="/orders">
+                <span aria-hidden="true">▤</span><small>Siparişler</small>
+            </NavLink>
+            <NavLink href="/kitchen">
+                <span aria-hidden="true">◫</span><small>Mutfak</small>
+            </NavLink>
+            <NavLink href="/account">
+                <span aria-hidden="true">○</span><small>Hesap</small>
+            </NavLink>
+        </nav>
+    }
+</div>
+
+@code {
+    private bool IsProtectedPath
+    {
+        get
+        {
+            var path = new Uri(Navigation.Uri).AbsolutePath;
+            return path.StartsWith("/dashboard", StringComparison.OrdinalIgnoreCase) ||
+                   path.StartsWith("/orders", StringComparison.OrdinalIgnoreCase) ||
+                   path.StartsWith("/kitchen", StringComparison.OrdinalIgnoreCase) ||
+                   path.StartsWith("/account", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private bool CanRenderBody =>
+        !IsProtectedPath || (Session.IsRestoreComplete && Session.IsAuthenticated);
+
+    protected override void OnInitialized()
+    {
+        Session.Changed += OnChanged;
+        Connectivity.ConnectivityChanged += OnConnectivityChanged;
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    public void Dispose()
+    {
+        Session.Changed -= OnChanged;
+        Connectivity.ConnectivityChanged -= OnConnectivityChanged;
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    private void OnConnectivityChanged(bool isOnline) => _ = InvokeAsync(StateHasChanged);
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args) =>
+        _ = InvokeAsync(StateHasChanged);
+}

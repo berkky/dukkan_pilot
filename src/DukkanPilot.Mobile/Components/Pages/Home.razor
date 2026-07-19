@@ -1,0 +1,44 @@
+@page "/"
+@inject AppStartupService Startup
+@inject SessionState Session
+@inject NavigationManager Navigation
+
+<section class="full-state startup-screen">
+    <div class="brand-mark large">DP</div>
+    <div>
+        <h1>DukkanPilot</h1>
+        <p class="eyebrow">MOBİL İŞLETME OPERASYONU</p>
+    </div>
+
+    @if (Startup.ConfigurationError is not null)
+    {
+        <div class="alert alert-error" role="alert">
+            <strong>Yapılandırma gerekli</strong>
+            <span>@Startup.ConfigurationError</span>
+        </div>
+    }
+    else
+    {
+        <div class="spinner" aria-label="Oturum geri yükleniyor"></div>
+        <p>Güvenli oturumunuz hazırlanıyor…</p>
+    }
+</section>
+
+@code {
+    private bool _started;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _started)
+        {
+            return;
+        }
+
+        _started = true;
+        await Startup.EnsureStartedAsync();
+        if (Startup.ConfigurationError is null)
+        {
+            Navigation.NavigateTo(Session.IsAuthenticated ? "/dashboard" : "/login", replace: true);
+        }
+    }
+}

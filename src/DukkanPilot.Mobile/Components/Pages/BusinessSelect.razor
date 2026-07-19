@@ -1,0 +1,70 @@
+@page "/business-select"
+@inject IMobileSessionService SessionService
+@inject SessionState Session
+@inject NavigationManager Navigation
+
+<section class="screen">
+    <header class="screen-header">
+        <div>
+            <p class="eyebrow">GÜVENLİ GİRİŞ</p>
+            <h1>İşletme seçin</h1>
+            <p>Bu oturumda çalışacağınız işletmeyi seçin.</p>
+        </div>
+    </header>
+
+    @if (SessionService.BusinessOptions.Count == 0)
+    {
+        <div class="empty-state">
+            <h2>Seçilebilir işletme bulunamadı</h2>
+            <p>Giriş işlemini yeniden başlatın.</p>
+            <a class="secondary-button" href="/login">Giriş ekranına dön</a>
+        </div>
+    }
+    else
+    {
+        <div class="selection-list">
+            @foreach (var business in SessionService.BusinessOptions)
+            {
+                <article class="selection-card">
+                    <div class="business-avatar">@business.Name[..1].ToUpperInvariant()</div>
+                    <div class="grow">
+                        <h2>@business.Name</h2>
+                        <span class="role-chip">@RoleLabel(business.Role)</span>
+                    </div>
+                    <button class="secondary-button" disabled="@Session.IsBusy"
+                            @onclick="() => SelectAsync(business.Id)">Seç</button>
+                </article>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(_error))
+    {
+        <div class="alert alert-error" role="alert">@_error</div>
+    }
+</section>
+
+@code {
+    private string? _error;
+
+    private async Task SelectAsync(int businessId)
+    {
+        if (Session.IsBusy)
+        {
+            return;
+        }
+
+        var result = await SessionService.SelectBusinessAsync(businessId);
+        if (result.Kind == LoginOutcomeKind.Authenticated)
+        {
+            Navigation.NavigateTo("/dashboard", replace: true);
+        }
+        else
+        {
+            _error = result.Message;
+        }
+    }
+
+    private static string RoleLabel(string role) =>
+        role == "Owner" ? "İşletme sahibi" : "Personel";
+}
